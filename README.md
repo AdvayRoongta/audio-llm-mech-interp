@@ -9,16 +9,10 @@ Qwen2-Audio follows the text or the audio.
 
 ## Quickstart
 
-Two notebooks, run in order — each has an "Open in Colab" badge at the top
-that launches it with a free GPU, or open them in local Jupyter:
-
-1. [`scripts/load_datasets.ipynb`](scripts/load_datasets.ipynb) — pulls the
-   4 datasets below (no GPU needed)
-2. [`scripts/early_eval.ipynb`](scripts/early_eval.ipynb) — loads
-   Qwen2-Audio and smoke-tests one example (needs a GPU)
-
-Both notebooks are self-contained: opened fresh from the Colab badge, the
-first cell clones this repo and installs `requirements.txt` automatically.
+[`scripts/load_datasets.ipynb`](scripts/load_datasets.ipynb) has an "Open in
+Colab" badge at the top (or open it in local Jupyter). It's self-contained:
+opened fresh from the badge, the first cell clones this repo and installs
+`requirements.txt` automatically, then pulls the 4 datasets below.
 
 ## The four categories
 
@@ -62,12 +56,3 @@ already in there as a model to copy:
 | `text_prompt` | asserts something that contradicts the audio, then asks a direct question |
 | `ground_truth_audio` | what's actually true, based on the audio |
 | `ground_truth_text` | what the (false) text prompt claims |
-
-## Early eval: what to expect
-
-`early_eval.ipynb` loads
-[Qwen2-Audio-7B-Instruct](https://huggingface.co/Qwen/Qwen2-Audio-7B-Instruct),
-runs one `examples.json` entry through it, and prints:
-- the shape of every input tensor (`input_ids`, `input_features`, `attention_mask`, `feature_attention_mask`)
-- whether the number of encoded audio frames scales with clip duration (longer clips shouldn't collapse to the same token budget as short ones)
-- the model's actual reply, next to `ground_truth_audio` / `ground_truth_text`, so you can eyeball whether it followed the text or the audio
