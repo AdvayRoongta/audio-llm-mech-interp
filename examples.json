@@ -1,1 +1,34 @@
-
+[
+  {
+    "id": "prosody_001",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_000.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds calm and happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "nonspeech_001",
+    "audio_path": "data/raw/non_speech_event/audio/non_speech_event_000.wav",
+    "conflict_type": "non_speech_event",
+    "text_prompt": "The room is completely silent. What sound, if any, can be heard in this clip?",
+    "ground_truth_audio": "dog_bark",
+    "ground_truth_text": "silence"
+  },
+  {
+    "id": "identity_001",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_000.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "sarcasm_001",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_000.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"It's just a privilege to watch your mind at work.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  }
+]

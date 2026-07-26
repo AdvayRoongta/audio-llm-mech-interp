@@ -1,0 +1,7 @@
+datasets>=3.0
+soundfile
+torchcodec   # needed by `datasets` to decode audio columns
+librosa
+torch
+transformers>=4.45
+accelerate
