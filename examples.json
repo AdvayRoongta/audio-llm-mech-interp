@@ -24,6 +24,182 @@
     "ground_truth_text": "male"
   },
   {
+    "id": "identity_002",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_004.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_003",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_008.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "identity_004",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_012.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_005",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_016.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "identity_006",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_020.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "identity_007",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_024.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_008",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_028.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "identity_009",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_032.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_009",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_037.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "identity_010",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_041.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult male. What is the speaker's gender?",
+    "ground_truth_audio": "female",
+    "ground_truth_text": "male"
+  },
+  {
+    "id": "identity_011",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_046.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_012",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_060.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's gender?",
+    "ground_truth_audio": "male",
+    "ground_truth_text": "female"
+  },
+  {
+    "id": "identity_012",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_063.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult female. What is the speaker's gender?",
+    "ground_truth_audio": "male",
+    "ground_truth_text": "female"
+  },
+  {
+    "id": "identity_013",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_065.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a male child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_014",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_067.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult female. What is the speaker's gender?",
+    "ground_truth_audio": "male",
+    "ground_truth_text": "female"
+  },
+  {
+    "id": "identity_015",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_070.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a male child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_016",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_073.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_017",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_081.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult female. What is the speaker's gender?",
+    "ground_truth_audio": "male",
+    "ground_truth_text": "female"
+  },
+  {
+    "id": "identity_018",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_085.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's gender?",
+    "ground_truth_audio": "male",
+    "ground_truth_text": "female"
+  },
+  {
+    "id": "identity_019",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_089.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a male child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_020",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_096.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is a female child. What is the speaker's age group?",
+    "ground_truth_audio": "adult",
+    "ground_truth_text": "child"
+  },
+  {
+    "id": "identity_021",
+    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_098.wav",
+    "conflict_type": "speaker_identity",
+    "text_prompt": "The speaker is an adult female. What is the speaker's gender?",
+    "ground_truth_audio": "male",
+    "ground_truth_text": "female"
+  },
+  {
     "id": "sarcasm_001",
     "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_000.wav",
     "conflict_type": "sarcasm_pacing",
