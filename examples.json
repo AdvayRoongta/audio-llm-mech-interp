@@ -206,5 +206,157 @@
     "text_prompt": "The speaker says: \"It's just a privilege to watch your mind at work.\" Is the speaker being sincere or sarcastic?",
     "ground_truth_audio": "sarcastic",
     "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_002",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_004.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"I hope I'm a waitress at the Cheesecake Factory for my whole life.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_003",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_006.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Not a great movie, but look at that beautiful desert.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_004",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_008.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Well, I'm just glad you finally found yourself a keeper.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_005",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_009.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Hey, you taught me something. Who would have thought it?\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_006",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_014.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"You're right, the party's fantastic. Please, tell me more. I haven't heard enough about it all week because hearing about that never gets old!\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_007",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_015.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Yeah, I'm really looking forward to it. In fact, there's no place I would rather be than here.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_008",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_032.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Okay, are you aware unagi is an eel?\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_009",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_035.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"That oughta do it.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_010",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_044.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Not to mention you'd have to power down on saturdays.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_011",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_047.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"The big deal is that nobody touches food on my plate.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_012",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_048.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"How nice. Maybe they can carpool when they visit you in federal prison.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_013",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_051.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"My aunt Marion gave them to me for my 12th birthday.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_014",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_055.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Leonard's work is nearly as amazing as third graders growing lima beans in wet paper towels.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_015",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_057.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Excuse me, I'm thirsty, so I'm going to go to the refrigerator and get myself a refreshing beverage.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_016",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_062.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"An entire dinner to talk about your research? Where you going, the drive-thru at Jack in the Box?\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_017",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_084.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"I did. The guy at the liquor store said this stuff tastes great in coffee.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_018",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_085.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Come on, let's just start walking. There's got to be a gas station or something nearby.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "sarcasm_019",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_091.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Maybe it's a good thing we came here. It's like a lesson in what not to do.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sarcastic",
+    "ground_truth_text": "sincere"
+  },
+  {
+    "id": "sarcasm_020",
+    "audio_path": "data/raw/sarcasm_pacing/audio/sarcasm_pacing_096.wav",
+    "conflict_type": "sarcasm_pacing",
+    "text_prompt": "The speaker says: \"Yeah, we just want to have the kind of dinner that we've all had here so many times before.\" Is the speaker being sincere or sarcastic?",
+    "ground_truth_audio": "sincere",
+    "ground_truth_text": "sarcastic"
   }
 ]
