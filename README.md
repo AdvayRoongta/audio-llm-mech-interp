@@ -12,9 +12,24 @@ Qwen2-Audio follows the text or the audio.
 [`scripts/load_datasets.ipynb`](scripts/load_datasets.ipynb) has an "Open in
 Colab" badge at the top (or open it in local Jupyter). It's self-contained:
 opened fresh from the badge, the first cell clones this repo and installs
-`requirements.txt` automatically, then pulls the 4 datasets below.
+`requirements.txt` automatically, then pulls the 3 datasets below.
 
-## The four categories
+**On Colab the clips are cached in your own Google Drive**, under
+`MyDrive/audio-initial-dataset/`. Colab wipes its local disk when the runtime
+recycles, so without this you'd re-download every session — instead, later
+runs find the cached copy and skip the download entirely. Each person has
+their own copy in their own Drive; nothing is shared between accounts, and
+nothing needs to be, since the loader is deterministic (same datasets, same
+split, first 100 rows) and everyone ends up with identical clips at identical
+paths. The one exception is hand-trimmed clips — those aren't reproducible,
+so commit them to git if you make any.
+
+Because the data outlives the session, a separate notebook (e.g. the
+mechanistic-interpretability one) never has to re-run this download. It mounts
+Drive, points `DATA_ROOT` at the same folder, and resolves clips with
+`DATA_ROOT / example["audio_path"]`.
+
+## The categories
 
 One public Hugging Face dataset backs each category. `load_datasets.ipynb`
 pulls the first 100 rows of each into `data/raw/<category>/` (audio + a
@@ -56,7 +71,7 @@ already in there as a model to copy:
 |---|---|
 | `id` | short descriptor + number, unique in the file (e.g. `sarcasm_014`) |
 | `audio_path` | path to the clip, relative to repo root |
-| `conflict_type` | one of the four category names above |
+| `conflict_type` | one of the category names above |
 | `text_prompt` | asserts something that contradicts the audio, then asks a direct question |
 | `ground_truth_audio` | what's actually true, based on the audio |
 | `ground_truth_text` | what the (false) text prompt claims |
