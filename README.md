@@ -23,9 +23,13 @@ pulls the first 100 rows of each into `data/raw/<category>/` (audio + a
 | category | person | source | listen for |
 |---|---|---|---|
 | `emotional_prosody` | Advay | [CREMA-D](https://huggingface.co/datasets/confit/cremad-parquet) | same actor, 6 acted emotions |
-| `non_speech_event` | Ankur | [ESC-50](https://huggingface.co/datasets/renumics/esc50) | sirens, dogs, crying, glass breaking, ... |
 | `speaker_identity` | Danity | [RAVDESS](https://huggingface.co/datasets/xbgoose/ravdess) | known actor + gender per clip |
 | `sarcasm_pacing` | Vishnu | [MUStARD](https://huggingface.co/datasets/macabdul9/SarcasmDetection_Mustard) | TV lines labeled sarcastic/sincere |
+
+<!-- non_speech_event is on hold for the paper for now (ESC-50 clips weren't a good fit) -- re-enable by uncommenting this row and the matching CATEGORIES entry in scripts/load_datasets.ipynb.
+| `non_speech_event` | Ankur | [ESC-50](https://huggingface.co/datasets/renumics/esc50) | sirens, dogs, crying, glass breaking, ... |
+-->
+
 
 Need to trim or splice a clip? Use [`pydub`](https://github.com/jiaaro/pydub)
 (needs `ffmpeg`) or any free online cutter, and save the result next to the
