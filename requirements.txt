@@ -5,3 +5,4 @@ librosa
 torch
 transformers>=4.45
 accelerate
+matplotlib
