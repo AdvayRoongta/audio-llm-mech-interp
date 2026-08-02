@@ -24,10 +24,35 @@ split, first 100 rows) and everyone ends up with identical clips at identical
 paths. The one exception is hand-trimmed clips — those aren't reproducible,
 so commit them to git if you make any.
 
-Because the data outlives the session, a separate notebook (e.g. the
-mechanistic-interpretability one) never has to re-run this download. It mounts
-Drive, points `DATA_ROOT` at the same folder, and resolves clips with
-`DATA_ROOT / example["audio_path"]`.
+Because the data outlives the session, the analysis notebook never has to
+re-run this download. It mounts Drive, points `DATA_ROOT` at the same folder,
+and resolves clips with `DATA_ROOT / example["audio_path"]`.
+
+## The two notebooks
+
+The split is by **whether the model has to be loaded**, since Colab notebooks
+can't share a runtime and the weights are 16.8 GB.
+
+| notebook | needs GPU? | run it |
+|---|---|---|
+| [`load_datasets.ipynb`](scripts/load_datasets.ipynb) | no | rarely — output persists in Drive |
+| [`experiments.ipynb`](scripts/experiments.ipynb) | §5+ yes | every working session |
+
+`experiments.ipynb` sections:
+
+1–4. **Audio → token mapping** (processor only, no GPU). Establishes that
+   Qwen2-Audio turns audio into **25 tokens per second, 40 ms each**, and gives
+   you `token_to_time()` / `audio_token_positions()` to address them.
+5. **Load the model** — 4-bit on a small GPU, `eager` attention.
+6. **Attention mass** — how much of the model's attention goes to audio vs.
+   text, per layer and head, corrected for attention sinks and span length.
+7. **Temporal concentration** — where *inside* the utterance that attention
+   lands, and whether it differs by conflict type.
+8. **Knockout** — block the model from attending to the audio and see whether
+   the answer actually moves. Attention alone isn't evidence; this is.
+
+> The weights can't be cached to Drive like the clips: free Drive is 15 GB and
+> the model is 16.8 GB, so it re-downloads each session.
 
 ## The categories
 
