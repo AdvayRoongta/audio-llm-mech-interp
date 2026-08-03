@@ -1,12 +1,5 @@
 [
-  {
-    "id": "prosody_001",
-    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_000.wav",
-    "conflict_type": "emotional_prosody",
-    "text_prompt": "The speaker sounds calm and happy. What is the speaker's emotional state?",
-    "ground_truth_audio": "anger",
-    "ground_truth_text": "happy"
-  },
+  
   {
     "id": "nonspeech_001",
     "audio_path": "data/raw/non_speech_event/audio/non_speech_event_000.wav",
@@ -350,5 +343,167 @@
     "text_prompt": "The speaker says: \"Yeah, we just want to have the kind of dinner that we've all had here so many times before.\" Is the speaker being sincere or sarcastic?",
     "ground_truth_audio": "sincere",
     "ground_truth_text": "sarcastic"
+  },
+  {
+    "id": "prosody_001",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_000.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_002",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_057.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds neutral. What is the speaker's emotional state?",
+    "ground_truth_audio": "happy",
+    "ground_truth_text": "neutral"
+  },
+  {
+    "id": "prosody_003",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_010.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "fear",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_004",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_011.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_005",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_023.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds angry. What is the speaker's emotional state?",
+    "ground_truth_audio": "happy",
+    "ground_truth_text": "anger"
+  },
+  {
+    "id": "prosody_006",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_027.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_007",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_066.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_008",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_048.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_009",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_002.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds angry. What is the speaker's emotional state?",
+    "ground_truth_audio": "disgust",
+    "ground_truth_text": "anger"
+  },
+  {
+    "id": "prosody_010",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_099.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds happy. What is the speaker's emotional state?",
+    "ground_truth_audio": "disgust",
+    "ground_truth_text": "happy"
+  },
+  {
+    "id": "prosody_011",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_096.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds sad. What is the speaker's emotional state?",
+    "ground_truth_audio": "happy",
+    "ground_truth_text": "sad"
+  },
+  {
+    "id": "prosody_012",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_039.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds sad. What is the speaker's emotional state?",
+    "ground_truth_audio": "happy",
+    "ground_truth_text": "sad"
+  },
+  {
+    "id": "prosody_013",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_095.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds angry. What is the speaker's emotional state?",
+    "ground_truth_audio": "sad",
+    "ground_truth_text": "anger"
+  },
+  {
+    "id": "prosody_014",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_092.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds fearful. What is the speaker's emotional state?",
+    "ground_truth_audio": "sad",
+    "ground_truth_text": "fear"
+  },
+  {
+    "id": "prosody_015",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_031.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds disgusted. What is the speaker's emotional state?",
+    "ground_truth_audio": "sad",
+    "ground_truth_text": "disgust"
+  },
+  {
+    "id": "prosody_016",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_040.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds fearful. What is the speaker's emotional state?",
+    "ground_truth_audio": "disgust",
+    "ground_truth_text": "fear"
+  },
+  {
+    "id": "prosody_017",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_082.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds angry. What is the speaker's emotional state?",
+    "ground_truth_audio": "disgust",
+    "ground_truth_text": "anger"
+  },
+  {
+    "id": "prosody_018",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_028.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds sad. What is the speaker's emotional state?",
+    "ground_truth_audio": "fear",
+    "ground_truth_text": "sad"
+  },
+  {
+    "id": "prosody_019",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_055.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds neutral. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "neutral"
+  },
+  {
+    "id": "prosody_020",
+    "audio_path": "data/raw/emotional_prosody/audio/emotional_prosody_017.wav",
+    "conflict_type": "emotional_prosody",
+    "text_prompt": "The speaker sounds disgusted. What is the speaker's emotional state?",
+    "ground_truth_audio": "anger",
+    "ground_truth_text": "disgust"
   }
 ]
+
+
