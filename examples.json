@@ -105,14 +105,6 @@
     "ground_truth_text": "female"
   },
   {
-    "id": "identity_012",
-    "audio_path": "data/raw/speaker_identity/audio/speaker_identity_063.wav",
-    "conflict_type": "speaker_identity",
-    "text_prompt": "The speaker is an adult female. What is the speaker's gender?",
-    "ground_truth_audio": "male",
-    "ground_truth_text": "female"
-  },
-  {
     "id": "identity_013",
     "audio_path": "data/raw/speaker_identity/audio/speaker_identity_065.wav",
     "conflict_type": "speaker_identity",
