@@ -1,14 +1,6 @@
 [
   
   {
-    "id": "nonspeech_001",
-    "audio_path": "data/raw/non_speech_event/audio/non_speech_event_000.wav",
-    "conflict_type": "non_speech_event",
-    "text_prompt": "The room is completely silent. What sound, if any, can be heard in this clip?",
-    "ground_truth_audio": "dog_bark",
-    "ground_truth_text": "silence"
-  },
-  {
     "id": "identity_001",
     "audio_path": "data/raw/speaker_identity/audio/speaker_identity_000.wav",
     "conflict_type": "speaker_identity",
