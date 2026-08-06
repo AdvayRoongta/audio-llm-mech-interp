@@ -5,4 +5,5 @@ librosa
 torch
 transformers>=4.45
 accelerate
+bitsandbytes>=0.46.1   # 4-bit loading, needed on a T4 (fp16 will not fit)
 matplotlib
