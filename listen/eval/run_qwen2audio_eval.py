@@ -36,7 +36,11 @@ from datetime import datetime
 # --------------------------------------------------------------------------- #
 
 CATEGORIES = ["emotional_prosody", "speaker_identity", "sarcasm_pacing"]
-CONDITIONS = ["neutral_text", "matched", "mismatched", "paralinguistic"]
+# Dataset uses these exact condition strings (capitalized/hyphenated), NOT
+# lowercase snake_case. This must match data/combined_examples.json verbatim
+# or every mismatched-condition check silently evaluates to False.
+CONDITIONS = ["Neutral-Text", "Matched", "Mismatched", "Paralinguistic"]
+MISMATCHED = "Mismatched"
 MODALITIES = ["text_only", "audio_only", "text_audio"]
 
 LETTERS = list(string.ascii_uppercase)
@@ -274,7 +278,7 @@ def audit_dataset(data, categories, input_path):
                     missing_audio_field += 1
                 elif resolve_audio_path(it["audio_path"], input_path) is None:
                     missing_audio_file += 1
-            if it.get("condition") == "mismatched":
+            if it.get("condition") == MISMATCHED:
                 n_mismatched += 1
                 claimed = it.get(claim_key) if claim_key else None
                 cl = resolve_value_to_letter(omap, claimed)
@@ -445,7 +449,7 @@ def score_item(item, parsed_letter, option_map, claim_key):
     else:
         correctness = "incorrect"
 
-    if item.get("condition") != "mismatched":
+    if item.get("condition") != MISMATCHED:
         follow_source = "not_applicable"
     elif parsed_letter is None:
         follow_source = "invalid"
@@ -534,7 +538,7 @@ def compute_metrics(records):
 
 def compute_tdr(records):
     """TDR over mismatched-condition items only, with a modality breakdown."""
-    mism = [r for r in records if r.get("condition") == "mismatched"]
+    mism = [r for r in records if r.get("condition") == MISMATCHED]
     counts = Counter(r.get("follow_source") for r in mism)
     usable = counts["text_claim"] + counts["audio_truth"] + counts["neither"]
     overall = counts["text_claim"] / usable if usable else None
