@@ -1,9 +1,0 @@
-datasets>=3.0
-soundfile
-torchcodec   # needed by `datasets` to decode audio columns
-librosa
-torch
-transformers>=4.45
-accelerate
-bitsandbytes>=0.46.1   # 4-bit loading, needed on a T4 (fp16 will not fit)
-matplotlib
