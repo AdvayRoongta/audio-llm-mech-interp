@@ -391,7 +391,7 @@ def inference_with_audio_clean(model, processor, item, max_new_tokens=64, audio_
     """
     import librosa
 
-    prompt = item["prompt_mcq"]
+    prompt = item.get("prompt_mcq") or item["prompt"]
     path = audio_path or item.get("audio_path")
     sr = processor.feature_extractor.sampling_rate
     waveform, _ = librosa.load(path, sr=sr)
@@ -414,7 +414,7 @@ def inference_with_audio_clean(model, processor, item, max_new_tokens=64, audio_
 
 def inference_with_text_clean(model, processor, item, max_new_tokens=64):
     """Text-only items: modality == 'text_only'. No audio is loaded or passed."""
-    prompt = item["prompt_mcq"]
+    prompt = item.get("prompt_mcq") or item["prompt"]
     conversation = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": [{"type": "text", "text": prompt}]},
