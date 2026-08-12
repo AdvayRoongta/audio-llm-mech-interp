@@ -25,6 +25,24 @@ before regenerating it to add prompt-order counterbalancing (`order`: `claim_fir
 Kept so the pre-counterbalancing dataset can be diffed against or restored if needed.
 See `notes/data_gaps.md` for the count breakdown of that change.
 
+## old_stuff/, preLISTEN/, scripts/
+
+Pre-LISTEN-pivot artifacts, superseded by the current `build/`/`data/`/`eval/` pipeline.
+Consolidated here from the repo root on 2026-08-12 to stop three separate top-level
+folders of legacy material from cluttering the root alongside the active structure.
+
+- `old_stuff/desta25-listen-eval/` — an earlier DeSTA2.5-based eval attempt
+  (`test_desta25.py`, `findings_note.md`, `examples_final_60.json`), predating the
+  Qwen2-Audio LISTEN-structured pipeline.
+- `preLISTEN/` — `examples.json` and `requirements.txt` from before the dataset adopted
+  the LISTEN condition x modality design.
+- `scripts/` — early exploratory notebooks (`experiments.ipynb`, `inference.ipynb`,
+  `load_datasets.ipynb`) that predate the current `build/`/`eval/` scripts.
+
+These briefly went missing from `origin/main` after a force-push accidentally overwrote
+them; they were recovered from the `recovery-old-listen` branch (which still exists on
+GitHub as a backup) and restored to `main`, then moved here.
+
 ## build_sarcasm_pacing_dataset.py / sarcasm_pacing_examples.json
 
 v1 of the sarcasm-pacing eval set, superseded by `build/build_sarcasm_pacing_v2.py` /
