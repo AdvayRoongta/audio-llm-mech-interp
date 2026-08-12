@@ -207,9 +207,18 @@ def sample_condition(inventory, used_filenames, n, emotions, condition, rng, war
 # ----------------------------------------------------------------------------
 
 
-def build_prompt(condition, modality, transcript, claimed_emotion, rng):
+def build_prompt(condition, modality, transcript, claimed_emotion, rng, order="claim_last"):
+    """
+    `order` only matters for text_audio items in a claim condition:
+    "claim_last" (default) keeps the claim in the leading transcript block,
+    right before the question -- today's behavior. "claim_first" instead
+    appends the claim after the question/conflict-warning block, so the
+    question is the thing immediately preceding it. text_only always uses
+    the transcript-block placement regardless of `order`.
+    """
     blocks = []
     text_block = []
+    trailing_claim = None
 
     if modality in ("text_only", "text_audio"):
         show_transcript = (
@@ -218,7 +227,11 @@ def build_prompt(condition, modality, transcript, claimed_emotion, rng):
         if show_transcript:
             text_block.append(f'Transcript: "{transcript}."')
         if condition in CLAIM_CONDITIONS:
-            text_block.append(CLAIM_TEMPLATE.format(emotion=claimed_emotion))
+            claim_line = CLAIM_TEMPLATE.format(emotion=claimed_emotion)
+            if modality == "text_audio" and order == "claim_first":
+                trailing_claim = claim_line
+            else:
+                text_block.append(claim_line)
     if text_block:
         blocks.append("\n".join(text_block))
 
@@ -226,6 +239,9 @@ def build_prompt(condition, modality, transcript, claimed_emotion, rng):
     if modality == "text_audio" and condition in CLAIM_CONDITIONS:
         question = f"{question}\n{CONFLICT_WARNING}"
     blocks.append(question)
+
+    if trailing_claim is not None:
+        blocks.append(trailing_claim)
     return blocks
 
 
@@ -244,23 +260,41 @@ def ground_truth_for(condition, modality, true_emotion, claimed_emotion):
     return true_emotion               # audio_only and text_audio follow the voice
 
 
-def make_item(idx, condition, modality, clip, claimed_emotion, rng):
+def make_item(idx, condition, modality, clip, claimed_emotion, rng, order=None,
+              options=None, correct_letter=None):
+    """
+    `order` is None for items with no competing claim (Neutral-Text,
+    Paralinguistic) and for text_only claim-condition items, which have a
+    fixed single layout and are stamped "claim_last" by the caller without
+    being duplicated. text_audio claim-condition items are called twice by
+    the caller, once per order value, and share one `options`/`correct_letter`
+    pair (computed by the caller) so the MCQ lettering is identical across
+    the claim_first/claim_last pair -- only the prompt text differs.
+    """
     prompt_blocks = build_prompt(
-        condition, modality, clip["transcript"], claimed_emotion, rng
+        condition, modality, clip["transcript"], claimed_emotion, rng,
+        order=order or "claim_last",
     )
-    options = build_options(rng)
+    if options is None:
+        options = build_options(rng)
     gt = ground_truth_for(condition, modality, clip["true_emotion"], claimed_emotion)
-    correct_letter = next(l for l, v in options.items() if v == gt)
+    if correct_letter is None:
+        correct_letter = next(l for l, v in options.items() if v == gt)
 
     option_lines = "\n".join(f"{l}. {v}" for l, v in sorted(options.items()))
     prompt = "\n\n".join(prompt_blocks + [option_lines, ANSWER_INSTRUCTION])
 
     slug = condition.lower().replace("-", "_")
+    if modality == "text_audio" and order is not None:
+        item_id = f"ep_{slug}_{modality}_{order}_{idx:03d}"
+    else:
+        item_id = f"ep_{slug}_{modality}_{idx:03d}"
     return {
-        "id": f"ep_{slug}_{modality}_{idx:03d}",
+        "id": item_id,
         "category": "emotional_prosody",
         "condition": condition,
         "modality": modality,
+        "order": order,
         "ravdess_filename": clip["filename"],
         "actor_id": clip["actor_id"],
         "actor_gender": clip["actor_gender"],
@@ -310,10 +344,28 @@ def build_dataset(n_per_condition, seed, include_neutral):
 
         for modality in CONDITION_MODALITIES[condition]:
             for idx, clip in enumerate(clips, start=1):
-                items.append(
-                    make_item(idx, condition, modality, clip,
-                              claims[clip["filename"]], rng)
-                )
+                claimed = claims[clip["filename"]]
+                if modality == "text_audio" and condition in CLAIM_CONDITIONS:
+                    # One options/correct_letter draw shared by both order
+                    # variants, so the pair differs only in prompt text.
+                    gt = ground_truth_for(condition, modality, clip["true_emotion"], claimed)
+                    shared_options = build_options(rng)
+                    shared_letter = next(l for l, v in shared_options.items() if v == gt)
+                    for order in ("claim_last", "claim_first"):
+                        items.append(
+                            make_item(idx, condition, modality, clip, claimed, rng,
+                                      order=order, options=shared_options,
+                                      correct_letter=shared_letter)
+                        )
+                elif modality == "text_only" and condition in CLAIM_CONDITIONS:
+                    items.append(
+                        make_item(idx, condition, modality, clip, claimed, rng,
+                                  order="claim_last")
+                    )
+                else:
+                    items.append(
+                        make_item(idx, condition, modality, clip, claimed, rng)
+                    )
 
     return items, inventory, condition_files, warnings
 
@@ -335,6 +387,40 @@ def print_summary(items, inventory, condition_files, warnings):
     for condition in CONDITION_ORDER:
         for modality in CONDITION_MODALITIES[condition]:
             print(f"  {condition:<16} {modality:<12} {grid[(condition, modality)]:>4}")
+
+    print("\nOrder breakdown (Matched/Mismatched, text_audio duplicated; text_only stamped claim_last)")
+    order_grid = Counter(
+        (i["condition"], i["modality"], i["order"])
+        for i in items if i["order"] is not None
+    )
+    for condition in ["Matched", "Mismatched"]:
+        for modality in CONDITION_MODALITIES[condition]:
+            for order in ("claim_last", "claim_first"):
+                n = order_grid.get((condition, modality, order), 0)
+                if n:
+                    print(f"  {condition:<16} {modality:<12} {order:<12} {n:>4}")
+
+    print("\n[CHECK] claim_last/claim_first pairing (Matched/Mismatched text_audio)")
+    pairing_ok = True
+    for condition in ["Matched", "Mismatched"]:
+        last_files = {
+            i["ravdess_filename"] for i in items
+            if i["condition"] == condition and i["modality"] == "text_audio"
+            and i["order"] == "claim_last"
+        }
+        first_files = {
+            i["ravdess_filename"] for i in items
+            if i["condition"] == condition and i["modality"] == "text_audio"
+            and i["order"] == "claim_first"
+        }
+        if last_files != first_files:
+            pairing_ok = False
+            print(f"  FAIL {condition}: claim_last/claim_first filename sets differ "
+                  f"({len(last_files)} vs {len(first_files)})")
+        else:
+            print(f"  OK   {condition}: {len(last_files)} clips, fully paired 1:1")
+    if not pairing_ok:
+        print("  FAIL -- order pairing broken, investigate before using this dataset")
 
     print("\nGround-truth label distribution (per condition)")
     for condition in CONDITION_ORDER:
