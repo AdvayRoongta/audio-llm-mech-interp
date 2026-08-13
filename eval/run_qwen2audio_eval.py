@@ -184,10 +184,15 @@ def parse_answer_letter(raw_output, option_map):
     if m and m.group(1).upper() in valid:
         return m.group(1).upper()
 
-    # 4. first standalone token that is a valid letter
+    # 4. first standalone token that is a valid letter. Uppercase only:
+    # re.findall splits contractions on the apostrophe ("I'm" -> "I","m";
+    # "I'd" -> "I","d"), and lowercase remnants like that (or the article
+    # "a") can coincidentally match a valid option letter before the real
+    # answer is reached. Answer letters are written capitalized in practice;
+    # a lowercase match here is virtually always a false positive.
     for tok in re.findall(r"\b([A-Za-z])\b", text):
-        if tok.upper() in valid:
-            return tok.upper()
+        if tok.isupper() and tok in valid:
+            return tok
 
     # 5. last resort: the output names exactly one option's text
     hits = [l for l, t in option_map.items() if norm(t) and norm(t) in norm(text)]
