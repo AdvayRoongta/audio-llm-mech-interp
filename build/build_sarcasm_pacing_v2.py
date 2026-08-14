@@ -70,6 +70,8 @@ CONDITION_MODALITIES = {
     "Paralinguistic": ["audio_only"],
 }
 
+ANSWER_INSTRUCTION = "Answer with the letter of the correct option."
+
 # 5-7 paraphrase variants per modality, LISTEN Appendix A.2 style
 PARAPHRASES = {
     "text_only": [
@@ -239,6 +241,9 @@ def make_item(idx_counter, category, condition, modality, row, rng, claim=None, 
     gt = ground_truth_for(condition, modality, row)
     if options is None or correct_letter is None:
         options, correct_letter = build_mcq(gt, rng)
+
+    option_lines = "\n".join(f"{l}. {v}" for l, v in sorted(options.items()))
+    prompt = f"{prompt}\n\n{option_lines}\n\n{ANSWER_INSTRUCTION}"
 
     return {
         "id": item_id,

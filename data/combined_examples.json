@@ -9690,7 +9690,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Transcript is \"The liberarche marquee at Caesar's palace\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"The liberarche marquee at Caesar's palace\" How would you describe the emotional tone of the speaker?\n\nA. Neutral\nB. Surprise\nC. Ridicule\nD. Fear\nE. Excitement\nF. Anger\nG. Frustration\nH. Sadness\nI. Happiness\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Surprise",
@@ -9722,7 +9722,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Frustration",
-    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Disgust\nB. Fear\nC. Happiness\nD. Anger\nE. Excitement\nF. Frustration\nG. Neutral\nH. Ridicule\nI. Sadness\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Fear",
@@ -9754,7 +9754,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Frustration",
-    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as neutral.",
+    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as neutral.\n\nA. Disgust\nB. Fear\nC. Happiness\nD. Anger\nE. Excitement\nF. Frustration\nG. Neutral\nH. Ridicule\nI. Sadness\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Fear",
@@ -9786,7 +9786,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Reading only the words \"No, she is going to sit here where itÕs a 112 degrees and eat enchiladas.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"No, she is going to sit here where itÕs a 112 degrees and eat enchiladas.\" what emotion do they suggest?\n\nA. Neutral\nB. Frustration\nC. Fear\nD. Ridicule\nE. Excitement\nF. Surprise\nG. Disgust\nH. Happiness\nI. Sadness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Frustration",
@@ -9818,7 +9818,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Frustration",
-    "prompt": "Label provided: neutral. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.",
+    "prompt": "Label provided: neutral. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.\n\nA. Frustration\nB. Disgust\nC. Happiness\nD. Ridicule\nE. Surprise\nF. Neutral\nG. Anger\nH. Sadness\nI. Excitement\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Disgust",
@@ -9850,7 +9850,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Frustration",
-    "prompt": "Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate. Description: the speaker is expressing neutral.",
+    "prompt": "Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate. Description: the speaker is expressing neutral.\n\nA. Frustration\nB. Disgust\nC. Happiness\nD. Ridicule\nE. Surprise\nF. Neutral\nG. Anger\nH. Sadness\nI. Excitement\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Disgust",
@@ -9882,7 +9882,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Based solely on the text \"Why don't you just lie down on the floor and swim there?\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"Why don't you just lie down on the floor and swim there?\" what emotion is expressed?\n\nA. Fear\nB. Anger\nC. Sadness\nD. Excitement\nE. Ridicule\nF. Frustration\nG. Neutral\nH. Happiness\nI. Surprise\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Anger",
@@ -9914,7 +9914,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Disgust",
-    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Fear\nB. Surprise\nC. Anger\nD. Sadness\nE. Excitement\nF. Disgust\nG. Frustration\nH. Happiness\nI. Neutral\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Surprise",
@@ -9946,7 +9946,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: neutral.",
+    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: neutral.\n\nA. Fear\nB. Surprise\nC. Anger\nD. Sadness\nE. Excitement\nF. Disgust\nG. Frustration\nH. Happiness\nI. Neutral\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Surprise",
@@ -9978,7 +9978,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Based solely on the text \"Are you sure she wasn't trying to breathe life back into him?\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"Are you sure she wasn't trying to breathe life back into him?\" what emotion is expressed?\n\nA. Fear\nB. Excitement\nC. Neutral\nD. Ridicule\nE. Surprise\nF. Happiness\nG. Anger\nH. Disgust\nI. Sadness\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Excitement",
@@ -10010,7 +10010,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Ridicule",
-    "prompt": "It has been claimed the speaker feels neutral. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.",
+    "prompt": "It has been claimed the speaker feels neutral. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.\n\nA. Anger\nB. Ridicule\nC. Excitement\nD. Fear\nE. Happiness\nF. Disgust\nG. Sadness\nH. Frustration\nI. Neutral\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Ridicule",
@@ -10042,7 +10042,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels neutral.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels neutral.\n\nA. Anger\nB. Ridicule\nC. Excitement\nD. Fear\nE. Happiness\nF. Disgust\nG. Sadness\nH. Frustration\nI. Neutral\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Ridicule",
@@ -10074,7 +10074,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Based solely on the text \"That's easy for you to say, you weren't almost just killed.\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"That's easy for you to say, you weren't almost just killed.\" what emotion is expressed?\n\nA. Surprise\nB. Neutral\nC. Sadness\nD. Excitement\nE. Fear\nF. Anger\nG. Frustration\nH. Ridicule\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Neutral",
@@ -10106,7 +10106,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Anger",
-    "prompt": "The speaker's emotion is sadness. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is sadness. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Ridicule\nB. Surprise\nC. Fear\nD. Neutral\nE. Excitement\nF. Sadness\nG. Happiness\nH. Disgust\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Surprise",
@@ -10138,7 +10138,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Anger",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is sadness.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is sadness.\n\nA. Ridicule\nB. Surprise\nC. Fear\nD. Neutral\nE. Excitement\nF. Sadness\nG. Happiness\nH. Disgust\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Surprise",
@@ -10170,7 +10170,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "The line spoken is \"No I am worried she might be Phir Resuda's\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"No I am worried she might be Phir Resuda's\" What emotion is being conveyed here?\n\nA. Excitement\nB. Ridicule\nC. Frustration\nD. Happiness\nE. Sadness\nF. Neutral\nG. Surprise\nH. Disgust\nI. Anger\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Ridicule",
@@ -10202,7 +10202,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Frustration",
-    "prompt": "It has been claimed the speaker feels sadness. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.",
+    "prompt": "It has been claimed the speaker feels sadness. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.\n\nA. Fear\nB. Ridicule\nC. Excitement\nD. Neutral\nE. Surprise\nF. Sadness\nG. Frustration\nH. Anger\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -10234,7 +10234,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Frustration",
-    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is sadness.",
+    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is sadness.\n\nA. Fear\nB. Ridicule\nC. Excitement\nD. Neutral\nE. Surprise\nF. Sadness\nG. Frustration\nH. Anger\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -10266,7 +10266,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "Based solely on the text \"I mean, you and I we're just, y'know, we're nothing, we're goofin' around.\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"I mean, you and I we're just, y'know, we're nothing, we're goofin' around.\" what emotion is expressed?\n\nA. Disgust\nB. Sadness\nC. Fear\nD. Happiness\nE. Excitement\nF. Surprise\nG. Frustration\nH. Neutral\nI. Ridicule\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Sadness",
@@ -10298,7 +10298,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Anger",
-    "prompt": "Someone has described the speaker's emotion as happiness. Listen to the audio and give your own classification. Beware the description may be wrong.",
+    "prompt": "Someone has described the speaker's emotion as happiness. Listen to the audio and give your own classification. Beware the description may be wrong.\n\nA. Sadness\nB. Excitement\nC. Surprise\nD. Fear\nE. Ridicule\nF. Anger\nG. Disgust\nH. Neutral\nI. Happiness\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Excitement",
@@ -10330,7 +10330,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Anger",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels happiness.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels happiness.\n\nA. Sadness\nB. Excitement\nC. Surprise\nD. Fear\nE. Ridicule\nF. Anger\nG. Disgust\nH. Neutral\nI. Happiness\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Excitement",
@@ -10362,7 +10362,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "The line spoken is \"No offense, worker bees.\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"No offense, worker bees.\" What emotion is being conveyed here?\n\nA. Fear\nB. Excitement\nC. Anger\nD. Surprise\nE. Disgust\nF. Ridicule\nG. Neutral\nH. Sadness\nI. Happiness\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Excitement",
@@ -10394,7 +10394,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Disgust",
-    "prompt": "Someone has described the speaker's emotion as neutral. Listen to the audio and give your own classification. Beware the description may be wrong.",
+    "prompt": "Someone has described the speaker's emotion as neutral. Listen to the audio and give your own classification. Beware the description may be wrong.\n\nA. Ridicule\nB. Surprise\nC. Neutral\nD. Disgust\nE. Fear\nF. Sadness\nG. Anger\nH. Frustration\nI. Happiness\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Surprise",
@@ -10426,7 +10426,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels neutral.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels neutral.\n\nA. Ridicule\nB. Surprise\nC. Neutral\nD. Disgust\nE. Fear\nF. Sadness\nG. Anger\nH. Frustration\nI. Happiness\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Surprise",
@@ -10458,7 +10458,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "The transcript reads \"Yes, we all know how cruel a parent can be, about the flatness of a child's pillow.\" Classify the emotional tone.",
+    "prompt": "The transcript reads \"Yes, we all know how cruel a parent can be, about the flatness of a child's pillow.\" Classify the emotional tone.\n\nA. Neutral\nB. Anger\nC. Ridicule\nD. Disgust\nE. Excitement\nF. Sadness\nG. Fear\nH. Happiness\nI. Frustration\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Anger",
@@ -10490,7 +10490,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Ridicule",
-    "prompt": "It has been claimed the speaker feels excitement. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.",
+    "prompt": "It has been claimed the speaker feels excitement. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.\n\nA. Surprise\nB. Fear\nC. Neutral\nD. Excitement\nE. Frustration\nF. Anger\nG. Ridicule\nH. Happiness\nI. Disgust\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Fear",
@@ -10522,7 +10522,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate. Description: the speaker is expressing excitement.",
+    "prompt": "Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate. Description: the speaker is expressing excitement.\n\nA. Surprise\nB. Fear\nC. Neutral\nD. Excitement\nE. Frustration\nF. Anger\nG. Ridicule\nH. Happiness\nI. Disgust\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Fear",
@@ -10554,7 +10554,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "The transcript reads \"No, no the actual cartoon character .. Of course the baloon.\" Classify the emotional tone.",
+    "prompt": "The transcript reads \"No, no the actual cartoon character .. Of course the baloon.\" Classify the emotional tone.\n\nA. Disgust\nB. Anger\nC. Neutral\nD. Ridicule\nE. Fear\nF. Sadness\nG. Surprise\nH. Excitement\nI. Happiness\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Anger",
@@ -10586,7 +10586,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Frustration",
-    "prompt": "The speaker's emotion is excitement. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is excitement. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Ridicule\nB. Excitement\nC. Frustration\nD. Surprise\nE. Sadness\nF. Neutral\nG. Disgust\nH. Happiness\nI. Fear\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Excitement",
@@ -10618,7 +10618,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Frustration",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels excitement.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels excitement.\n\nA. Ridicule\nB. Excitement\nC. Frustration\nD. Surprise\nE. Sadness\nF. Neutral\nG. Disgust\nH. Happiness\nI. Fear\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Excitement",
@@ -10650,7 +10650,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Based solely on the text \"What'd you do, delete your photo?\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"What'd you do, delete your photo?\" what emotion is expressed?\n\nA. Surprise\nB. Frustration\nC. Happiness\nD. Excitement\nE. Sadness\nF. Fear\nG. Disgust\nH. Anger\nI. Neutral\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Frustration",
@@ -10682,7 +10682,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Ridicule",
-    "prompt": "Description: the speaker is expressing surprise. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.",
+    "prompt": "Description: the speaker is expressing surprise. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.\n\nA. Fear\nB. Excitement\nC. Disgust\nD. Happiness\nE. Anger\nF. Neutral\nG. Frustration\nH. Ridicule\nI. Surprise\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Excitement",
@@ -10714,7 +10714,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels surprise.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels surprise.\n\nA. Fear\nB. Excitement\nC. Disgust\nD. Happiness\nE. Anger\nF. Neutral\nG. Frustration\nH. Ridicule\nI. Surprise\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Excitement",
@@ -10746,7 +10746,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Transcript is \"You said you spent all that money because those boots go with skirts, dresses and pants. What do you plan on wearing? A Chicken suit?\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"You said you spent all that money because those boots go with skirts, dresses and pants. What do you plan on wearing? A Chicken suit?\" How would you describe the emotional tone of the speaker?\n\nA. Surprise\nB. Excitement\nC. Frustration\nD. Anger\nE. Sadness\nF. Happiness\nG. Ridicule\nH. Disgust\nI. Fear\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Excitement",
@@ -10778,7 +10778,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Anger",
-    "prompt": "Label provided: excitement. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.",
+    "prompt": "Label provided: excitement. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.\n\nA. Disgust\nB. Excitement\nC. Sadness\nD. Frustration\nE. Neutral\nF. Ridicule\nG. Surprise\nH. Fear\nI. Anger\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -10810,7 +10810,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Anger",
-    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as excitement.",
+    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as excitement.\n\nA. Disgust\nB. Excitement\nC. Sadness\nD. Frustration\nE. Neutral\nF. Ridicule\nG. Surprise\nH. Fear\nI. Anger\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -10842,7 +10842,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "The line spoken is \"India.\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"India.\" What emotion is being conveyed here?\n\nA. Sadness\nB. Disgust\nC. Surprise\nD. Neutral\nE. Happiness\nF. Fear\nG. Anger\nH. Excitement\nI. Ridicule\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Disgust",
@@ -10874,7 +10874,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Ridicule",
-    "prompt": "Description: the speaker is expressing neutral. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.",
+    "prompt": "Description: the speaker is expressing neutral. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.\n\nA. Neutral\nB. Fear\nC. Anger\nD. Excitement\nE. Ridicule\nF. Happiness\nG. Surprise\nH. Frustration\nI. Disgust\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Fear",
@@ -10906,7 +10906,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is neutral.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is neutral.\n\nA. Neutral\nB. Fear\nC. Anger\nD. Excitement\nE. Ridicule\nF. Happiness\nG. Surprise\nH. Frustration\nI. Disgust\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Fear",
@@ -10938,7 +10938,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Transcript is \"Hmm, yeah, but somehow, you manage.\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"Hmm, yeah, but somehow, you manage.\" How would you describe the emotional tone of the speaker?\n\nA. Surprise\nB. Disgust\nC. Neutral\nD. Ridicule\nE. Happiness\nF. Excitement\nG. Sadness\nH. Frustration\nI. Fear\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Disgust",
@@ -10970,7 +10970,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Disgust",
-    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Anger\nB. Excitement\nC. Fear\nD. Ridicule\nE. Disgust\nF. Frustration\nG. Surprise\nH. Happiness\nI. Neutral\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Excitement",
@@ -11002,7 +11002,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Disgust",
-    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is neutral.",
+    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is neutral.\n\nA. Anger\nB. Excitement\nC. Fear\nD. Ridicule\nE. Disgust\nF. Frustration\nG. Surprise\nH. Happiness\nI. Neutral\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Excitement",
@@ -11034,7 +11034,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "The line spoken is \"If there was a hidden compartment, don't you think you'd be stuffed in it by now?\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"If there was a hidden compartment, don't you think you'd be stuffed in it by now?\" What emotion is being conveyed here?\n\nA. Disgust\nB. Ridicule\nC. Fear\nD. Sadness\nE. Anger\nF. Excitement\nG. Neutral\nH. Surprise\nI. Happiness\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Ridicule",
@@ -11066,7 +11066,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Frustration",
-    "prompt": "Description: the speaker is expressing happiness. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.",
+    "prompt": "Description: the speaker is expressing happiness. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.\n\nA. Fear\nB. Ridicule\nC. Neutral\nD. Happiness\nE. Sadness\nF. Surprise\nG. Disgust\nH. Excitement\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -11098,7 +11098,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Frustration",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is happiness.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is happiness.\n\nA. Fear\nB. Ridicule\nC. Neutral\nD. Happiness\nE. Sadness\nF. Surprise\nG. Disgust\nH. Excitement\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -11130,7 +11130,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Reading only the words \"It's just a privilege to watch your mind at work.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"It's just a privilege to watch your mind at work.\" what emotion do they suggest?\n\nA. Happiness\nB. Ridicule\nC. Neutral\nD. Excitement\nE. Surprise\nF. Sadness\nG. Disgust\nH. Frustration\nI. Anger\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Ridicule",
@@ -11162,7 +11162,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Disgust",
-    "prompt": "The speaker's emotion is excitement. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is excitement. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Surprise\nB. Excitement\nC. Sadness\nD. Happiness\nE. Fear\nF. Ridicule\nG. Anger\nH. Disgust\nI. Neutral\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Excitement",
@@ -11194,7 +11194,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels excitement.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels excitement.\n\nA. Surprise\nB. Excitement\nC. Sadness\nD. Happiness\nE. Fear\nF. Ridicule\nG. Anger\nH. Disgust\nI. Neutral\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Excitement",
@@ -11226,7 +11226,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Transcript is \"Step one is flunk out of art school.\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"Step one is flunk out of art school.\" How would you describe the emotional tone of the speaker?\n\nA. Ridicule\nB. Fear\nC. Happiness\nD. Frustration\nE. Disgust\nF. Surprise\nG. Excitement\nH. Anger\nI. Neutral\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Fear",
@@ -11258,7 +11258,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Ridicule",
-    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Excitement\nB. Fear\nC. Frustration\nD. Anger\nE. Neutral\nF. Happiness\nG. Sadness\nH. Surprise\nI. Ridicule\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Fear",
@@ -11290,7 +11290,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels neutral.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels neutral.\n\nA. Excitement\nB. Fear\nC. Frustration\nD. Anger\nE. Neutral\nF. Happiness\nG. Sadness\nH. Surprise\nI. Ridicule\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Fear",
@@ -11322,7 +11322,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "The transcript reads \"Just tell me how.\" Classify the emotional tone.",
+    "prompt": "The transcript reads \"Just tell me how.\" Classify the emotional tone.\n\nA. Excitement\nB. Happiness\nC. Anger\nD. Neutral\nE. Disgust\nF. Ridicule\nG. Fear\nH. Sadness\nI. Frustration\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Happiness",
@@ -11354,7 +11354,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Anger",
-    "prompt": "Label provided: happiness. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.",
+    "prompt": "Label provided: happiness. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.\n\nA. Happiness\nB. Surprise\nC. Neutral\nD. Anger\nE. Sadness\nF. Disgust\nG. Ridicule\nH. Excitement\nI. Frustration\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -11386,7 +11386,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Anger",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels happiness.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels happiness.\n\nA. Happiness\nB. Surprise\nC. Neutral\nD. Anger\nE. Sadness\nF. Disgust\nG. Ridicule\nH. Excitement\nI. Frustration\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -11418,7 +11418,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Based solely on the text \"No, pinch me!\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"No, pinch me!\" what emotion is expressed?\n\nA. Frustration\nB. Happiness\nC. Neutral\nD. Anger\nE. Surprise\nF. Excitement\nG. Ridicule\nH. Sadness\nI. Disgust\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Happiness",
@@ -11450,7 +11450,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Frustration",
-    "prompt": "You are told the speaker's emotion is excitement. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.",
+    "prompt": "You are told the speaker's emotion is excitement. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.\n\nA. Happiness\nB. Neutral\nC. Anger\nD. Ridicule\nE. Frustration\nF. Excitement\nG. Surprise\nH. Sadness\nI. Fear\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Neutral",
@@ -11482,7 +11482,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Frustration",
-    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: excitement.",
+    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: excitement.\n\nA. Happiness\nB. Neutral\nC. Anger\nD. Ridicule\nE. Frustration\nF. Excitement\nG. Surprise\nH. Sadness\nI. Fear\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Neutral",
@@ -11514,7 +11514,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Reading only the words \"You went to college.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"You went to college.\" what emotion do they suggest?\n\nA. Disgust\nB. Anger\nC. Ridicule\nD. Frustration\nE. Fear\nF. Excitement\nG. Happiness\nH. Sadness\nI. Surprise\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Anger",
@@ -11546,7 +11546,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Disgust",
-    "prompt": "Description: the speaker is expressing surprise. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.",
+    "prompt": "Description: the speaker is expressing surprise. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.\n\nA. Disgust\nB. Ridicule\nC. Sadness\nD. Frustration\nE. Neutral\nF. Happiness\nG. Excitement\nH. Anger\nI. Fear\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Ridicule",
@@ -11578,7 +11578,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: surprise.",
+    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: surprise.\n\nA. Disgust\nB. Ridicule\nC. Sadness\nD. Frustration\nE. Neutral\nF. Happiness\nG. Excitement\nH. Anger\nI. Fear\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Ridicule",
@@ -11610,7 +11610,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Reading only the words \"How could Archie defeat Predator?\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"How could Archie defeat Predator?\" what emotion do they suggest?\n\nA. Fear\nB. Disgust\nC. Excitement\nD. Happiness\nE. Neutral\nF. Sadness\nG. Frustration\nH. Anger\nI. Ridicule\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Disgust",
@@ -11642,7 +11642,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Someone has described the speaker's emotion as surprise. Listen to the audio and give your own classification. Beware the description may be wrong.",
+    "prompt": "Someone has described the speaker's emotion as surprise. Listen to the audio and give your own classification. Beware the description may be wrong.\n\nA. Surprise\nB. Excitement\nC. Anger\nD. Disgust\nE. Happiness\nF. Ridicule\nG. Sadness\nH. Neutral\nI. Frustration\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Excitement",
@@ -11674,7 +11674,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is surprise.",
+    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is surprise.\n\nA. Surprise\nB. Excitement\nC. Anger\nD. Disgust\nE. Happiness\nF. Ridicule\nG. Sadness\nH. Neutral\nI. Frustration\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Excitement",
@@ -11706,7 +11706,7 @@
     "true_emotion": "Fear",
     "claimed_emotion": "Fear",
     "ground_truth_label": "Fear",
-    "prompt": "Given the sentence \"No no, you don't have to fly back, really.\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"No no, you don't have to fly back, really.\" how would you classify the speaker's emotional state?\n\nA. Neutral\nB. Sadness\nC. Disgust\nD. Ridicule\nE. Excitement\nF. Fear\nG. Anger\nH. Happiness\nI. Frustration\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Sadness",
@@ -11738,7 +11738,7 @@
     "true_emotion": "Fear",
     "claimed_emotion": "Fear",
     "ground_truth_label": "Fear",
-    "prompt": "The speaker's emotion is fear. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is fear. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Surprise\nB. Frustration\nC. Fear\nD. Sadness\nE. Ridicule\nF. Disgust\nG. Happiness\nH. Excitement\nI. Anger\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Frustration",
@@ -11770,7 +11770,7 @@
     "true_emotion": "Fear",
     "claimed_emotion": "Fear",
     "ground_truth_label": "Fear",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is fear.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is fear.\n\nA. Surprise\nB. Frustration\nC. Fear\nD. Sadness\nE. Ridicule\nF. Disgust\nG. Happiness\nH. Excitement\nI. Anger\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Frustration",
@@ -11802,7 +11802,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Reading only the words \"Oh, I've been trying to get in touch with him, but I never heard back. Is he okay?\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"Oh, I've been trying to get in touch with him, but I never heard back. Is he okay?\" what emotion do they suggest?\n\nA. Happiness\nB. Surprise\nC. Fear\nD. Disgust\nE. Anger\nF. Frustration\nG. Ridicule\nH. Sadness\nI. Excitement\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -11834,7 +11834,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is neutral. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Disgust\nB. Excitement\nC. Frustration\nD. Surprise\nE. Happiness\nF. Ridicule\nG. Fear\nH. Neutral\nI. Sadness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -11866,7 +11866,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: neutral.",
+    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: neutral.\n\nA. Disgust\nB. Excitement\nC. Frustration\nD. Surprise\nE. Happiness\nF. Ridicule\nG. Fear\nH. Neutral\nI. Sadness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -11898,7 +11898,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "The transcript reads \"What a baby.\" Classify the emotional tone.",
+    "prompt": "The transcript reads \"What a baby.\" Classify the emotional tone.\n\nA. Anger\nB. Neutral\nC. Fear\nD. Sadness\nE. Ridicule\nF. Frustration\nG. Surprise\nH. Disgust\nI. Happiness\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Neutral",
@@ -11930,7 +11930,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "You are told the speaker's emotion is disgust. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.",
+    "prompt": "You are told the speaker's emotion is disgust. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.\n\nA. Fear\nB. Ridicule\nC. Neutral\nD. Surprise\nE. Excitement\nF. Happiness\nG. Frustration\nH. Sadness\nI. Anger\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -11962,7 +11962,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels disgust.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels disgust.\n\nA. Fear\nB. Ridicule\nC. Neutral\nD. Surprise\nE. Excitement\nF. Happiness\nG. Frustration\nH. Sadness\nI. Anger\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -11994,7 +11994,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Given the sentence \"Leonard, may I present, live from New Delhi, Dr. and Mrs. V. M. Koothrappali.\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"Leonard, may I present, live from New Delhi, Dr. and Mrs. V. M. Koothrappali.\" how would you classify the speaker's emotional state?\n\nA. Frustration\nB. Ridicule\nC. Neutral\nD. Excitement\nE. Happiness\nF. Sadness\nG. Anger\nH. Fear\nI. Surprise\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Ridicule",
@@ -12026,7 +12026,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "You are told the speaker's emotion is excitement. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.",
+    "prompt": "You are told the speaker's emotion is excitement. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.\n\nA. Surprise\nB. Ridicule\nC. Frustration\nD. Neutral\nE. Excitement\nF. Fear\nG. Sadness\nH. Anger\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Ridicule",
@@ -12058,7 +12058,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is excitement.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is excitement.\n\nA. Surprise\nB. Ridicule\nC. Frustration\nD. Neutral\nE. Excitement\nF. Fear\nG. Sadness\nH. Anger\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Ridicule",
@@ -12090,7 +12090,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Based solely on the text \"I'm sorry, Sheldon bought a loom and learned how to weave?\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"I'm sorry, Sheldon bought a loom and learned how to weave?\" what emotion is expressed?\n\nA. Sadness\nB. Happiness\nC. Fear\nD. Disgust\nE. Anger\nF. Excitement\nG. Frustration\nH. Neutral\nI. Ridicule\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Happiness",
@@ -12122,7 +12122,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "It has been claimed the speaker feels surprise. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.",
+    "prompt": "It has been claimed the speaker feels surprise. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.\n\nA. Frustration\nB. Happiness\nC. Excitement\nD. Surprise\nE. Fear\nF. Sadness\nG. Anger\nH. Neutral\nI. Ridicule\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Happiness",
@@ -12154,7 +12154,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": "Surprise",
     "ground_truth_label": "Surprise",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels surprise.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels surprise.\n\nA. Frustration\nB. Happiness\nC. Excitement\nD. Surprise\nE. Fear\nF. Sadness\nG. Anger\nH. Neutral\nI. Ridicule\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Happiness",
@@ -12186,7 +12186,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Based solely on the text \"I don't think so. Hello?  When you get in there\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"I don't think so. Hello?  When you get in there\" what emotion is expressed?\n\nA. Frustration\nB. Fear\nC. Disgust\nD. Surprise\nE. Happiness\nF. Excitement\nG. Ridicule\nH. Sadness\nI. Anger\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Fear",
@@ -12218,7 +12218,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "The speaker's emotion is sadness. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is sadness. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Surprise\nB. Frustration\nC. Fear\nD. Sadness\nE. Ridicule\nF. Neutral\nG. Excitement\nH. Anger\nI. Happiness\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Frustration",
@@ -12250,7 +12250,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: sadness.",
+    "prompt": "Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match. Label provided: sadness.\n\nA. Surprise\nB. Frustration\nC. Fear\nD. Sadness\nE. Ridicule\nF. Neutral\nG. Excitement\nH. Anger\nI. Happiness\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Frustration",
@@ -12282,7 +12282,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "The line spoken is \"Answering the question once and for all why Wolowitz bailed out of medical school.\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"Answering the question once and for all why Wolowitz bailed out of medical school.\" What emotion is being conveyed here?\n\nA. Sadness\nB. Excitement\nC. Disgust\nD. Frustration\nE. Surprise\nF. Neutral\nG. Happiness\nH. Ridicule\nI. Anger\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Excitement",
@@ -12314,7 +12314,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "You are told the speaker's emotion is disgust. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.",
+    "prompt": "You are told the speaker's emotion is disgust. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.\n\nA. Frustration\nB. Sadness\nC. Neutral\nD. Happiness\nE. Ridicule\nF. Surprise\nG. Disgust\nH. Excitement\nI. Fear\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Sadness",
@@ -12346,7 +12346,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is disgust.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is disgust.\n\nA. Frustration\nB. Sadness\nC. Neutral\nD. Happiness\nE. Ridicule\nF. Surprise\nG. Disgust\nH. Excitement\nI. Fear\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Sadness",
@@ -12378,7 +12378,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "The line spoken is \"It's more of a tradition.\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"It's more of a tradition.\" What emotion is being conveyed here?\n\nA. Disgust\nB. Fear\nC. Anger\nD. Surprise\nE. Frustration\nF. Neutral\nG. Excitement\nH. Sadness\nI. Ridicule\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Fear",
@@ -12410,7 +12410,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Label provided: neutral. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.",
+    "prompt": "Label provided: neutral. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.\n\nA. Excitement\nB. Happiness\nC. Anger\nD. Sadness\nE. Neutral\nF. Fear\nG. Ridicule\nH. Frustration\nI. Surprise\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Happiness",
@@ -12442,7 +12442,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is neutral.",
+    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is neutral.\n\nA. Excitement\nB. Happiness\nC. Anger\nD. Sadness\nE. Neutral\nF. Fear\nG. Ridicule\nH. Frustration\nI. Surprise\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Happiness",
@@ -12474,7 +12474,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "The line spoken is \"- No, no, no. I'm really good at this. All right, give me a hint. Does it involve difficulty initiating a stream of anything?\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"- No, no, no. I'm really good at this. All right, give me a hint. Does it involve difficulty initiating a stream of anything?\" What emotion is being conveyed here?\n\nA. Neutral\nB. Surprise\nC. Ridicule\nD. Disgust\nE. Anger\nF. Sadness\nG. Fear\nH. Happiness\nI. Frustration\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Surprise",
@@ -12506,7 +12506,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Label provided: excitement. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.",
+    "prompt": "Label provided: excitement. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.\n\nA. Ridicule\nB. Anger\nC. Frustration\nD. Happiness\nE. Excitement\nF. Fear\nG. Sadness\nH. Surprise\nI. Disgust\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Anger",
@@ -12538,7 +12538,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": "Excitement",
     "ground_truth_label": "Excitement",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels excitement.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels excitement.\n\nA. Ridicule\nB. Anger\nC. Frustration\nD. Happiness\nE. Excitement\nF. Fear\nG. Sadness\nH. Surprise\nI. Disgust\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Anger",
@@ -12570,7 +12570,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Given the sentence \"My aunt Marion gave them to me for my 12th birthday.\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"My aunt Marion gave them to me for my 12th birthday.\" how would you classify the speaker's emotional state?\n\nA. Neutral\nB. Frustration\nC. Surprise\nD. Anger\nE. Excitement\nF. Ridicule\nG. Sadness\nH. Fear\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Frustration",
@@ -12602,7 +12602,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "You are told the speaker's emotion is neutral. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.",
+    "prompt": "You are told the speaker's emotion is neutral. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.\n\nA. Surprise\nB. Ridicule\nC. Sadness\nD. Frustration\nE. Excitement\nF. Disgust\nG. Fear\nH. Happiness\nI. Neutral\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Ridicule",
@@ -12634,7 +12634,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is neutral.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is neutral.\n\nA. Surprise\nB. Ridicule\nC. Sadness\nD. Frustration\nE. Excitement\nF. Disgust\nG. Fear\nH. Happiness\nI. Neutral\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Ridicule",
@@ -12666,7 +12666,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "Given the sentence \"And it's gone.\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"And it's gone.\" how would you classify the speaker's emotional state?\n\nA. Sadness\nB. Ridicule\nC. Anger\nD. Frustration\nE. Fear\nF. Happiness\nG. Neutral\nH. Excitement\nI. Surprise\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Ridicule",
@@ -12698,7 +12698,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "Someone has described the speaker's emotion as disgust. Listen to the audio and give your own classification. Beware the description may be wrong.",
+    "prompt": "Someone has described the speaker's emotion as disgust. Listen to the audio and give your own classification. Beware the description may be wrong.\n\nA. Anger\nB. Happiness\nC. Ridicule\nD. Disgust\nE. Frustration\nF. Surprise\nG. Sadness\nH. Fear\nI. Excitement\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Happiness",
@@ -12730,7 +12730,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": "Disgust",
     "ground_truth_label": "Disgust",
-    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as disgust.",
+    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as disgust.\n\nA. Anger\nB. Happiness\nC. Ridicule\nD. Disgust\nE. Frustration\nF. Surprise\nG. Sadness\nH. Fear\nI. Excitement\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Happiness",
@@ -12762,7 +12762,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Anger",
     "ground_truth_label": "Anger",
-    "prompt": "Transcript is \"Oh, you're hardly out of the woods, no. You still run the risk of infection, a blood clot, the possibility that an inattentive surgeon let a barn spider lay eggs in your nose.\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"Oh, you're hardly out of the woods, no. You still run the risk of infection, a blood clot, the possibility that an inattentive surgeon let a barn spider lay eggs in your nose.\" How would you describe the emotional tone of the speaker?\n\nA. Disgust\nB. Excitement\nC. Neutral\nD. Ridicule\nE. Surprise\nF. Happiness\nG. Anger\nH. Frustration\nI. Fear\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -12794,7 +12794,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Anger",
     "ground_truth_label": "Anger",
-    "prompt": "The speaker's emotion is anger. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.",
+    "prompt": "The speaker's emotion is anger. Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match.\n\nA. Anger\nB. Happiness\nC. Excitement\nD. Fear\nE. Surprise\nF. Neutral\nG. Sadness\nH. Ridicule\nI. Disgust\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Happiness",
@@ -12826,7 +12826,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Anger",
     "ground_truth_label": "Anger",
-    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as anger.",
+    "prompt": "Listen to the audio and give your own classification. Beware the description may be wrong. Someone has described the speaker's emotion as anger.\n\nA. Anger\nB. Happiness\nC. Excitement\nD. Fear\nE. Surprise\nF. Neutral\nG. Sadness\nH. Ridicule\nI. Disgust\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Happiness",
@@ -12858,7 +12858,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Reading only the words \"I'm the supply manager.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"I'm the supply manager.\" what emotion do they suggest?\n\nA. Sadness\nB. Ridicule\nC. Disgust\nD. Frustration\nE. Anger\nF. Happiness\nG. Excitement\nH. Neutral\nI. Surprise\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Ridicule",
@@ -12890,7 +12890,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Description: the speaker is expressing neutral. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.",
+    "prompt": "Description: the speaker is expressing neutral. Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate.\n\nA. Excitement\nB. Disgust\nC. Ridicule\nD. Happiness\nE. Fear\nF. Sadness\nG. Surprise\nH. Neutral\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Disgust",
@@ -12922,7 +12922,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate. Description: the speaker is expressing neutral.",
+    "prompt": "Listen to the audio and classify the actual emotion conveyed. The description may be inaccurate. Description: the speaker is expressing neutral.\n\nA. Excitement\nB. Disgust\nC. Ridicule\nD. Happiness\nE. Fear\nF. Sadness\nG. Surprise\nH. Neutral\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Disgust",
@@ -12954,7 +12954,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Based solely on the text \"I really don't wanna sit with Allen Iverson over there .\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"I really don't wanna sit with Allen Iverson over there .\" what emotion is expressed?\n\nA. Surprise\nB. Ridicule\nC. Neutral\nD. Frustration\nE. Happiness\nF. Excitement\nG. Sadness\nH. Anger\nI. Disgust\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Ridicule",
@@ -12986,7 +12986,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Label provided: sadness. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.",
+    "prompt": "Label provided: sadness. Listen to the audio clip and determine the speaker's real emotional tone. Note the label and audio may not match.\n\nA. Fear\nB. Anger\nC. Frustration\nD. Surprise\nE. Happiness\nF. Ridicule\nG. Sadness\nH. Neutral\nI. Disgust\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Anger",
@@ -13018,7 +13018,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is sadness.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is sadness.\n\nA. Fear\nB. Anger\nC. Frustration\nD. Surprise\nE. Happiness\nF. Ridicule\nG. Sadness\nH. Neutral\nI. Disgust\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Anger",
@@ -13050,7 +13050,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Reading only the words \"No, of course not. I-I just feel bad. Well, so do I,\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"No, of course not. I-I just feel bad. Well, so do I,\" what emotion do they suggest?\n\nA. Happiness\nB. Sadness\nC. Anger\nD. Disgust\nE. Ridicule\nF. Fear\nG. Excitement\nH. Frustration\nI. Neutral\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Sadness",
@@ -13082,7 +13082,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Someone has described the speaker's emotion as sadness. Listen to the audio and give your own classification. Beware the description may be wrong.",
+    "prompt": "Someone has described the speaker's emotion as sadness. Listen to the audio and give your own classification. Beware the description may be wrong.\n\nA. Anger\nB. Happiness\nC. Sadness\nD. Excitement\nE. Ridicule\nF. Fear\nG. Frustration\nH. Surprise\nI. Neutral\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Happiness",
@@ -13114,7 +13114,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": "Sadness",
     "ground_truth_label": "Sadness",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels sadness.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels sadness.\n\nA. Anger\nB. Happiness\nC. Sadness\nD. Excitement\nE. Ridicule\nF. Fear\nG. Frustration\nH. Surprise\nI. Neutral\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Happiness",
@@ -13146,7 +13146,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "The line spoken is \"I've done it, like, a dozen times.\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"I've done it, like, a dozen times.\" What emotion is being conveyed here?\n\nA. Excitement\nB. Frustration\nC. Disgust\nD. Neutral\nE. Anger\nF. Surprise\nG. Fear\nH. Happiness\nI. Ridicule\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Frustration",
@@ -13178,7 +13178,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Someone has described the speaker's emotion as neutral. Listen to the audio and give your own classification. Beware the description may be wrong.",
+    "prompt": "Someone has described the speaker's emotion as neutral. Listen to the audio and give your own classification. Beware the description may be wrong.\n\nA. Disgust\nB. Happiness\nC. Neutral\nD. Frustration\nE. Ridicule\nF. Excitement\nG. Surprise\nH. Fear\nI. Anger\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Happiness",
@@ -13210,7 +13210,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": "Neutral",
     "ground_truth_label": "Neutral",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is neutral.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is neutral.\n\nA. Disgust\nB. Happiness\nC. Neutral\nD. Frustration\nE. Ridicule\nF. Excitement\nG. Surprise\nH. Fear\nI. Anger\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Happiness",
@@ -13242,7 +13242,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Anger",
     "ground_truth_label": "Anger",
-    "prompt": "Based solely on the text \"What's going on?!  That's what's going on!!\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"What's going on?!  That's what's going on!!\" what emotion is expressed?\n\nA. Fear\nB. Excitement\nC. Disgust\nD. Sadness\nE. Frustration\nF. Ridicule\nG. Surprise\nH. Happiness\nI. Anger\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Excitement",
@@ -13274,7 +13274,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Anger",
     "ground_truth_label": "Anger",
-    "prompt": "It has been claimed the speaker feels anger. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.",
+    "prompt": "It has been claimed the speaker feels anger. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.\n\nA. Happiness\nB. Neutral\nC. Surprise\nD. Sadness\nE. Ridicule\nF. Anger\nG. Disgust\nH. Frustration\nI. Excitement\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Neutral",
@@ -13306,7 +13306,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": "Anger",
     "ground_truth_label": "Anger",
-    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is anger.",
+    "prompt": "Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree. You are told the speaker's emotion is anger.\n\nA. Happiness\nB. Neutral\nC. Surprise\nD. Sadness\nE. Ridicule\nF. Anger\nG. Disgust\nH. Frustration\nI. Excitement\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Neutral",
@@ -13338,7 +13338,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "Given the sentence \"Yeah!\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"Yeah!\" how would you classify the speaker's emotional state?\n\nA. Frustration\nB. Surprise\nC. Anger\nD. Sadness\nE. Disgust\nF. Happiness\nG. Fear\nH. Excitement\nI. Ridicule\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Surprise",
@@ -13370,7 +13370,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "You are told the speaker's emotion is happiness. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.",
+    "prompt": "You are told the speaker's emotion is happiness. Now listen to the clip and decide the true emotional tone. The stated emotion and the audio may not agree.\n\nA. Ridicule\nB. Anger\nC. Disgust\nD. Frustration\nE. Surprise\nF. Fear\nG. Neutral\nH. Happiness\nI. Sadness\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Anger",
@@ -13402,7 +13402,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels happiness.",
+    "prompt": "Listen carefully and classify the emotion in the audio -- the claim and audio may conflict. It has been claimed the speaker feels happiness.\n\nA. Ridicule\nB. Anger\nC. Disgust\nD. Frustration\nE. Surprise\nF. Fear\nG. Neutral\nH. Happiness\nI. Sadness\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Anger",
@@ -13434,7 +13434,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "The line spoken is \"I've never loved anybody as much as I love you.\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"I've never loved anybody as much as I love you.\" What emotion is being conveyed here?\n\nA. Excitement\nB. Frustration\nC. Fear\nD. Happiness\nE. Sadness\nF. Disgust\nG. Surprise\nH. Neutral\nI. Anger\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Frustration",
@@ -13466,7 +13466,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "It has been claimed the speaker feels happiness. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.",
+    "prompt": "It has been claimed the speaker feels happiness. Listen carefully and classify the emotion in the audio -- the claim and audio may conflict.\n\nA. Happiness\nB. Surprise\nC. Disgust\nD. Ridicule\nE. Neutral\nF. Anger\nG. Sadness\nH. Frustration\nI. Fear\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -13498,7 +13498,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": "Happiness",
     "ground_truth_label": "Happiness",
-    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is happiness.",
+    "prompt": "Listen to the audio and classify the emotion. How would you describe the emotional tone of the speaker? Beware that the audio description and audio itself may not match. You are told the speaker's emotion is happiness.\n\nA. Happiness\nB. Surprise\nC. Disgust\nD. Ridicule\nE. Neutral\nF. Anger\nG. Sadness\nH. Frustration\nI. Fear\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -13530,7 +13530,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Surprise",
-    "prompt": "Reading only the words \"And protected them from a tornado?\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"And protected them from a tornado?\" what emotion do they suggest?\n\nA. Happiness\nB. Surprise\nC. Frustration\nD. Anger\nE. Excitement\nF. Disgust\nG. Sadness\nH. Ridicule\nI. Neutral\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -13562,7 +13562,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Ridicule",
-    "prompt": "Given the transcript \"And protected them from a tornado?\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"And protected them from a tornado?\" listen to the audio and identify the true emotion conveyed.\n\nA. Ridicule\nB. Disgust\nC. Fear\nD. Frustration\nE. Anger\nF. Neutral\nG. Excitement\nH. Sadness\nI. Surprise\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Disgust",
@@ -13594,7 +13594,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Transcript is \"I'm not getting high on the job. I'm getting high at home. I live here, remember?\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"I'm not getting high on the job. I'm getting high at home. I live here, remember?\" How would you describe the emotional tone of the speaker?\n\nA. Anger\nB. Ridicule\nC. Sadness\nD. Frustration\nE. Excitement\nF. Neutral\nG. Disgust\nH. Happiness\nI. Surprise\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Ridicule",
@@ -13626,7 +13626,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Given the transcript \"I'm not getting high on the job. I'm getting high at home. I live here, remember?\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"I'm not getting high on the job. I'm getting high at home. I live here, remember?\" listen to the audio and identify the true emotion conveyed.\n\nA. Surprise\nB. Disgust\nC. Ridicule\nD. Neutral\nE. Frustration\nF. Excitement\nG. Anger\nH. Fear\nI. Happiness\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Disgust",
@@ -13658,7 +13658,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Reading only the words \"I-I'm really sorry. It's just that I\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"I-I'm really sorry. It's just that I\" what emotion do they suggest?\n\nA. Disgust\nB. Excitement\nC. Frustration\nD. Surprise\nE. Happiness\nF. Ridicule\nG. Fear\nH. Neutral\nI. Anger\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -13690,7 +13690,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "The line spoken is \"I-I'm really sorry. It's just that I\" Listen to the clip and classify the speaker's emotion.",
+    "prompt": "The line spoken is \"I-I'm really sorry. It's just that I\" Listen to the clip and classify the speaker's emotion.\n\nA. Happiness\nB. Surprise\nC. Sadness\nD. Anger\nE. Frustration\nF. Fear\nG. Ridicule\nH. Neutral\nI. Excitement\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Surprise",
@@ -13722,7 +13722,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Transcript is \"Twenty-one hours, you're a hero.\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"Twenty-one hours, you're a hero.\" How would you describe the emotional tone of the speaker?\n\nA. Anger\nB. Surprise\nC. Happiness\nD. Frustration\nE. Ridicule\nF. Neutral\nG. Disgust\nH. Sadness\nI. Fear\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Surprise",
@@ -13754,7 +13754,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Transcript is \"Twenty-one hours, you're a hero.\" Listen to the audio and describe the emotional tone of the speaker.",
+    "prompt": "Transcript is \"Twenty-one hours, you're a hero.\" Listen to the audio and describe the emotional tone of the speaker.\n\nA. Anger\nB. Disgust\nC. Neutral\nD. Ridicule\nE. Sadness\nF. Excitement\nG. Happiness\nH. Fear\nI. Frustration\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Disgust",
@@ -13786,7 +13786,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Given the sentence \"So, I'm sorry I just don't think we should go away together yet.\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"So, I'm sorry I just don't think we should go away together yet.\" how would you classify the speaker's emotional state?\n\nA. Neutral\nB. Ridicule\nC. Excitement\nD. Sadness\nE. Surprise\nF. Happiness\nG. Frustration\nH. Disgust\nI. Anger\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Ridicule",
@@ -13818,7 +13818,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "The line spoken is \"So, I'm sorry I just don't think we should go away together yet.\" Listen to the clip and classify the speaker's emotion.",
+    "prompt": "The line spoken is \"So, I'm sorry I just don't think we should go away together yet.\" Listen to the clip and classify the speaker's emotion.\n\nA. Disgust\nB. Excitement\nC. Sadness\nD. Ridicule\nE. Neutral\nF. Surprise\nG. Happiness\nH. Anger\nI. Frustration\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Excitement",
@@ -13850,7 +13850,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Reading only the words \"Aw, the people's pajamas have little horses on them, and the horses' have little people.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"Aw, the people's pajamas have little horses on them, and the horses' have little people.\" what emotion do they suggest?\n\nA. Neutral\nB. Fear\nC. Anger\nD. Excitement\nE. Ridicule\nF. Sadness\nG. Surprise\nH. Happiness\nI. Disgust\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Fear",
@@ -13882,7 +13882,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Transcript is \"Aw, the people's pajamas have little horses on them, and the horses' have little people.\" Listen to the audio and describe the emotional tone of the speaker.",
+    "prompt": "Transcript is \"Aw, the people's pajamas have little horses on them, and the horses' have little people.\" Listen to the audio and describe the emotional tone of the speaker.\n\nA. Neutral\nB. Anger\nC. Ridicule\nD. Sadness\nE. Fear\nF. Excitement\nG. Disgust\nH. Happiness\nI. Frustration\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Anger",
@@ -13914,7 +13914,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "The line spoken is \"But younger than some buildings!\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"But younger than some buildings!\" What emotion is being conveyed here?\n\nA. Neutral\nB. Sadness\nC. Fear\nD. Disgust\nE. Ridicule\nF. Frustration\nG. Excitement\nH. Happiness\nI. Surprise\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Sadness",
@@ -13946,7 +13946,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Ridicule",
-    "prompt": "The line spoken is \"But younger than some buildings!\" Listen to the clip and classify the speaker's emotion.",
+    "prompt": "The line spoken is \"But younger than some buildings!\" Listen to the clip and classify the speaker's emotion.\n\nA. Frustration\nB. Sadness\nC. Anger\nD. Happiness\nE. Fear\nF. Ridicule\nG. Neutral\nH. Excitement\nI. Disgust\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Sadness",
@@ -13978,7 +13978,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "The line spoken is \"I'm sorry, what?\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"I'm sorry, what?\" What emotion is being conveyed here?\n\nA. Ridicule\nB. Disgust\nC. Sadness\nD. Frustration\nE. Anger\nF. Fear\nG. Surprise\nH. Excitement\nI. Happiness\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Disgust",
@@ -14010,7 +14010,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Reading \"I'm sorry, what?\" while listening to the audio, what emotion does the speaker express?",
+    "prompt": "Reading \"I'm sorry, what?\" while listening to the audio, what emotion does the speaker express?\n\nA. Ridicule\nB. Happiness\nC. Excitement\nD. Fear\nE. Neutral\nF. Surprise\nG. Disgust\nH. Anger\nI. Frustration\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Happiness",
@@ -14042,7 +14042,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "The transcript reads \"Welcome to my life.\" Classify the emotional tone.",
+    "prompt": "The transcript reads \"Welcome to my life.\" Classify the emotional tone.\n\nA. Anger\nB. Excitement\nC. Ridicule\nD. Neutral\nE. Fear\nF. Sadness\nG. Surprise\nH. Frustration\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Excitement",
@@ -14074,7 +14074,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Reading \"Welcome to my life.\" while listening to the audio, what emotion does the speaker express?",
+    "prompt": "Reading \"Welcome to my life.\" while listening to the audio, what emotion does the speaker express?\n\nA. Surprise\nB. Sadness\nC. Frustration\nD. Neutral\nE. Disgust\nF. Happiness\nG. Excitement\nH. Ridicule\nI. Fear\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Sadness",
@@ -14106,7 +14106,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Excitement",
-    "prompt": "Given the sentence \"If there's someone more relentless than you, I'd like to meet them.\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"If there's someone more relentless than you, I'd like to meet them.\" how would you classify the speaker's emotional state?\n\nA. Disgust\nB. Fear\nC. Ridicule\nD. Neutral\nE. Sadness\nF. Surprise\nG. Anger\nH. Frustration\nI. Excitement\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Fear",
@@ -14138,7 +14138,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Given the transcript \"If there's someone more relentless than you, I'd like to meet them.\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"If there's someone more relentless than you, I'd like to meet them.\" listen to the audio and identify the true emotion conveyed.\n\nA. Excitement\nB. Happiness\nC. Fear\nD. Frustration\nE. Neutral\nF. Disgust\nG. Surprise\nH. Ridicule\nI. Sadness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Happiness",
@@ -14170,7 +14170,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Transcript is \"How's this? \"Pleased to meet you, Dr. Gablehauser. \"How fortunate for you that the university's \"chosen to hire you, despite the fact \"that you've done no original research in 25 years, \"and instead have written a series of popular books \"that reduce the great concepts of science \"to a series of anecdotes, \"each one dumbed down to accommodate the duration \"of an average bowel movement.\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"How's this? \"Pleased to meet you, Dr. Gablehauser. \"How fortunate for you that the university's \"chosen to hire you, despite the fact \"that you've done no original research in 25 years, \"and instead have written a series of popular books \"that reduce the great concepts of science \"to a series of anecdotes, \"each one dumbed down to accommodate the duration \"of an average bowel movement.\" How would you describe the emotional tone of the speaker?\n\nA. Excitement\nB. Surprise\nC. Ridicule\nD. Frustration\nE. Fear\nF. Sadness\nG. Disgust\nH. Neutral\nI. Happiness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Surprise",
@@ -14202,7 +14202,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Given the transcript \"How's this? \"Pleased to meet you, Dr. Gablehauser. \"How fortunate for you that the university's \"chosen to hire you, despite the fact \"that you've done no original research in 25 years, \"and instead have written a series of popular books \"that reduce the great concepts of science \"to a series of anecdotes, \"each one dumbed down to accommodate the duration \"of an average bowel movement.\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"How's this? \"Pleased to meet you, Dr. Gablehauser. \"How fortunate for you that the university's \"chosen to hire you, despite the fact \"that you've done no original research in 25 years, \"and instead have written a series of popular books \"that reduce the great concepts of science \"to a series of anecdotes, \"each one dumbed down to accommodate the duration \"of an average bowel movement.\" listen to the audio and identify the true emotion conveyed.\n\nA. Surprise\nB. Disgust\nC. Frustration\nD. Ridicule\nE. Sadness\nF. Anger\nG. Fear\nH. Neutral\nI. Happiness\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Disgust",
@@ -14234,7 +14234,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Transcript is \"So? Do cocaine smugglers write \"cocaine\" on the box?\" How would you describe the emotional tone of the speaker?",
+    "prompt": "Transcript is \"So? Do cocaine smugglers write \"cocaine\" on the box?\" How would you describe the emotional tone of the speaker?\n\nA. Sadness\nB. Frustration\nC. Excitement\nD. Happiness\nE. Anger\nF. Surprise\nG. Fear\nH. Neutral\nI. Disgust\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Frustration",
@@ -14266,7 +14266,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Transcript is \"So? Do cocaine smugglers write \"cocaine\" on the box?\" Listen to the audio and describe the emotional tone of the speaker.",
+    "prompt": "Transcript is \"So? Do cocaine smugglers write \"cocaine\" on the box?\" Listen to the audio and describe the emotional tone of the speaker.\n\nA. Surprise\nB. Ridicule\nC. Sadness\nD. Frustration\nE. Neutral\nF. Anger\nG. Disgust\nH. Excitement\nI. Fear\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Ridicule",
@@ -14298,7 +14298,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": null,
     "ground_truth_label": "Excitement",
-    "prompt": "Reading only the words \"Oh, you know, Goth stuff. Goth magazines, Goth music.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"Oh, you know, Goth stuff. Goth magazines, Goth music.\" what emotion do they suggest?\n\nA. Fear\nB. Excitement\nC. Neutral\nD. Anger\nE. Frustration\nF. Surprise\nG. Happiness\nH. Sadness\nI. Disgust\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Excitement",
@@ -14330,7 +14330,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": null,
     "ground_truth_label": "Excitement",
-    "prompt": "Text: \"Oh, you know, Goth stuff. Goth magazines, Goth music.\" Now listen to the audio and determine the actual emotion.",
+    "prompt": "Text: \"Oh, you know, Goth stuff. Goth magazines, Goth music.\" Now listen to the audio and determine the actual emotion.\n\nA. Disgust\nB. Happiness\nC. Ridicule\nD. Frustration\nE. Excitement\nF. Sadness\nG. Fear\nH. Surprise\nI. Anger\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Happiness",
@@ -14362,7 +14362,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Reading only the words \"Astronauts saw him carrying that.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"Astronauts saw him carrying that.\" what emotion do they suggest?\n\nA. Anger\nB. Frustration\nC. Neutral\nD. Excitement\nE. Ridicule\nF. Sadness\nG. Disgust\nH. Happiness\nI. Surprise\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Frustration",
@@ -14394,7 +14394,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Reading \"Astronauts saw him carrying that.\" while listening to the audio, what emotion does the speaker express?",
+    "prompt": "Reading \"Astronauts saw him carrying that.\" while listening to the audio, what emotion does the speaker express?\n\nA. Disgust\nB. Neutral\nC. Happiness\nD. Excitement\nE. Ridicule\nF. Fear\nG. Sadness\nH. Surprise\nI. Frustration\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Neutral",
@@ -14426,7 +14426,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": null,
     "ground_truth_label": "Excitement",
-    "prompt": "Reading only the words \"All right, let's do it.\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"All right, let's do it.\" what emotion do they suggest?\n\nA. Sadness\nB. Happiness\nC. Surprise\nD. Frustration\nE. Anger\nF. Fear\nG. Excitement\nH. Ridicule\nI. Disgust\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Happiness",
@@ -14458,7 +14458,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": null,
     "ground_truth_label": "Excitement",
-    "prompt": "Given the transcript \"All right, let's do it.\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"All right, let's do it.\" listen to the audio and identify the true emotion conveyed.\n\nA. Anger\nB. Sadness\nC. Disgust\nD. Excitement\nE. Happiness\nF. Surprise\nG. Neutral\nH. Fear\nI. Frustration\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Sadness",
@@ -14490,7 +14490,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "The line spoken is \"- You and... Oh, sure. And while we're at it, why don't we get engaged, too? Why don't we get a little house, start a family? Enjoy our sunset years together? Do you hear yourself, woman?!\" What emotion is being conveyed here?",
+    "prompt": "The line spoken is \"- You and... Oh, sure. And while we're at it, why don't we get engaged, too? Why don't we get a little house, start a family? Enjoy our sunset years together? Do you hear yourself, woman?!\" What emotion is being conveyed here?\n\nA. Ridicule\nB. Sadness\nC. Anger\nD. Excitement\nE. Neutral\nF. Surprise\nG. Frustration\nH. Fear\nI. Happiness\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Sadness",
@@ -14522,7 +14522,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Given the transcript \"- You and... Oh, sure. And while we're at it, why don't we get engaged, too? Why don't we get a little house, start a family? Enjoy our sunset years together? Do you hear yourself, woman?!\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"- You and... Oh, sure. And while we're at it, why don't we get engaged, too? Why don't we get a little house, start a family? Enjoy our sunset years together? Do you hear yourself, woman?!\" listen to the audio and identify the true emotion conveyed.\n\nA. Surprise\nB. Fear\nC. Disgust\nD. Frustration\nE. Happiness\nF. Neutral\nG. Sadness\nH. Excitement\nI. Ridicule\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Surprise",
       "B": "Fear",
@@ -14554,7 +14554,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Reading only the words \"She can get into any restaurant, but the best husband she can find is Raj?\" what emotion do they suggest?",
+    "prompt": "Reading only the words \"She can get into any restaurant, but the best husband she can find is Raj?\" what emotion do they suggest?\n\nA. Sadness\nB. Fear\nC. Happiness\nD. Surprise\nE. Frustration\nF. Disgust\nG. Anger\nH. Excitement\nI. Neutral\nJ. Ridicule\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Fear",
@@ -14586,7 +14586,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": null,
     "ground_truth_label": "Disgust",
-    "prompt": "Given the transcript \"She can get into any restaurant, but the best husband she can find is Raj?\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"She can get into any restaurant, but the best husband she can find is Raj?\" listen to the audio and identify the true emotion conveyed.\n\nA. Fear\nB. Neutral\nC. Excitement\nD. Ridicule\nE. Disgust\nF. Surprise\nG. Happiness\nH. Frustration\nI. Sadness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Neutral",
@@ -14618,7 +14618,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Given the sentence \"Okay, sit down. Listen, Emily, what happened between me and Raj was a long time ago. It was,\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"Okay, sit down. Listen, Emily, what happened between me and Raj was a long time ago. It was,\" how would you classify the speaker's emotional state?\n\nA. Fear\nB. Frustration\nC. Sadness\nD. Neutral\nE. Disgust\nF. Happiness\nG. Anger\nH. Ridicule\nI. Surprise\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Frustration",
@@ -14650,7 +14650,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Reading \"Okay, sit down. Listen, Emily, what happened between me and Raj was a long time ago. It was,\" while listening to the audio, what emotion does the speaker express?",
+    "prompt": "Reading \"Okay, sit down. Listen, Emily, what happened between me and Raj was a long time ago. It was,\" while listening to the audio, what emotion does the speaker express?\n\nA. Neutral\nB. Disgust\nC. Happiness\nD. Sadness\nE. Excitement\nF. Fear\nG. Anger\nH. Surprise\nI. Ridicule\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Disgust",
@@ -14682,7 +14682,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": null,
     "ground_truth_label": "Surprise",
-    "prompt": "Given the sentence \"It runs on syphilis?\" how would you classify the speaker's emotional state?",
+    "prompt": "Given the sentence \"It runs on syphilis?\" how would you classify the speaker's emotional state?\n\nA. Happiness\nB. Ridicule\nC. Sadness\nD. Disgust\nE. Frustration\nF. Anger\nG. Surprise\nH. Excitement\nI. Neutral\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Ridicule",
@@ -14714,7 +14714,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": null,
     "ground_truth_label": "Anger",
-    "prompt": "Given the transcript \"It runs on syphilis?\" listen to the audio and identify the true emotion conveyed.",
+    "prompt": "Given the transcript \"It runs on syphilis?\" listen to the audio and identify the true emotion conveyed.\n\nA. Excitement\nB. Fear\nC. Ridicule\nD. Surprise\nE. Disgust\nF. Frustration\nG. Happiness\nH. Neutral\nI. Anger\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Fear",
@@ -14746,7 +14746,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Based solely on the text \"Can we please talk about something else? Maybe something vaguely related to life as we know it on this planet?\" what emotion is expressed?",
+    "prompt": "Based solely on the text \"Can we please talk about something else? Maybe something vaguely related to life as we know it on this planet?\" what emotion is expressed?\n\nA. Excitement\nB. Neutral\nC. Ridicule\nD. Frustration\nE. Disgust\nF. Surprise\nG. Anger\nH. Sadness\nI. Happiness\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Neutral",
@@ -14778,7 +14778,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Reading \"Can we please talk about something else? Maybe something vaguely related to life as we know it on this planet?\" while listening to the audio, what emotion does the speaker express?",
+    "prompt": "Reading \"Can we please talk about something else? Maybe something vaguely related to life as we know it on this planet?\" while listening to the audio, what emotion does the speaker express?\n\nA. Ridicule\nB. Excitement\nC. Frustration\nD. Anger\nE. Surprise\nF. Neutral\nG. Happiness\nH. Fear\nI. Sadness\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Excitement",
@@ -14810,7 +14810,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": null,
     "ground_truth_label": "Anger",
-    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?",
+    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?\n\nA. Fear\nB. Ridicule\nC. Surprise\nD. Excitement\nE. Disgust\nF. Frustration\nG. Neutral\nH. Happiness\nI. Sadness\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Ridicule",
@@ -14842,7 +14842,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": null,
     "ground_truth_label": "Disgust",
-    "prompt": "What emotion does the speaker's voice convey in this audio clip?",
+    "prompt": "What emotion does the speaker's voice convey in this audio clip?\n\nA. Fear\nB. Happiness\nC. Disgust\nD. Ridicule\nE. Frustration\nF. Neutral\nG. Anger\nH. Excitement\nI. Surprise\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Happiness",
@@ -14874,7 +14874,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?",
+    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?\n\nA. Ridicule\nB. Frustration\nC. Surprise\nD. Happiness\nE. Neutral\nF. Excitement\nG. Anger\nH. Sadness\nI. Disgust\nJ. Fear\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Ridicule",
       "B": "Frustration",
@@ -14906,7 +14906,7 @@
     "true_emotion": "Anger",
     "claimed_emotion": null,
     "ground_truth_label": "Anger",
-    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?",
+    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?\n\nA. Happiness\nB. Anger\nC. Surprise\nD. Sadness\nE. Fear\nF. Disgust\nG. Ridicule\nH. Excitement\nI. Neutral\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Anger",
@@ -14938,7 +14938,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Based only on the audio, how would you classify the speaker's emotional tone?",
+    "prompt": "Based only on the audio, how would you classify the speaker's emotional tone?\n\nA. Fear\nB. Disgust\nC. Surprise\nD. Frustration\nE. Anger\nF. Neutral\nG. Happiness\nH. Sadness\nI. Ridicule\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Disgust",
@@ -14970,7 +14970,7 @@
     "true_emotion": "Excitement",
     "claimed_emotion": null,
     "ground_truth_label": "Excitement",
-    "prompt": "Based only on the audio, how would you classify the speaker's emotional tone?",
+    "prompt": "Based only on the audio, how would you classify the speaker's emotional tone?\n\nA. Anger\nB. Neutral\nC. Fear\nD. Ridicule\nE. Excitement\nF. Sadness\nG. Frustration\nH. Surprise\nI. Disgust\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Neutral",
@@ -15002,7 +15002,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?",
+    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?\n\nA. Happiness\nB. Excitement\nC. Anger\nD. Neutral\nE. Surprise\nF. Fear\nG. Disgust\nH. Sadness\nI. Ridicule\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Excitement",
@@ -15034,7 +15034,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?",
+    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?\n\nA. Frustration\nB. Sadness\nC. Excitement\nD. Fear\nE. Disgust\nF. Ridicule\nG. Neutral\nH. Happiness\nI. Anger\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Frustration",
       "B": "Sadness",
@@ -15066,7 +15066,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Ridicule",
-    "prompt": "What emotion does the speaker's voice convey in this audio clip?",
+    "prompt": "What emotion does the speaker's voice convey in this audio clip?\n\nA. Neutral\nB. Frustration\nC. Ridicule\nD. Anger\nE. Fear\nF. Disgust\nG. Sadness\nH. Happiness\nI. Excitement\nJ. Surprise\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Frustration",
@@ -15098,7 +15098,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": null,
     "ground_truth_label": "Surprise",
-    "prompt": "Classify the emotional tone of the speaker based on the audio alone.",
+    "prompt": "Classify the emotional tone of the speaker based on the audio alone.\n\nA. Neutral\nB. Sadness\nC. Ridicule\nD. Excitement\nE. Frustration\nF. Fear\nG. Surprise\nH. Disgust\nI. Anger\nJ. Happiness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Sadness",
@@ -15130,7 +15130,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.",
+    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.\n\nA. Excitement\nB. Frustration\nC. Fear\nD. Disgust\nE. Anger\nF. Sadness\nG. Ridicule\nH. Happiness\nI. Surprise\nJ. Neutral\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Excitement",
       "B": "Frustration",
@@ -15162,7 +15162,7 @@
     "true_emotion": "Surprise",
     "claimed_emotion": null,
     "ground_truth_label": "Surprise",
-    "prompt": "Based only on the audio, how would you classify the speaker's emotional tone?",
+    "prompt": "Based only on the audio, how would you classify the speaker's emotional tone?\n\nA. Sadness\nB. Neutral\nC. Ridicule\nD. Fear\nE. Surprise\nF. Disgust\nG. Frustration\nH. Happiness\nI. Anger\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Neutral",
@@ -15194,7 +15194,7 @@
     "true_emotion": "Neutral",
     "claimed_emotion": null,
     "ground_truth_label": "Neutral",
-    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?",
+    "prompt": "Listen carefully to the audio. What is the speaker's emotional state?\n\nA. Fear\nB. Surprise\nC. Sadness\nD. Excitement\nE. Disgust\nF. Happiness\nG. Ridicule\nH. Anger\nI. Neutral\nJ. Frustration\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Fear",
       "B": "Surprise",
@@ -15226,7 +15226,7 @@
     "true_emotion": "Disgust",
     "claimed_emotion": null,
     "ground_truth_label": "Disgust",
-    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?",
+    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?\n\nA. Neutral\nB. Anger\nC. Disgust\nD. Fear\nE. Ridicule\nF. Excitement\nG. Surprise\nH. Frustration\nI. Happiness\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Neutral",
       "B": "Anger",
@@ -15258,7 +15258,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?",
+    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?\n\nA. Disgust\nB. Surprise\nC. Neutral\nD. Happiness\nE. Excitement\nF. Anger\nG. Ridicule\nH. Fear\nI. Frustration\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Disgust",
       "B": "Surprise",
@@ -15290,7 +15290,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.",
+    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.\n\nA. Sadness\nB. Fear\nC. Disgust\nD. Surprise\nE. Ridicule\nF. Happiness\nG. Frustration\nH. Neutral\nI. Excitement\nJ. Anger\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Sadness",
       "B": "Fear",
@@ -15322,7 +15322,7 @@
     "true_emotion": "Frustration",
     "claimed_emotion": null,
     "ground_truth_label": "Frustration",
-    "prompt": "What emotion does the speaker's voice convey in this audio clip?",
+    "prompt": "What emotion does the speaker's voice convey in this audio clip?\n\nA. Happiness\nB. Ridicule\nC. Fear\nD. Frustration\nE. Surprise\nF. Excitement\nG. Sadness\nH. Neutral\nI. Anger\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Ridicule",
@@ -15354,7 +15354,7 @@
     "true_emotion": "Sadness",
     "claimed_emotion": null,
     "ground_truth_label": "Sadness",
-    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.",
+    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.\n\nA. Happiness\nB. Neutral\nC. Fear\nD. Surprise\nE. Excitement\nF. Frustration\nG. Ridicule\nH. Anger\nI. Sadness\nJ. Disgust\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Neutral",
@@ -15386,7 +15386,7 @@
     "true_emotion": "Happiness",
     "claimed_emotion": null,
     "ground_truth_label": "Happiness",
-    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.",
+    "prompt": "Listen to the clip and identify the emotion conveyed by the speaker's delivery.\n\nA. Anger\nB. Fear\nC. Sadness\nD. Frustration\nE. Happiness\nF. Neutral\nG. Disgust\nH. Ridicule\nI. Surprise\nJ. Excitement\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Anger",
       "B": "Fear",
@@ -15418,7 +15418,7 @@
     "true_emotion": "Ridicule",
     "claimed_emotion": null,
     "ground_truth_label": "Ridicule",
-    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?",
+    "prompt": "Listen to the audio and classify the emotion. What emotion is expressed in the speaker's voice?\n\nA. Happiness\nB. Fear\nC. Ridicule\nD. Frustration\nE. Excitement\nF. Surprise\nG. Disgust\nH. Anger\nI. Neutral\nJ. Sadness\n\nAnswer with the letter of the correct option.",
     "options": {
       "A": "Happiness",
       "B": "Fear",
