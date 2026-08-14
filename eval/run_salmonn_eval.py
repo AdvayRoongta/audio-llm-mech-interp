@@ -526,6 +526,37 @@ def _write_silence_wav(sample_rate, duration_seconds=SILENCE_DURATION_SECONDS):
     return path
 
 
+def _resample_if_needed(path, target_sample_rate):
+    """
+    SALMONN's own prepare_one_sample() (SALMONN/utils.py) hands raw_speech
+    straight to WhisperFeatureExtractor with no resampling step of its own --
+    it assumes the file on disk is already at the extractor's sampling rate
+    (16kHz). That's true for this dataset's MUStARD++-sourced sarcasm_pacing
+    audio (already 16kHz) but NOT for its RAVDESS-sourced audio
+    (emotional_prosody, speaker_identity -- natively 48kHz), which fails
+    WhisperFeatureExtractor's sampling-rate check outright. Resample to a temp
+    file when the source doesn't already match, mirroring the silence-WAV
+    temp-file pattern used for text_only below. Returns (path, is_temp).
+    """
+    import soundfile as sf
+
+    info = sf.info(path)
+    if info.samplerate == target_sample_rate:
+        return path, False
+
+    import librosa
+
+    audio, sr = sf.read(path, dtype="float32", always_2d=False)
+    if getattr(audio, "ndim", 1) > 1:
+        audio = audio.mean(axis=1)
+    resampled = librosa.resample(audio, orig_sr=sr, target_sr=target_sample_rate)
+
+    fd, out_path = tempfile.mkstemp(suffix=".wav")
+    os.close(fd)
+    sf.write(out_path, resampled, target_sample_rate)
+    return out_path, True
+
+
 def _run_generate(model, samples, prompt, max_new_tokens):
     import torch
 
@@ -554,16 +585,26 @@ def inference_with_audio_clean(model, wav_processor, item, max_new_tokens=64, au
     text claim, for text_audio it already carries the claim. This function
     does not construct or reorder any claim text itself.
 
-    Uses the item's real audio_path directly. Unlike the text_only path
-    below, no temp file is needed here -- prepare_one_sample() takes a file
-    path, and a real audio file already exists on disk for these items.
+    Uses the item's real audio_path, resampled to wav_processor's sampling
+    rate first if the source file doesn't already match it (see
+    _resample_if_needed) -- this dataset mixes RAVDESS audio (48kHz) and
+    MUStARD++ audio (already 16kHz), and SALMONN's own prepare_one_sample()
+    does no resampling of its own.
     """
     from utils import prepare_one_sample
 
     prompt = _ensure_terse_instruction(item["prompt"])
     path = audio_path or item.get("audio_path")
-    samples = prepare_one_sample(path, wav_processor)
-    raw = _run_generate(model, samples, prompt, max_new_tokens)
+    resolved_path, is_temp = _resample_if_needed(path, wav_processor.sampling_rate)
+    try:
+        samples = prepare_one_sample(resolved_path, wav_processor)
+        raw = _run_generate(model, samples, prompt, max_new_tokens)
+    finally:
+        if is_temp:
+            try:
+                os.remove(resolved_path)
+            except OSError:
+                pass
     cleaned = _clean_llm_output(raw)
     return cleaned, parse_answer_letter(cleaned, build_option_map(item))
 
