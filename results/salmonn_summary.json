@@ -1,0 +1,45 @@
+{
+  "timestamp": "20260814_211310",
+  "ckpt": "/vol/hf_cache/models--tsinghua-ee--SALMONN/snapshots/e0e903b8a07f623616d1b950b8846b4535b76666/salmonn_v1.pth",
+  "llama_path": "lmsys/vicuna-13b-v1.1",
+  "whisper_path": "openai/whisper-large-v2",
+  "beats_path": "/vol/salmonn_artifacts/beats.pt",
+  "dtype": "float16",
+  "low_resource": false,
+  "input": "/repo/data/combined_examples.json",
+  "seed": 0,
+  "limit": null,
+  "experiments": ["emotional_prosody", "speaker_identity", "sarcasm_pacing"],
+  "per_category": {
+    "emotional_prosody": {
+      "metrics": {"n_total": 178, "n_scored": 178, "n_invalid": 0, "n_error": 0, "weighted_accuracy": 0.47752808988764045, "uar": 0.47444358178053825, "macro_f1": 0.4667567263311944, "micro_f1": 0.47752808988764045, "accuracy_invalid_as_wrong": 0.47752808988764045},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 38, "n_scored": 38, "n_invalid": 0, "weighted_accuracy": 0.13157894736842105, "uar": 0.19407894736842102},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.95, "uar": 0.9523809523809523},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.3333333333333333, "uar": 0.3896554834054834},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.15, "uar": 0.16666666666666666}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 51, "follow_audio": 1, "follow_neither": 8, "invalid": 0, "claim_unresolved": 0, "tdr": 0.85}
+    },
+    "speaker_identity": {
+      "metrics": {"n_total": 160, "n_scored": 160, "n_invalid": 0, "n_error": 0, "weighted_accuracy": 0.575, "uar": 0.575, "macro_f1": 0.5733333333333333, "micro_f1": 0.575, "accuracy_invalid_as_wrong": 0.575},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.5, "uar": 0.5},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.5, "uar": 0.5},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.6666666666666666, "uar": 0.6666666666666666},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.6, "uar": 0.6}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 32, "follow_audio": 24, "follow_neither": 4, "invalid": 0, "claim_unresolved": 0, "tdr": 0.5333333333333333}
+    },
+    "sarcasm_pacing": {
+      "metrics": {"n_total": 180, "n_scored": 180, "n_invalid": 0, "n_error": 0, "weighted_accuracy": 0.31666666666666665, "uar": 0.3626531569565625, "macro_f1": 0.3576662712353232, "micro_f1": 0.31666666666666665, "accuracy_invalid_as_wrong": 0.31666666666666665},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 40, "n_scored": 40, "n_invalid": 0, "weighted_accuracy": 0.225, "uar": 0.1585978835978836},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.5833333333333334, "uar": 0.6305555555555555},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.11666666666666667, "uar": 0.1259259259259259},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.3, "uar": 0.35185185185185186}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 25, "follow_audio": 4, "follow_neither": 31, "invalid": 0, "claim_unresolved": 0, "tdr": 0.4166666666666667}
+    }
+  }
+}

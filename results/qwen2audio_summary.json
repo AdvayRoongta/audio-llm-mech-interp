@@ -1,0 +1,41 @@
+{
+  "timestamp": "20260814_204408",
+  "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+  "dtype": "float16",
+  "input": "/repo/data/combined_examples.json",
+  "seed": 0,
+  "limit": null,
+  "experiments": ["emotional_prosody", "speaker_identity", "sarcasm_pacing"],
+  "per_category": {
+    "emotional_prosody": {
+      "metrics": {"n_total": 178, "n_scored": 177, "n_invalid": 1, "n_error": 0, "weighted_accuracy": 0.6101694915254238, "uar": 0.6068464144551101, "macro_f1": 0.6006919606133834, "micro_f1": 0.6101694915254238, "accuracy_invalid_as_wrong": 0.6067415730337079},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 38, "n_scored": 37, "n_invalid": 1, "weighted_accuracy": 0.3783783783783784, "uar": 0.4861111111111111},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 1.0, "uar": 1.0},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.3333333333333333, "uar": 0.3856872294372294},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.7, "uar": 0.6904761904761905}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 60, "follow_audio": 0, "follow_neither": 0, "invalid": 0, "claim_unresolved": 0, "tdr": 1.0}
+    },
+    "speaker_identity": {
+      "metrics": {"n_total": 160, "n_scored": 160, "n_invalid": 0, "n_error": 0, "weighted_accuracy": 0.7875, "uar": 0.7875000000000001, "macro_f1": 0.786967418546366, "micro_f1": 0.7875, "accuracy_invalid_as_wrong": 0.7875},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.95, "uar": 0.95},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 1.0, "uar": 1.0},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.45, "uar": 0.44999999999999996},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 1.0, "uar": 1.0}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 53, "follow_audio": 7, "follow_neither": 0, "invalid": 0, "claim_unresolved": 0, "tdr": 0.8833333333333333}
+    },
+    "sarcasm_pacing": {
+      "metrics": {"n_total": 180, "n_scored": 173, "n_invalid": 7, "n_error": 0, "weighted_accuracy": 0.3352601156069364, "uar": 0.36775495607513986, "macro_f1": 0.33599856574456116, "micro_f1": 0.3352601156069364, "accuracy_invalid_as_wrong": 0.32222222222222224},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 40, "n_scored": 37, "n_invalid": 3, "weighted_accuracy": 0.2972972972972973, "uar": 0.21904761904761905},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.6833333333333333, "uar": 0.6930555555555555},
+        "Mismatched": {"n_total": 60, "n_scored": 57, "n_invalid": 3, "weighted_accuracy": 0.0, "uar": 0.0},
+        "Paralinguistic": {"n_total": 20, "n_scored": 19, "n_invalid": 1, "weighted_accuracy": 0.3157894736842105, "uar": 0.35185185185185186}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 57, "follow_text": 34, "follow_audio": 0, "follow_neither": 23, "invalid": 3, "claim_unresolved": 0, "tdr": 0.5964912280701754}
+    }
+  }
+}
