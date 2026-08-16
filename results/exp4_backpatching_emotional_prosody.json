@@ -1,0 +1,112 @@
+{
+  "run": {
+    "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "default",
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "category": "emotional_prosody",
+    "seed": 0,
+    "fixed_seconds": 3.0,
+    "n_layers": 32,
+    "n_mismatched": 40,
+    "n_matched": 40
+  },
+  "baseline": {
+    "audio": 0.0,
+    "capability": 1.0,
+    "tdr": {
+      "n": 40,
+      "tdr": 1.0,
+      "audio_rate": 0.0,
+      "neither": 0.0
+    }
+  },
+  "sweep": [
+    {
+      "src": 31,
+      "dst": 0,
+      "window": 1,
+      "audio": 0.0,
+      "capability": 1.0,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 0,
+      "window": 3,
+      "audio": 0.0,
+      "capability": 1.0,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 0,
+      "window": 5,
+      "audio": 0.0,
+      "capability": 1.0,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 2,
+      "window": 1,
+      "audio": 0.0,
+      "capability": 1.0,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 2,
+      "window": 3,
+      "audio": 0.0,
+      "capability": 1.0,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 2,
+      "window": 5,
+      "audio": 0.0,
+      "capability": 0.95,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 4,
+      "window": 1,
+      "audio": 0.0,
+      "capability": 1.0,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 4,
+      "window": 3,
+      "audio": 0.0,
+      "capability": 0.95,
+      "tdr": 1.0
+    },
+    {
+      "src": 31,
+      "dst": 4,
+      "window": 5,
+      "audio": 0.0,
+      "capability": 0.85,
+      "tdr": 0.95
+    }
+  ],
+  "best": {
+    "src": 31,
+    "dst": 0,
+    "window": 1,
+    "audio": 0.0,
+    "capability": 1.0,
+    "tdr": 1.0
+  },
+  "mid_layer_control": {
+    "src": 16,
+    "audio": 0.025
+  },
+  "verdict": "REJECT: a mid-layer source does as well, so late->early is not the mechanism."
+}

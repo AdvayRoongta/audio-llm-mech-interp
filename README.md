@@ -64,6 +64,9 @@ nothing can fail to parse.
 | `exp3_circuit_localization.py` | Which (layer, submodule, position) carry the claim vs the audio, and do those circuits overlap? | GPU, eager attention |
 | `exp4_backpatching.py` | Does Cho et al.'s late→early back-patch fix transfer to paralinguistic conflicts? | GPU |
 
+These need a GPU and the audio corpus. See **[MODAL.md](MODAL.md)** for
+running them on Modal, which fetches the audio and the model for you.
+
 Run them from the repo root, after putting the audio corpus in `dataset_audio/`:
 
 ```bash
