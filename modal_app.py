@@ -271,6 +271,35 @@ def warm_model():
     return str(model.dtype)
 
 
+@app.function(image=image, timeout=60 * 5)
+def code_version():
+    """Confirm which copy of the code Modal is actually running.
+
+    add_local_dir re-mounts eval/ on every run, so edits should propagate with
+    no rebuild -- but when output looks unchanged after an edit, guessing is
+    worse than checking.
+    """
+    import hashlib
+    import os
+
+    print("{:<34} {:>8}  {}".format("file", "bytes", "sha256[:12]"))
+    for name in sorted(os.listdir("/repo/eval")):
+        if not name.endswith(".py"):
+            continue
+        path = os.path.join("/repo/eval", name)
+        data = open(path, "rb").read()
+        print("{:<34} {:>8}  {}".format(
+            name, len(data), hashlib.sha256(data).hexdigest()[:12]))
+
+    src = open("/repo/eval/exp3_circuit_localization.py").read()
+    fixed = "SIGNAL_FLOOR" in src and "no signal, IoU undefined" in src
+    print("\nexp3 zero-signal fix present: {}".format(fixed))
+    if not fixed:
+        print("Modal is running an OLD exp3. Re-run from the repo root, or")
+        print("force a rebuild with:  modal run --force-build modal_app.py::code_version")
+    return {"exp3_fix_present": fixed}
+
+
 @app.function(image=image, volumes=VOLUMES, timeout=60 * 10, env=ENV)
 def corpus_status():
     """What audio is actually present, per category."""
