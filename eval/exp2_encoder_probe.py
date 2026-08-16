@@ -117,6 +117,8 @@ def run_category(model, processor, items, category, args):
     import numpy as np
 
     rows = unique_clips(items, category)
+    if getattr(args, "limit", None):
+        rows = rows[:args.limit]
     if len(rows) < args.folds * 2:
         print("{}: only {} usable clips, skipping".format(category, len(rows)))
         return None
@@ -185,6 +187,8 @@ def parse_args(argv=None):
     ap.add_argument("--input", default=C.DEFAULT_DATASET)
     ap.add_argument("--category", choices=C.CATEGORIES, help="restrict to one category")
     ap.add_argument("--folds", type=int, default=5)
+    ap.add_argument("--limit", type=int,
+                    help="cap clips per category (smoke test before a full run)")
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
     ap.add_argument("--output-dir", default="results")
     ap.add_argument("--seed", type=int, default=0)
