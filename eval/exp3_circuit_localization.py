@@ -4,9 +4,13 @@ Cho et al. (arXiv:2606.18924) localised text and audio circuits for *lexical*
 conflicts and named paralinguistic conflicts as future work. This is that
 experiment, on this dataset.
 
-Method follows theirs -- attribution patching with integrated gradients, scored
-as (layer, submodule, position-group) tuples -- reimplemented on plain
-transformers hooks, since TransformerLens has no Qwen2-Audio support.
+Method follows theirs -- attribution patching scored as (layer, submodule,
+position-group) tuples -- reimplemented on plain transformers hooks, since
+TransformerLens has no Qwen2-Audio support. Cho et al. use integrated
+gradients on top of this; that part is NOT implemented here, because doing it
+across all components at once breaks cross-position gradient flow and doing it
+correctly needs a per-component path. --ig-steps 1 (plain AP) is the only
+supported setting, and it is the default.
 
 Two circuits, two counterfactuals. A circuit is defined by what changes the
 answer, so each modality needs its own clean/corrupt pair:
@@ -101,48 +105,69 @@ def metric_fn(model, logits, letter_ids_a, letter_ids_b):
 
 
 def attributions(model, clean_inputs, corrupt_inputs, groups, ids_a, ids_b, ig_steps):
-    """attr = (a_clean - a_corrupt) . d(metric)/d(a), averaged over the IG path.
+    """attr = (a_clean - a_corrupt) . d(metric)/d(a), from one forward+backward.
 
-    One backward pass per step rather than one forward per component, which is
-    what makes this tractable across 32 layers.
+    The hooks here only *observe*: they call retain_grad() on each submodule
+    output and keep a reference. They must not replace the output. An earlier
+    version substituted a cached blend at every attention and MLP module, which
+    turned each submodule into a constant with respect to its inputs -- that
+    severs attention's cross-position information flow, so every position
+    except the last had exactly zero gradient and the whole circuit collapsed
+    onto the generation position.
+
+    Note that faithfulness did not catch that: patching the final position
+    alone does recover the effect, so a degenerate circuit still scored 1.00.
     """
     import torch
 
+    if ig_steps and ig_steps > 1:
+        raise NotImplementedError(
+            "ig_steps > 1 is not implemented. Interpolating every submodule's\n"
+            "output simultaneously breaks cross-position gradient flow (that was\n"
+            "the bug this function used to have), and doing it correctly needs a\n"
+            "per-component path, which costs n_components x n_steps forwards.\n"
+            "Use --ig-steps 1 for plain attribution patching.")
+
     a_clean = capture(model, clean_inputs)
-    a_corrupt = capture(model, corrupt_inputs)
-    mods = submodules(model)
-    total = {(i, name, g): 0.0 for i, name, _ in mods for g in groups}
 
-    for step in range(1, ig_steps + 1):
-        alpha = step / ig_steps
-        held, handles = {}, []
-        for i, name, mod in mods:
-            def mk(key):
-                def hook(m, inp, out):
-                    is_tuple = isinstance(out, tuple)
-                    h = out[0] if is_tuple else out
-                    blend = a_corrupt[key] + alpha * (a_clean[key] - a_corrupt[key])
-                    blend = blend.to(h.dtype).clone().requires_grad_(True)
-                    held[key] = blend
-                    return (blend,) + out[1:] if is_tuple else blend
-                return hook
-            handles.append(mod.register_forward_hook(mk((i, name))))
+    held, handles = {}, []
+    for i, name, mod in submodules(model):
+        def mk(key):
+            def hook(m, inp, out):
+                h = out[0] if isinstance(out, tuple) else out
+                if h.requires_grad:
+                    h.retain_grad()
+                held[key] = h
+                return None          # observe only; never modify the output
+            return hook
+        handles.append(mod.register_forward_hook(mk((i, name))))
 
-        out = model(**corrupt_inputs, use_cache=False)
-        metric_fn(model, out.logits, ids_a, ids_b).backward()
-        for h in handles:
-            h.remove()
+    model.zero_grad(set_to_none=True)
+    out = model(**corrupt_inputs, use_cache=False)
+    metric_fn(model, out.logits, ids_a, ids_b).backward()
+    for h in handles:
+        h.remove()
 
-        for i, name, _ in mods:
-            key = (i, name)
-            grad = held[key].grad
-            if grad is None:
-                continue
-            delta = (a_clean[key] - a_corrupt[key]).float()
-            contrib = (delta * grad.float())[0]
-            for gname, (lo, hi) in groups.items():
-                total[(i, name, gname)] += float(contrib[lo:hi + 1].sum()) / ig_steps
-        model.zero_grad(set_to_none=True)
+    total = {}
+    no_grad = []
+    for i, name, _ in submodules(model):
+        key = (i, name)
+        h = held.get(key)
+        grad = None if h is None else h.grad
+        if grad is None:
+            no_grad.append(key)
+            for g in groups:
+                total[(i, name, g)] = 0.0
+            continue
+        delta = (a_clean[key] - h.detach()).float()
+        contrib = (delta * grad.float())[0]
+        for gname, (lo, hi) in groups.items():
+            total[(i, name, gname)] = float(contrib[lo:hi + 1].sum())
+
+    if no_grad:
+        print("   WARNING: no gradient reached {} of {} submodules".format(
+            len(no_grad), len(held) or len(no_grad)))
+    model.zero_grad(set_to_none=True)
     return total
 
 
@@ -350,7 +375,8 @@ def parse_args(argv=None):
     ap.add_argument("--input", default=C.DEFAULT_DATASET)
     ap.add_argument("--category", default="emotional_prosody", choices=C.CATEGORIES)
     ap.add_argument("--fixed-seconds", type=float, default=3.0)
-    ap.add_argument("--ig-steps", type=int, default=5, help="1 = plain attribution patching")
+    ap.add_argument("--ig-steps", type=int, default=1,
+                    help="only 1 is supported; see attributions() for why")
     ap.add_argument("--top-frac", type=float, default=0.20, help="Cho et al. used 0.20 for Qwen")
     ap.add_argument("--max-pairs", type=int, default=8)
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
