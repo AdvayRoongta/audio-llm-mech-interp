@@ -256,6 +256,32 @@ def audio_token_id(model):
     return model.config.audio_token_index
 
 
+def find_span(processor, inputs, text):
+    """Token span (first, last) of a prompt substring, or None.
+
+    Tokenizing a fragment in isolation can differ from its tokenization in
+    context at the edges -- a leading space merges, a trailing period splits --
+    so this retries progressively trimmed variants rather than giving up on the
+    first miss. Returns None instead of guessing when nothing matches.
+    """
+    ids = inputs["input_ids"][0].tolist()
+    tok = processor.tokenizer
+    text = (text or "").strip()
+    if len(text) < 2:
+        return None
+    for variant in (text, " " + text, "\n" + text):
+        sub = tok.encode(variant, add_special_tokens=False)
+        for lo in (0, 1):
+            for hi in (0, 1):
+                s = sub[lo:len(sub) - hi] if hi else sub[lo:]
+                if len(s) < 2:
+                    continue
+                for i in range(len(ids) - len(s) + 1):
+                    if ids[i:i + len(s)] == s:
+                        return i, i + len(s) - 1
+    return None
+
+
 # --------------------------------------------------------------------------- #
 # scoring
 # --------------------------------------------------------------------------- #

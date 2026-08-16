@@ -60,20 +60,64 @@ def submodules(model):
     return out
 
 
-def position_groups(model, inputs, item):
-    """Cho et al. split attributions by position; that split is what exposed
-    the disjoint-Data / shared-Query structure for lexical conflicts."""
+def position_groups(model, processor, inputs, item):
+    """Split positions the way Cho et al. do, because the Data-vs-Query
+    contrast is the whole comparison.
+
+    Their partition is Data / Query / Generation. Lumping the claim, the
+    question and the option list into one "text" group would conflate Data with
+    Query and make their numbers incomparable to ours. So:
+
+        audio     the audio token span            (Data, audio side)
+        claim     the sentence asserting a label  (Data, text side)
+        query     the question between them       (Query)
+        options   the "A. ... B. ..." list        (Query, answer surface)
+        gen       the final position              (Generation)
+
+    Any piece that cannot be located is omitted rather than guessed at, so a
+    prompt-format change shows up as a missing group instead of a wrong one.
+    """
     seq = inputs["input_ids"].shape[1]
     groups = {"gen": (seq - 1, seq - 1)}
+
     span = C.audio_span(inputs, C.audio_token_id(model))
     if span:
         groups["audio"] = span
-        # Everything after the audio and before the final position is prompt
-        # text: the claim plus the question plus the option list.
-        if span[1] + 1 <= seq - 2:
-            groups["text"] = (span[1] + 1, seq - 2)
-    else:
-        groups["text"] = (0, seq - 2)
+
+    prompt = item.get("prompt", "")
+    cut = prompt.find("\nA. ")
+
+    # claim: the line mentioning the asserted label
+    claim = claim_value(item)
+    if claim and cut > 0:
+        for line in prompt[:cut].splitlines():
+            if claim.lower() in line.lower() and "transcript" not in line.lower():
+                got = C.find_span(processor, inputs, line.strip())
+                if got:
+                    groups["claim"] = got
+                break
+
+    # options: the lettered list through the end of the prompt
+    if cut > 0:
+        got = C.find_span(processor, inputs, prompt[cut:].strip())
+        if got:
+            groups["options"] = got
+
+    # query: whatever text sits between the claim and the options
+    if "claim" in groups and "options" in groups:
+        lo, hi = groups["claim"][1] + 1, groups["options"][0] - 1
+        if lo <= hi:
+            groups["query"] = (lo, hi)
+    elif span and cut > 0 and "options" in groups:
+        lo, hi = span[1] + 1, groups["options"][0] - 1
+        if lo <= hi:
+            groups["query"] = (lo, hi)
+
+    # Fallback so the experiment still runs on an unexpected prompt format.
+    if not any(k in groups for k in ("claim", "query", "options")):
+        lo = (span[1] + 1) if span else 0
+        if lo <= seq - 2:
+            groups["text"] = (lo, seq - 2)
     return groups
 
 
@@ -231,7 +275,16 @@ def iou(a, b):
 
 
 def claim_value(item):
-    """The raw label the text asserts, e.g. 'female'."""
+    """The label the prompt actually asserts, e.g. 'female'.
+
+    claim_swapped() rewrites the prompt but leaves the dataset's claimed_* field
+    untouched, so on a swapped item that field names the label that is no longer
+    there. _claim_swapped_to records what the prompt now says and takes
+    precedence -- otherwise anything locating the claim in the text searches for
+    the wrong word.
+    """
+    if item.get("_claim_swapped_to") is not None:
+        return item["_claim_swapped_to"]
     import run_qwen2audio_eval as R
     key = R.first_present_key(item, R.CLAIMED_KEY_CANDIDATES.get(item.get("category"), []))
     return item.get(key) if key else None
@@ -364,7 +417,7 @@ def run_pair(model, processor, clean, corrupt, letter_a, letter_b, fixed_seconds
     letters = C.letter_token_ids(processor, list(C.option_map(corrupt).keys()))
     ids_a, ids_b = letters[letter_a], letters[letter_b]
 
-    groups = position_groups(model, ia, clean)
+    groups = position_groups(model, processor, ia, clean)
     attr = attributions(model, ia, ib, groups, ids_a, ids_b, ig_steps)
     return attr, groups, ia, ib, ids_a, ids_b
 
