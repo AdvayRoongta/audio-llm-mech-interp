@@ -175,8 +175,28 @@ def patch_components(model, clean_inputs, corrupt_inputs, components, groups):
     return out.logits
 
 
+# Below this, an attribution is indistinguishable from float noise. Causal
+# attention makes whole groups exactly zero -- e.g. the audio span cannot see a
+# claim that comes after it, so for the text circuit every audio-position
+# attribution is 0.0. Ranking zeros with a stable sort returns insertion order,
+# so two circuits "agree" perfectly and IoU comes out 1.000 while meaning
+# nothing at all.
+SIGNAL_FLOOR = 1e-8
+
+
+def group_magnitude(attr, group=None):
+    vals = [abs(v) for k, v in attr.items() if group is None or k[2] == group]
+    return max(vals) if vals else 0.0
+
+
+def has_signal(attr, group=None):
+    return group_magnitude(attr, group) > SIGNAL_FLOOR
+
+
 def top_set(attr, frac, group=None):
     rows = [(k, abs(v)) for k, v in attr.items() if group is None or k[2] == group]
+    if not rows or max(v for _, v in rows) <= SIGNAL_FLOOR:
+        return set()          # no signal: refuse to rank noise
     rows.sort(key=lambda kv: -kv[1])
     return {k for k, _ in rows[:max(1, int(len(rows) * frac))]}
 
@@ -374,14 +394,27 @@ def main(argv=None):
     print("\n" + "=" * 74)
     print("CIRCUIT OVERLAP (IoU at {:.0%} sparsity)".format(args.top_frac))
     print("=" * 74)
-    overlap = {}
-    for g in sorted(set(groups_t) & set(groups_a)):
-        overlap[g] = iou(top_set(attr_text, args.top_frac, g),
-                         top_set(attr_audio, args.top_frac, g))
-        print("  {:<8} {:.3f}".format(g, overlap[g]))
-    overlap["ALL"] = iou(top_set(attr_text, args.top_frac),
-                         top_set(attr_audio, args.top_frac))
-    print("  {:<8} {:.3f}".format("ALL", overlap["ALL"]))
+    overlap, magnitudes = {}, {}
+    print("  {:<8} {:>8}  {:>11} {:>11}".format("group", "IoU", "|attr|text", "|attr|audio"))
+    for g in sorted(set(groups_t) & set(groups_a)) + ["ALL"]:
+        grp = None if g == "ALL" else g
+        mt, ma = group_magnitude(attr_text, grp), group_magnitude(attr_audio, grp)
+        magnitudes[g] = {"text": mt, "audio": ma}
+        live = mt > SIGNAL_FLOOR and ma > SIGNAL_FLOOR
+        val = iou(top_set(attr_text, args.top_frac, grp),
+                  top_set(attr_audio, args.top_frac, grp)) if live else None
+        overlap[g] = val
+        print("  {:<8} {:>8}  {:>11.2e} {:>11.2e}{}".format(
+            g, "{:.3f}".format(val) if val is not None else "n/a", mt, ma,
+            "" if live else "   <- no signal, IoU undefined"))
+
+    dead = [g for g, v in overlap.items() if v is None]
+    if dead:
+        print("\n  Groups with no signal: {}.".format(", ".join(dead)))
+        print("  Causal attention means a group that cannot see what the")
+        print("  counterfactual changed has identical activations in both runs,")
+        print("  so its attributions are exactly zero. That is expected, not a")
+        print("  bug -- but it is not overlap, and must not be reported as 1.0.")
     print("\nCho et al. (lexical, Qwen): ~0.01 at Data positions, 0.54-0.89 at")
     print("Query/Generation. Compare -- a different shape here is the finding.")
 
@@ -417,6 +450,7 @@ def main(argv=None):
                                n_text_pairs=len(text_pairs), n_audio_pairs=len(audio_pairs),
                                seed=args.seed),
                    "overlap_iou": overlap,
+                   "group_magnitudes": magnitudes,
                    "faithfulness": faith,
                    "attr_text": {"{}|{}|{}".format(*k): v for k, v in attr_text.items()},
                    "attr_audio": {"{}|{}|{}".format(*k): v for k, v in attr_audio.items()}},
