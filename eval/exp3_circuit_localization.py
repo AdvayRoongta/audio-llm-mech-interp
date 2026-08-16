@@ -274,6 +274,43 @@ def iou(a, b):
     return len(a & b) / len(a | b) if (a | b) else 0.0
 
 
+def mean_attr(per_pair):
+    """Component-wise mean across pairs."""
+    if not per_pair:
+        return {}
+    keys = set().union(*(d.keys() for d in per_pair))
+    return {k: sum(d.get(k, 0.0) for d in per_pair) / len(per_pair) for k in keys}
+
+
+def bootstrap_iou(per_text, per_audio, group, frac, n_boot=1000, seed=0):
+    """Percentile CI for the IoU, resampling pairs with replacement.
+
+    Returns (point_estimate, lo, hi) or None when either side has no signal.
+    """
+    import random as _random
+
+    point_t, point_a = mean_attr(per_text), mean_attr(per_audio)
+    if not has_signal(point_t, group) or not has_signal(point_a, group):
+        return None
+    point = iou(top_set(point_t, frac, group), top_set(point_a, frac, group))
+
+    rng = _random.Random(seed)
+    vals = []
+    for _ in range(n_boot):
+        bt = [per_text[rng.randrange(len(per_text))] for _ in range(len(per_text))]
+        ba = [per_audio[rng.randrange(len(per_audio))] for _ in range(len(per_audio))]
+        mt, ma = mean_attr(bt), mean_attr(ba)
+        if not has_signal(mt, group) or not has_signal(ma, group):
+            continue
+        vals.append(iou(top_set(mt, frac, group), top_set(ma, frac, group)))
+    if not vals:
+        return None
+    vals.sort()
+    lo = vals[int(0.025 * (len(vals) - 1))]
+    hi = vals[int(0.975 * (len(vals) - 1))]
+    return point, lo, hi
+
+
 def claim_value(item):
     """The label the prompt actually asserts, e.g. 'female'.
 
@@ -432,6 +469,8 @@ def parse_args(argv=None):
                     help="only 1 is supported; see attributions() for why")
     ap.add_argument("--top-frac", type=float, default=0.20, help="Cho et al. used 0.20 for Qwen")
     ap.add_argument("--max-pairs", type=int, default=8)
+    ap.add_argument("--n-boot", type=int, default=1000,
+                    help="bootstrap resamples for the IoU confidence interval")
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
     ap.add_argument("--output-dir", default="results")
     ap.add_argument("--seed", type=int, default=0)
@@ -456,36 +495,48 @@ def main(argv=None):
         raise SystemExit("not enough aligned pairs to localize a circuit")
 
     def accumulate(pairs, label):
-        total, groups_seen = {}, None
+        """Per-pair attributions, kept individually so IoU can be bootstrapped.
+
+        A single pair's circuit is noisy, so the mean alone gives no way to say
+        whether two categories differ or whether either differs from Cho et al.
+        """
+        per_pair, groups_seen = [], None
         for n, (clean, corrupt, la, lb) in enumerate(pairs, 1):
             attr, groups, ia, ib, ids_a, ids_b = run_pair(
                 model, processor, clean, corrupt, la, lb,
                 args.fixed_seconds, args.ig_steps)
-            for k, v in attr.items():
-                total[k] = total.get(k, 0.0) + v / len(pairs)
+            per_pair.append(attr)
             groups_seen = groups
             print("  {} pair {}/{}".format(label, n, len(pairs)))
-        return total, groups_seen
+        return per_pair, mean_attr(per_pair), groups_seen
 
-    attr_text, groups_t = accumulate(text_pairs, "text")
-    attr_audio, groups_a = accumulate(audio_pairs, "audio")
+    per_text, attr_text, groups_t = accumulate(text_pairs, "text")
+    per_audio, attr_audio, groups_a = accumulate(audio_pairs, "audio")
 
     print("\n" + "=" * 74)
     print("CIRCUIT OVERLAP (IoU at {:.0%} sparsity)".format(args.top_frac))
     print("=" * 74)
-    overlap, magnitudes = {}, {}
-    print("  {:<8} {:>8}  {:>11} {:>11}".format("group", "IoU", "|attr|text", "|attr|audio"))
+    overlap, magnitudes, cis = {}, {}, {}
+    print("  {:<8} {:>8} {:>16}  {:>11} {:>11}".format(
+        "group", "IoU", "95% CI", "|attr|text", "|attr|audio"))
     for g in sorted(set(groups_t) & set(groups_a)) + ["ALL"]:
         grp = None if g == "ALL" else g
         mt, ma = group_magnitude(attr_text, grp), group_magnitude(attr_audio, grp)
         magnitudes[g] = {"text": mt, "audio": ma}
-        live = mt > SIGNAL_FLOOR and ma > SIGNAL_FLOOR
-        val = iou(top_set(attr_text, args.top_frac, grp),
-                  top_set(attr_audio, args.top_frac, grp)) if live else None
-        overlap[g] = val
-        print("  {:<8} {:>8}  {:>11.2e} {:>11.2e}{}".format(
-            g, "{:.3f}".format(val) if val is not None else "n/a", mt, ma,
-            "" if live else "   <- no signal, IoU undefined"))
+        boot = bootstrap_iou(per_text, per_audio, grp, args.top_frac,
+                             n_boot=args.n_boot, seed=args.seed)
+        if boot is None:
+            overlap[g], cis[g] = None, None
+            print("  {:<8} {:>8} {:>16}  {:>11.2e} {:>11.2e}   <- no signal, IoU undefined"
+                  .format(g, "n/a", "", mt, ma))
+        else:
+            point, lo, hi = boot
+            overlap[g], cis[g] = point, [lo, hi]
+            print("  {:<8} {:>8} {:>16}  {:>11.2e} {:>11.2e}".format(
+                g, "{:.3f}".format(point), "[{:.2f}, {:.2f}]".format(lo, hi), mt, ma))
+    print("\n  CIs are percentile bootstrap over {} resamples of {} text / {} audio"
+          .format(args.n_boot, len(per_text), len(per_audio)))
+    print("  pairs. With this few pairs they are wide -- that is the point.")
 
     dead = [g for g, v in overlap.items() if v is None]
     if dead:
@@ -529,6 +580,7 @@ def main(argv=None):
                                n_text_pairs=len(text_pairs), n_audio_pairs=len(audio_pairs),
                                seed=args.seed),
                    "overlap_iou": overlap,
+                   "overlap_iou_ci95": cis,
                    "group_magnitudes": magnitudes,
                    "faithfulness": faith,
                    "attr_text": {"{}|{}|{}".format(*k): v for k, v in attr_text.items()},
