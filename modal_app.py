@@ -24,7 +24,7 @@ Then, in order:
 Results are copied to ./results automatically at the end. To pull them again
 without rerunning:
 
-    modal run modal_app.py::fetch_results
+    modal run modal_app.py --fetch-only
 
 Individual pieces:
 
@@ -346,8 +346,13 @@ def experiment(name: str, args: str = ""):
 
 
 @app.local_entrypoint()
-def main():
+def main(fetch_only: bool = False):
     """Run every experiment the available audio supports.
+
+    fetch_only just pulls existing results down without rerunning anything.
+    It is a flag rather than a second local_entrypoint because Modal only
+    auto-selects an entrypoint when there is exactly one, and a second one
+    breaks plain `modal run modal_app.py`.
 
     exp1 runs across all categories with audio -- it is the gate, and its
     verdict decides whether exp2-4 mean anything for that category. exp3 and
@@ -358,6 +363,10 @@ def main():
     v1 raw clips cover 113 of its 180 items. Expect the per-category warning
     about the 29 MUStARD++ ids that are still missing.
     """
+    if fetch_only:
+        save_results_locally()
+        return
+
     status = corpus_status.remote()
     ready = [c for c, v in (status or {}).items() if v["present"] > 0]
     partial = {c: v for c, v in (status or {}).items() if 0 < v["present"] < v["total"]}
@@ -408,7 +417,3 @@ def save_results_locally(dest="results"):
     return n
 
 
-@app.local_entrypoint()
-def fetch_results():
-    """Just pull results down, without rerunning anything."""
-    save_results_locally()
