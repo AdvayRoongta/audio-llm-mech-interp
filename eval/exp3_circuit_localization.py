@@ -118,8 +118,6 @@ def attributions(model, clean_inputs, corrupt_inputs, groups, ids_a, ids_b, ig_s
     Note that faithfulness did not catch that: patching the final position
     alone does recover the effect, so a degenerate circuit still scored 1.00.
     """
-    import torch
-
     if ig_steps and ig_steps > 1:
         raise NotImplementedError(
             "ig_steps > 1 is not implemented. Interpolating every submodule's\n"
@@ -127,6 +125,8 @@ def attributions(model, clean_inputs, corrupt_inputs, groups, ids_a, ids_b, ig_s
             "the bug this function used to have), and doing it correctly needs a\n"
             "per-component path, which costs n_components x n_steps forwards.\n"
             "Use --ig-steps 1 for plain attribution patching.")
+
+    import torch  # noqa: F401  (kept for parity with the other helpers)
 
     a_clean = capture(model, clean_inputs)
 
