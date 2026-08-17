@@ -498,8 +498,8 @@ def main():
         description="Generate an emotional-prosody conflict eval set from the "
                     "RAVDESS filename convention (no source files required)."
     )
-    ap.add_argument("--n-per-condition", type=int, default=20,
-                    help="unique clips sampled per condition (default: 20)")
+    ap.add_argument("--n-per-condition", type=int, default=133,
+                    help="unique clips sampled per condition (default: 133)")
     ap.add_argument("--seed", type=int, default=0, help="RNG seed (default: 0)")
     ap.add_argument("--out", default="data/emotional_prosody_examples.json",
                     help="output JSON path")

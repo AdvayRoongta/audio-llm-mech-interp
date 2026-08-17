@@ -434,7 +434,7 @@ def print_summary(items, condition_counts, warnings):
 def main():
     ap = argparse.ArgumentParser(description="Build sarcasm-pacing eval set v2 (real false-claim structure)")
     ap.add_argument("--input-csv", required=True, help="path to mustard_pp_utterances_only.csv")
-    ap.add_argument("--n-per-condition", type=int, default=20)
+    ap.add_argument("--n-per-condition", type=int, default=133)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default="data/sarcasm_pacing_examples_v2.json")
     ap.add_argument("--neutral-text-divergent", action="store_true",
