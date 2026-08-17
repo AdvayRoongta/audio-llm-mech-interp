@@ -1,0 +1,269 @@
+{
+  "run": {
+    "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "default",
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "seed": 0,
+    "folds": 5,
+    "dataset": "data/combined_examples.json",
+    "speaker_dependent": false
+  },
+  "verdicts": {
+    "speaker_identity": "signal survives to the language model. Suppression is decoder-side -> run exp3/exp4."
+  },
+  "results": [
+    {
+      "category": "speaker_identity",
+      "n_clips": 80,
+      "classes": [
+        "female",
+        "male"
+      ],
+      "chance": 0.5,
+      "cv_scheme": "speaker-independent",
+      "n_actors": 24,
+      "layers": [
+        {
+          "layer": 0,
+          "name": "encoder 0",
+          "accuracy": 0.8978991596638656,
+          "shuffled": 0.3758403361344538,
+          "chance": 0.5
+        },
+        {
+          "layer": 1,
+          "name": "encoder 1",
+          "accuracy": 0.9496848739495798,
+          "shuffled": 0.38476890756302523,
+          "chance": 0.5
+        },
+        {
+          "layer": 2,
+          "name": "encoder 2",
+          "accuracy": 0.9496848739495798,
+          "shuffled": 0.32478991596638657,
+          "chance": 0.5
+        },
+        {
+          "layer": 3,
+          "name": "encoder 3",
+          "accuracy": 0.9353991596638656,
+          "shuffled": 0.29800420168067226,
+          "chance": 0.5
+        },
+        {
+          "layer": 4,
+          "name": "encoder 4",
+          "accuracy": 0.9478991596638655,
+          "shuffled": 0.3557773109243697,
+          "chance": 0.5
+        },
+        {
+          "layer": 5,
+          "name": "encoder 5",
+          "accuracy": 0.9596638655462184,
+          "shuffled": 0.28119747899159664,
+          "chance": 0.5
+        },
+        {
+          "layer": 6,
+          "name": "encoder 6",
+          "accuracy": 0.9453781512605042,
+          "shuffled": 0.296218487394958,
+          "chance": 0.5
+        },
+        {
+          "layer": 7,
+          "name": "encoder 7",
+          "accuracy": 0.9471638655462185,
+          "shuffled": 0.3722689075630252,
+          "chance": 0.5
+        },
+        {
+          "layer": 8,
+          "name": "encoder 8",
+          "accuracy": 0.9596638655462184,
+          "shuffled": 0.33329831932773113,
+          "chance": 0.5
+        },
+        {
+          "layer": 9,
+          "name": "encoder 9",
+          "accuracy": 0.9739495798319329,
+          "shuffled": 0.24516806722689077,
+          "chance": 0.5
+        },
+        {
+          "layer": 10,
+          "name": "encoder 10",
+          "accuracy": 0.9596638655462184,
+          "shuffled": 0.24548319327731094,
+          "chance": 0.5
+        },
+        {
+          "layer": 11,
+          "name": "encoder 11",
+          "accuracy": 0.9857142857142858,
+          "shuffled": 0.27048319327731096,
+          "chance": 0.5
+        },
+        {
+          "layer": 12,
+          "name": "encoder 12",
+          "accuracy": 0.9857142857142858,
+          "shuffled": 0.3097689075630252,
+          "chance": 0.5
+        },
+        {
+          "layer": 13,
+          "name": "encoder 13",
+          "accuracy": 1.0,
+          "shuffled": 0.34758403361344536,
+          "chance": 0.5
+        },
+        {
+          "layer": 14,
+          "name": "encoder 14",
+          "accuracy": 1.0,
+          "shuffled": 0.37615546218487395,
+          "chance": 0.5
+        },
+        {
+          "layer": 15,
+          "name": "encoder 15",
+          "accuracy": 1.0,
+          "shuffled": 0.4004201680672269,
+          "chance": 0.5
+        },
+        {
+          "layer": 16,
+          "name": "encoder 16",
+          "accuracy": 1.0,
+          "shuffled": 0.38718487394957984,
+          "chance": 0.5
+        },
+        {
+          "layer": 17,
+          "name": "encoder 17",
+          "accuracy": 1.0,
+          "shuffled": 0.33361344537815124,
+          "chance": 0.5
+        },
+        {
+          "layer": 18,
+          "name": "encoder 18",
+          "accuracy": 1.0,
+          "shuffled": 0.3490546218487395,
+          "chance": 0.5
+        },
+        {
+          "layer": 19,
+          "name": "encoder 19",
+          "accuracy": 1.0,
+          "shuffled": 0.3065126050420168,
+          "chance": 0.5
+        },
+        {
+          "layer": 20,
+          "name": "encoder 20",
+          "accuracy": 1.0,
+          "shuffled": 0.3918067226890756,
+          "chance": 0.5
+        },
+        {
+          "layer": 21,
+          "name": "encoder 21",
+          "accuracy": 0.975,
+          "shuffled": 0.4942226890756302,
+          "chance": 0.5
+        },
+        {
+          "layer": 22,
+          "name": "encoder 22",
+          "accuracy": 0.9875,
+          "shuffled": 0.4699579831932773,
+          "chance": 0.5
+        },
+        {
+          "layer": 23,
+          "name": "encoder 23",
+          "accuracy": 1.0,
+          "shuffled": 0.4482142857142858,
+          "chance": 0.5
+        },
+        {
+          "layer": 24,
+          "name": "encoder 24",
+          "accuracy": 1.0,
+          "shuffled": 0.49149159663865544,
+          "chance": 0.5
+        },
+        {
+          "layer": 25,
+          "name": "encoder 25",
+          "accuracy": 1.0,
+          "shuffled": 0.47720588235294115,
+          "chance": 0.5
+        },
+        {
+          "layer": 26,
+          "name": "encoder 26",
+          "accuracy": 1.0,
+          "shuffled": 0.5125,
+          "chance": 0.5
+        },
+        {
+          "layer": 27,
+          "name": "encoder 27",
+          "accuracy": 0.9875,
+          "shuffled": 0.47720588235294115,
+          "chance": 0.5
+        },
+        {
+          "layer": 28,
+          "name": "encoder 28",
+          "accuracy": 1.0,
+          "shuffled": 0.451155462184874,
+          "chance": 0.5
+        },
+        {
+          "layer": 29,
+          "name": "encoder 29",
+          "accuracy": 1.0,
+          "shuffled": 0.40220588235294114,
+          "chance": 0.5
+        },
+        {
+          "layer": 30,
+          "name": "encoder 30",
+          "accuracy": 1.0,
+          "shuffled": 0.40220588235294114,
+          "chance": 0.5
+        },
+        {
+          "layer": 31,
+          "name": "encoder 31",
+          "accuracy": 1.0,
+          "shuffled": 0.4465336134453781,
+          "chance": 0.5
+        },
+        {
+          "layer": 32,
+          "name": "encoder 32",
+          "accuracy": 1.0,
+          "shuffled": 0.45472689075630246,
+          "chance": 0.5
+        },
+        {
+          "layer": 33,
+          "name": "post-projector",
+          "accuracy": 1.0,
+          "shuffled": 0.4286764705882353,
+          "chance": 0.5
+        }
+      ]
+    }
+  ]
+}

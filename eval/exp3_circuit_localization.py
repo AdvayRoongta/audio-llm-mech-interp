@@ -4,9 +4,13 @@ Cho et al. (arXiv:2606.18924) localised text and audio circuits for *lexical*
 conflicts and named paralinguistic conflicts as future work. This is that
 experiment, on this dataset.
 
-Method follows theirs -- attribution patching with integrated gradients, scored
-as (layer, submodule, position-group) tuples -- reimplemented on plain
-transformers hooks, since TransformerLens has no Qwen2-Audio support.
+Method follows theirs -- attribution patching scored as (layer, submodule,
+position-group) tuples -- reimplemented on plain transformers hooks, since
+TransformerLens has no Qwen2-Audio support. Cho et al. use integrated
+gradients on top of this; that part is NOT implemented here, because doing it
+across all components at once breaks cross-position gradient flow and doing it
+correctly needs a per-component path. --ig-steps 1 (plain AP) is the only
+supported setting, and it is the default.
 
 Two circuits, two counterfactuals. A circuit is defined by what changes the
 answer, so each modality needs its own clean/corrupt pair:
@@ -56,20 +60,64 @@ def submodules(model):
     return out
 
 
-def position_groups(model, inputs, item):
-    """Cho et al. split attributions by position; that split is what exposed
-    the disjoint-Data / shared-Query structure for lexical conflicts."""
+def position_groups(model, processor, inputs, item):
+    """Split positions the way Cho et al. do, because the Data-vs-Query
+    contrast is the whole comparison.
+
+    Their partition is Data / Query / Generation. Lumping the claim, the
+    question and the option list into one "text" group would conflate Data with
+    Query and make their numbers incomparable to ours. So:
+
+        audio     the audio token span            (Data, audio side)
+        claim     the sentence asserting a label  (Data, text side)
+        query     the question between them       (Query)
+        options   the "A. ... B. ..." list        (Query, answer surface)
+        gen       the final position              (Generation)
+
+    Any piece that cannot be located is omitted rather than guessed at, so a
+    prompt-format change shows up as a missing group instead of a wrong one.
+    """
     seq = inputs["input_ids"].shape[1]
     groups = {"gen": (seq - 1, seq - 1)}
+
     span = C.audio_span(inputs, C.audio_token_id(model))
     if span:
         groups["audio"] = span
-        # Everything after the audio and before the final position is prompt
-        # text: the claim plus the question plus the option list.
-        if span[1] + 1 <= seq - 2:
-            groups["text"] = (span[1] + 1, seq - 2)
-    else:
-        groups["text"] = (0, seq - 2)
+
+    prompt = item.get("prompt", "")
+    cut = prompt.find("\nA. ")
+
+    # claim: the line mentioning the asserted label
+    claim = claim_value(item)
+    if claim and cut > 0:
+        for line in prompt[:cut].splitlines():
+            if claim.lower() in line.lower() and "transcript" not in line.lower():
+                got = C.find_span(processor, inputs, line.strip())
+                if got:
+                    groups["claim"] = got
+                break
+
+    # options: the lettered list through the end of the prompt
+    if cut > 0:
+        got = C.find_span(processor, inputs, prompt[cut:].strip())
+        if got:
+            groups["options"] = got
+
+    # query: whatever text sits between the claim and the options
+    if "claim" in groups and "options" in groups:
+        lo, hi = groups["claim"][1] + 1, groups["options"][0] - 1
+        if lo <= hi:
+            groups["query"] = (lo, hi)
+    elif span and cut > 0 and "options" in groups:
+        lo, hi = span[1] + 1, groups["options"][0] - 1
+        if lo <= hi:
+            groups["query"] = (lo, hi)
+
+    # Fallback so the experiment still runs on an unexpected prompt format.
+    if not any(k in groups for k in ("claim", "query", "options")):
+        lo = (span[1] + 1) if span else 0
+        if lo <= seq - 2:
+            groups["text"] = (lo, seq - 2)
     return groups
 
 
@@ -101,48 +149,69 @@ def metric_fn(model, logits, letter_ids_a, letter_ids_b):
 
 
 def attributions(model, clean_inputs, corrupt_inputs, groups, ids_a, ids_b, ig_steps):
-    """attr = (a_clean - a_corrupt) . d(metric)/d(a), averaged over the IG path.
+    """attr = (a_clean - a_corrupt) . d(metric)/d(a), from one forward+backward.
 
-    One backward pass per step rather than one forward per component, which is
-    what makes this tractable across 32 layers.
+    The hooks here only *observe*: they call retain_grad() on each submodule
+    output and keep a reference. They must not replace the output. An earlier
+    version substituted a cached blend at every attention and MLP module, which
+    turned each submodule into a constant with respect to its inputs -- that
+    severs attention's cross-position information flow, so every position
+    except the last had exactly zero gradient and the whole circuit collapsed
+    onto the generation position.
+
+    Note that faithfulness did not catch that: patching the final position
+    alone does recover the effect, so a degenerate circuit still scored 1.00.
     """
-    import torch
+    if ig_steps and ig_steps > 1:
+        raise NotImplementedError(
+            "ig_steps > 1 is not implemented. Interpolating every submodule's\n"
+            "output simultaneously breaks cross-position gradient flow (that was\n"
+            "the bug this function used to have), and doing it correctly needs a\n"
+            "per-component path, which costs n_components x n_steps forwards.\n"
+            "Use --ig-steps 1 for plain attribution patching.")
+
+    import torch  # noqa: F401  (kept for parity with the other helpers)
 
     a_clean = capture(model, clean_inputs)
-    a_corrupt = capture(model, corrupt_inputs)
-    mods = submodules(model)
-    total = {(i, name, g): 0.0 for i, name, _ in mods for g in groups}
 
-    for step in range(1, ig_steps + 1):
-        alpha = step / ig_steps
-        held, handles = {}, []
-        for i, name, mod in mods:
-            def mk(key):
-                def hook(m, inp, out):
-                    is_tuple = isinstance(out, tuple)
-                    h = out[0] if is_tuple else out
-                    blend = a_corrupt[key] + alpha * (a_clean[key] - a_corrupt[key])
-                    blend = blend.to(h.dtype).clone().requires_grad_(True)
-                    held[key] = blend
-                    return (blend,) + out[1:] if is_tuple else blend
-                return hook
-            handles.append(mod.register_forward_hook(mk((i, name))))
+    held, handles = {}, []
+    for i, name, mod in submodules(model):
+        def mk(key):
+            def hook(m, inp, out):
+                h = out[0] if isinstance(out, tuple) else out
+                if h.requires_grad:
+                    h.retain_grad()
+                held[key] = h
+                return None          # observe only; never modify the output
+            return hook
+        handles.append(mod.register_forward_hook(mk((i, name))))
 
-        out = model(**corrupt_inputs, use_cache=False)
-        metric_fn(model, out.logits, ids_a, ids_b).backward()
-        for h in handles:
-            h.remove()
+    model.zero_grad(set_to_none=True)
+    out = model(**corrupt_inputs, use_cache=False)
+    metric_fn(model, out.logits, ids_a, ids_b).backward()
+    for h in handles:
+        h.remove()
 
-        for i, name, _ in mods:
-            key = (i, name)
-            grad = held[key].grad
-            if grad is None:
-                continue
-            delta = (a_clean[key] - a_corrupt[key]).float()
-            contrib = (delta * grad.float())[0]
-            for gname, (lo, hi) in groups.items():
-                total[(i, name, gname)] += float(contrib[lo:hi + 1].sum()) / ig_steps
-        model.zero_grad(set_to_none=True)
+    total = {}
+    no_grad = []
+    for i, name, _ in submodules(model):
+        key = (i, name)
+        h = held.get(key)
+        grad = None if h is None else h.grad
+        if grad is None:
+            no_grad.append(key)
+            for g in groups:
+                total[(i, name, g)] = 0.0
+            continue
+        delta = (a_clean[key] - h.detach()).float()
+        contrib = (delta * grad.float())[0]
+        for gname, (lo, hi) in groups.items():
+            total[(i, name, gname)] = float(contrib[lo:hi + 1].sum())
+
+    if no_grad:
+        print("   WARNING: no gradient reached {} of {} submodules".format(
+            len(no_grad), len(held) or len(no_grad)))
+    model.zero_grad(set_to_none=True)
     return total
 
 
@@ -175,8 +244,28 @@ def patch_components(model, clean_inputs, corrupt_inputs, components, groups):
     return out.logits
 
 
+# Below this, an attribution is indistinguishable from float noise. Causal
+# attention makes whole groups exactly zero -- e.g. the audio span cannot see a
+# claim that comes after it, so for the text circuit every audio-position
+# attribution is 0.0. Ranking zeros with a stable sort returns insertion order,
+# so two circuits "agree" perfectly and IoU comes out 1.000 while meaning
+# nothing at all.
+SIGNAL_FLOOR = 1e-8
+
+
+def group_magnitude(attr, group=None):
+    vals = [abs(v) for k, v in attr.items() if group is None or k[2] == group]
+    return max(vals) if vals else 0.0
+
+
+def has_signal(attr, group=None):
+    return group_magnitude(attr, group) > SIGNAL_FLOOR
+
+
 def top_set(attr, frac, group=None):
     rows = [(k, abs(v)) for k, v in attr.items() if group is None or k[2] == group]
+    if not rows or max(v for _, v in rows) <= SIGNAL_FLOOR:
+        return set()          # no signal: refuse to rank noise
     rows.sort(key=lambda kv: -kv[1])
     return {k for k, _ in rows[:max(1, int(len(rows) * frac))]}
 
@@ -185,8 +274,54 @@ def iou(a, b):
     return len(a & b) / len(a | b) if (a | b) else 0.0
 
 
+def mean_attr(per_pair):
+    """Component-wise mean across pairs."""
+    if not per_pair:
+        return {}
+    keys = set().union(*(d.keys() for d in per_pair))
+    return {k: sum(d.get(k, 0.0) for d in per_pair) / len(per_pair) for k in keys}
+
+
+def bootstrap_iou(per_text, per_audio, group, frac, n_boot=1000, seed=0):
+    """Percentile CI for the IoU, resampling pairs with replacement.
+
+    Returns (point_estimate, lo, hi) or None when either side has no signal.
+    """
+    import random as _random
+
+    point_t, point_a = mean_attr(per_text), mean_attr(per_audio)
+    if not has_signal(point_t, group) or not has_signal(point_a, group):
+        return None
+    point = iou(top_set(point_t, frac, group), top_set(point_a, frac, group))
+
+    rng = _random.Random(seed)
+    vals = []
+    for _ in range(n_boot):
+        bt = [per_text[rng.randrange(len(per_text))] for _ in range(len(per_text))]
+        ba = [per_audio[rng.randrange(len(per_audio))] for _ in range(len(per_audio))]
+        mt, ma = mean_attr(bt), mean_attr(ba)
+        if not has_signal(mt, group) or not has_signal(ma, group):
+            continue
+        vals.append(iou(top_set(mt, frac, group), top_set(ma, frac, group)))
+    if not vals:
+        return None
+    vals.sort()
+    lo = vals[int(0.025 * (len(vals) - 1))]
+    hi = vals[int(0.975 * (len(vals) - 1))]
+    return point, lo, hi
+
+
 def claim_value(item):
-    """The raw label the text asserts, e.g. 'female'."""
+    """The label the prompt actually asserts, e.g. 'female'.
+
+    claim_swapped() rewrites the prompt but leaves the dataset's claimed_* field
+    untouched, so on a swapped item that field names the label that is no longer
+    there. _claim_swapped_to records what the prompt now says and takes
+    precedence -- otherwise anything locating the claim in the text searches for
+    the wrong word.
+    """
+    if item.get("_claim_swapped_to") is not None:
+        return item["_claim_swapped_to"]
     import run_qwen2audio_eval as R
     key = R.first_present_key(item, R.CLAIMED_KEY_CANDIDATES.get(item.get("category"), []))
     return item.get(key) if key else None
@@ -319,7 +454,7 @@ def run_pair(model, processor, clean, corrupt, letter_a, letter_b, fixed_seconds
     letters = C.letter_token_ids(processor, list(C.option_map(corrupt).keys()))
     ids_a, ids_b = letters[letter_a], letters[letter_b]
 
-    groups = position_groups(model, ia, clean)
+    groups = position_groups(model, processor, ia, clean)
     attr = attributions(model, ia, ib, groups, ids_a, ids_b, ig_steps)
     return attr, groups, ia, ib, ids_a, ids_b
 
@@ -330,9 +465,12 @@ def parse_args(argv=None):
     ap.add_argument("--input", default=C.DEFAULT_DATASET)
     ap.add_argument("--category", default="emotional_prosody", choices=C.CATEGORIES)
     ap.add_argument("--fixed-seconds", type=float, default=3.0)
-    ap.add_argument("--ig-steps", type=int, default=5, help="1 = plain attribution patching")
+    ap.add_argument("--ig-steps", type=int, default=1,
+                    help="only 1 is supported; see attributions() for why")
     ap.add_argument("--top-frac", type=float, default=0.20, help="Cho et al. used 0.20 for Qwen")
     ap.add_argument("--max-pairs", type=int, default=8)
+    ap.add_argument("--n-boot", type=int, default=1000,
+                    help="bootstrap resamples for the IoU confidence interval")
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
     ap.add_argument("--output-dir", default="results")
     ap.add_argument("--seed", type=int, default=0)
@@ -357,31 +495,56 @@ def main(argv=None):
         raise SystemExit("not enough aligned pairs to localize a circuit")
 
     def accumulate(pairs, label):
-        total, groups_seen = {}, None
+        """Per-pair attributions, kept individually so IoU can be bootstrapped.
+
+        A single pair's circuit is noisy, so the mean alone gives no way to say
+        whether two categories differ or whether either differs from Cho et al.
+        """
+        per_pair, groups_seen = [], None
         for n, (clean, corrupt, la, lb) in enumerate(pairs, 1):
             attr, groups, ia, ib, ids_a, ids_b = run_pair(
                 model, processor, clean, corrupt, la, lb,
                 args.fixed_seconds, args.ig_steps)
-            for k, v in attr.items():
-                total[k] = total.get(k, 0.0) + v / len(pairs)
+            per_pair.append(attr)
             groups_seen = groups
             print("  {} pair {}/{}".format(label, n, len(pairs)))
-        return total, groups_seen
+        return per_pair, mean_attr(per_pair), groups_seen
 
-    attr_text, groups_t = accumulate(text_pairs, "text")
-    attr_audio, groups_a = accumulate(audio_pairs, "audio")
+    per_text, attr_text, groups_t = accumulate(text_pairs, "text")
+    per_audio, attr_audio, groups_a = accumulate(audio_pairs, "audio")
 
     print("\n" + "=" * 74)
     print("CIRCUIT OVERLAP (IoU at {:.0%} sparsity)".format(args.top_frac))
     print("=" * 74)
-    overlap = {}
-    for g in sorted(set(groups_t) & set(groups_a)):
-        overlap[g] = iou(top_set(attr_text, args.top_frac, g),
-                         top_set(attr_audio, args.top_frac, g))
-        print("  {:<8} {:.3f}".format(g, overlap[g]))
-    overlap["ALL"] = iou(top_set(attr_text, args.top_frac),
-                         top_set(attr_audio, args.top_frac))
-    print("  {:<8} {:.3f}".format("ALL", overlap["ALL"]))
+    overlap, magnitudes, cis = {}, {}, {}
+    print("  {:<8} {:>8} {:>16}  {:>11} {:>11}".format(
+        "group", "IoU", "95% CI", "|attr|text", "|attr|audio"))
+    for g in sorted(set(groups_t) & set(groups_a)) + ["ALL"]:
+        grp = None if g == "ALL" else g
+        mt, ma = group_magnitude(attr_text, grp), group_magnitude(attr_audio, grp)
+        magnitudes[g] = {"text": mt, "audio": ma}
+        boot = bootstrap_iou(per_text, per_audio, grp, args.top_frac,
+                             n_boot=args.n_boot, seed=args.seed)
+        if boot is None:
+            overlap[g], cis[g] = None, None
+            print("  {:<8} {:>8} {:>16}  {:>11.2e} {:>11.2e}   <- no signal, IoU undefined"
+                  .format(g, "n/a", "", mt, ma))
+        else:
+            point, lo, hi = boot
+            overlap[g], cis[g] = point, [lo, hi]
+            print("  {:<8} {:>8} {:>16}  {:>11.2e} {:>11.2e}".format(
+                g, "{:.3f}".format(point), "[{:.2f}, {:.2f}]".format(lo, hi), mt, ma))
+    print("\n  CIs are percentile bootstrap over {} resamples of {} text / {} audio"
+          .format(args.n_boot, len(per_text), len(per_audio)))
+    print("  pairs. With this few pairs they are wide -- that is the point.")
+
+    dead = [g for g, v in overlap.items() if v is None]
+    if dead:
+        print("\n  Groups with no signal: {}.".format(", ".join(dead)))
+        print("  Causal attention means a group that cannot see what the")
+        print("  counterfactual changed has identical activations in both runs,")
+        print("  so its attributions are exactly zero. That is expected, not a")
+        print("  bug -- but it is not overlap, and must not be reported as 1.0.")
     print("\nCho et al. (lexical, Qwen): ~0.01 at Data positions, 0.54-0.89 at")
     print("Query/Generation. Compare -- a different shape here is the finding.")
 
@@ -417,6 +580,8 @@ def main(argv=None):
                                n_text_pairs=len(text_pairs), n_audio_pairs=len(audio_pairs),
                                seed=args.seed),
                    "overlap_iou": overlap,
+                   "overlap_iou_ci95": cis,
+                   "group_magnitudes": magnitudes,
                    "faithfulness": faith,
                    "attr_text": {"{}|{}|{}".format(*k): v for k, v in attr_text.items()},
                    "attr_audio": {"{}|{}|{}".format(*k): v for k, v in attr_audio.items()}},

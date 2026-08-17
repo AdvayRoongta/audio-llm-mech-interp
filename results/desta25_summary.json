@@ -1,0 +1,41 @@
+{
+  "timestamp": "20260814_204904",
+  "model_path": "DeSTA-ntu/DeSTA2.5-Audio-Llama-3.1-8B",
+  "dtype": "bfloat16",
+  "input": "/repo/data/combined_examples.json",
+  "seed": 0,
+  "limit": null,
+  "experiments": ["emotional_prosody", "speaker_identity", "sarcasm_pacing"],
+  "per_category": {
+    "emotional_prosody": {
+      "metrics": {"n_total": 178, "n_scored": 175, "n_invalid": 3, "n_error": 0, "weighted_accuracy": 0.6857142857142857, "uar": 0.6888492538163591, "macro_f1": 0.6878329148830252, "micro_f1": 0.6857142857142857, "accuracy_invalid_as_wrong": 0.6741573033707865},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 38, "n_scored": 38, "n_invalid": 0, "weighted_accuracy": 0.6052631578947368, "uar": 0.5230263157894737},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.9333333333333333, "uar": 0.9365079365079365},
+        "Mismatched": {"n_total": 60, "n_scored": 57, "n_invalid": 3, "weighted_accuracy": 0.5263157894736842, "uar": 0.5676406926406926},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.55, "uar": 0.5714285714285714}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 57, "follow_text": 38, "follow_audio": 10, "follow_neither": 9, "invalid": 3, "claim_unresolved": 0, "tdr": 0.6666666666666666}
+    },
+    "speaker_identity": {
+      "metrics": {"n_total": 160, "n_scored": 152, "n_invalid": 8, "n_error": 0, "weighted_accuracy": 0.7302631578947368, "uar": 0.7299029799029799, "macro_f1": 0.7299709692794316, "micro_f1": 0.7302631578947368, "accuracy_invalid_as_wrong": 0.69375},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 20, "n_scored": 17, "n_invalid": 3, "weighted_accuracy": 0.9411764705882353, "uar": 0.9285714285714286},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 1.0, "uar": 1.0},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.3333333333333333, "uar": 0.3333333333333333},
+        "Paralinguistic": {"n_total": 20, "n_scored": 15, "n_invalid": 5, "weighted_accuracy": 1.0, "uar": 1.0}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 60, "follow_audio": 0, "follow_neither": 0, "invalid": 0, "claim_unresolved": 0, "tdr": 1.0}
+    },
+    "sarcasm_pacing": {
+      "metrics": {"n_total": 180, "n_scored": 180, "n_invalid": 0, "n_error": 0, "weighted_accuracy": 0.21666666666666667, "uar": 0.23077211745942394, "macro_f1": 0.20767960313692022, "micro_f1": 0.21666666666666667, "accuracy_invalid_as_wrong": 0.21666666666666667},
+      "by_condition": {
+        "Neutral-Text": {"n_total": 40, "n_scored": 40, "n_invalid": 0, "weighted_accuracy": 0.225, "uar": 0.24444444444444446},
+        "Matched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.31666666666666665, "uar": 0.30833333333333335},
+        "Mismatched": {"n_total": 60, "n_scored": 60, "n_invalid": 0, "weighted_accuracy": 0.1, "uar": 0.1148148148148148},
+        "Paralinguistic": {"n_total": 20, "n_scored": 20, "n_invalid": 0, "weighted_accuracy": 0.25, "uar": 0.2592592592592593}
+      },
+      "tdr": {"n_mismatched": 60, "n_usable": 60, "follow_text": 13, "follow_audio": 5, "follow_neither": 42, "invalid": 0, "claim_unresolved": 0, "tdr": 0.21666666666666667}
+    }
+  }
+}

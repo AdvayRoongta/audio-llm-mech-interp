@@ -158,15 +158,22 @@ def main(argv=None):
     print("capability {:.3f} -> {:.3f} ({:+.3f})".format(
         b_cap, best["capability"], best["capability"] - b_cap))
 
+    gain = best["audio"] - b_audio
+    # Order matters. "no effect" has to be tested before the mid-layer
+    # comparison: when every config sits at the floor, best <= mid is true by
+    # coincidence and reports "late->early is not the mechanism", which implies
+    # some other layer worked. Nothing worked.
     if best["capability"] == best["capability"] and best["capability"] < b_cap - 0.05:
-        verdict = "REJECT: capability dropped -- the patch broke the model, not the suppression."
+        verdict = ("REJECT: capability fell {:.3f} -> {:.3f}; the patch damaged the "
+                   "model rather than the suppression.".format(b_cap, best["capability"]))
+    elif gain <= 0.0:
+        verdict = ("NO EFFECT: audio accuracy stayed at {:.3f}. Back-patching does not "
+                   "transfer to this conflict type.".format(best["audio"]))
     elif best["audio"] <= c_audio:
-        verdict = "REJECT: a mid-layer source does as well, so late->early is not the mechanism."
-    elif best["audio"] > b_audio:
-        verdict = "TRANSFERS: +{:.3f} audio accuracy with capability intact.".format(
-            best["audio"] - b_audio)
+        verdict = ("REJECT: a mid-layer source does as well ({:.3f} vs {:.3f}), so "
+                   "late->early is not the mechanism.".format(c_audio, best["audio"]))
     else:
-        verdict = "NO EFFECT: back-patching does not transfer to this conflict type."
+        verdict = "TRANSFERS: +{:.3f} audio accuracy with capability intact.".format(gain)
     print("\n" + verdict)
     print("\nIf it transfers, check whether the destination layers coincide with the")
     print("text circuit exp3 found -- that would say back-patching overwrites the")

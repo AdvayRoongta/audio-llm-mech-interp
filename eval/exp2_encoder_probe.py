@@ -97,19 +97,50 @@ def layer_vectors(model, processor, item, tower, proj):
     return vecs
 
 
-def probe_layer(X, y, folds=5, seed=0):
+def make_cv(y, groups, folds, seed):
+    """Cross-validation splits, speaker-independent when we can be.
+
+    RAVDESS has 24 actors and each contributes many clips, so random folds put
+    the same voice in train and test. A probe can then lean on speaker-specific
+    prosody instead of emotion, which inflates accuracy. Grouping by actor
+    forces it to generalise across voices.
+
+    Falls back to plain stratified folds, loudly, when no group id exists
+    (MUStARD items carry none) or when a class sits in too few actors to split.
+    """
+    from sklearn.model_selection import StratifiedKFold
+
+    if groups is not None:
+        try:
+            from sklearn.model_selection import StratifiedGroupKFold
+            cv = StratifiedGroupKFold(n_splits=folds, shuffle=True, random_state=seed)
+            splits = list(cv.split(np_zeros(len(y)), y, groups))
+            if all(len(te) > 0 for _, te in splits):
+                return splits, "speaker-independent"
+        except Exception as exc:
+            print("   speaker-independent split unavailable ({}), "
+                  "falling back".format(type(exc).__name__))
+    cv = StratifiedKFold(n_splits=folds, shuffle=True, random_state=seed)
+    return list(cv.split(np_zeros(len(y)), y)), "speaker-dependent"
+
+
+def np_zeros(n):
+    import numpy as np
+    return np.zeros((n, 1))
+
+
+def probe_layer(X, y, splits, seed=0):
     """CV accuracy for one layer, and the shuffled-label control."""
     import numpy as np
     from sklearn.linear_model import LogisticRegression
-    from sklearn.model_selection import StratifiedKFold, cross_val_score
+    from sklearn.model_selection import cross_val_score
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 
     pipe = make_pipeline(StandardScaler(), LogisticRegression(max_iter=2000))
-    cv = StratifiedKFold(folds, shuffle=True, random_state=seed)
-    real = float(cross_val_score(pipe, X, y, cv=cv).mean())
+    real = float(cross_val_score(pipe, X, y, cv=splits).mean())
     shuffled = float(cross_val_score(
-        pipe, X, np.random.RandomState(seed).permutation(y), cv=cv).mean())
+        pipe, X, np.random.RandomState(seed).permutation(y), cv=splits).mean())
     return real, shuffled
 
 
@@ -117,11 +148,16 @@ def run_category(model, processor, items, category, args):
     import numpy as np
 
     rows = unique_clips(items, category)
+    if getattr(args, "limit", None):
+        rows = rows[:args.limit]
     if len(rows) < args.folds * 2:
         print("{}: only {} usable clips, skipping".format(category, len(rows)))
         return None
 
     labels = [r["label"] for r in rows]
+    groups = [r["item"].get("actor_id") for r in rows]
+    if any(g is None for g in groups):
+        groups = None
     classes = sorted(set(labels))
     counts = {c: labels.count(c) for c in classes}
     if min(counts.values()) < args.folds:
@@ -129,7 +165,10 @@ def run_category(model, processor, items, category, args):
               .format(category, min(counts.values()), args.folds))
         return None
 
-    print("\n{}: {} clips, {} classes {}".format(category, len(rows), len(classes), counts))
+    n_actors = len(set(groups)) if groups else 0
+    print("\n{}: {} clips, {} classes {}{}".format(
+        category, len(rows), len(classes), counts,
+        ", {} actors".format(n_actors) if groups else ", no actor ids"))
 
     tower, proj = C.audio_tower(model), C.projector(model)
     feats = []
@@ -140,17 +179,24 @@ def run_category(model, processor, items, category, args):
 
     n_layers = len(feats[0])
     chance = 1.0 / len(classes)
+    use_groups = None if args.speaker_dependent else groups
+    splits, scheme = make_cv(np.array(labels), use_groups, args.folds, args.seed)
+    print("  CV: {} ({} folds)".format(scheme, len(splits)))
+    if scheme == "speaker-dependent" and not args.speaker_dependent:
+        print("  NOTE: the same voice can appear in train and test, which can")
+        print("        inflate accuracy. Treat this as an upper bound.")
     out = []
     for l in range(n_layers):
         X = np.stack([f[l] for f in feats])
-        real, shuffled = probe_layer(X, np.array(labels), args.folds, args.seed)
+        real, shuffled = probe_layer(X, np.array(labels), splits, args.seed)
         name = "post-projector" if l == n_layers - 1 else "encoder {}".format(l)
         out.append({"layer": l, "name": name, "accuracy": real,
                     "shuffled": shuffled, "chance": chance})
         print("  {:<16} acc {:.3f}   shuffled {:.3f}   chance {:.3f}".format(
             name, real, shuffled, chance))
     return {"category": category, "n_clips": len(rows), "classes": classes,
-            "chance": chance, "layers": out}
+            "chance": chance, "cv_scheme": scheme,
+            "n_actors": n_actors, "layers": out}
 
 
 def verdict(result):
@@ -185,6 +231,10 @@ def parse_args(argv=None):
     ap.add_argument("--input", default=C.DEFAULT_DATASET)
     ap.add_argument("--category", choices=C.CATEGORIES, help="restrict to one category")
     ap.add_argument("--folds", type=int, default=5)
+    ap.add_argument("--speaker-dependent", action="store_true",
+                    help="allow the same actor in train and test (inflates accuracy)")
+    ap.add_argument("--limit", type=int,
+                    help="cap clips per category (smoke test before a full run)")
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
     ap.add_argument("--output-dir", default="results")
     ap.add_argument("--seed", type=int, default=0)
@@ -215,7 +265,8 @@ def main(argv=None):
     out = os.path.join(args.output_dir, "exp2_encoder_probe.json")
     with open(out, "w") as f:
         json.dump({"run": dict(info, seed=args.seed, folds=args.folds,
-                               dataset=args.input),
+                               dataset=args.input,
+                               speaker_dependent=args.speaker_dependent),
                    "verdicts": verdicts, "results": results}, f, indent=2)
     print("\nwrote {}".format(out))
     return 0

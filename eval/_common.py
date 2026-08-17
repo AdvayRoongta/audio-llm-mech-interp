@@ -40,12 +40,17 @@ MODALITIES = R.MODALITIES
 # --------------------------------------------------------------------------- #
 # dataset
 # --------------------------------------------------------------------------- #
-def load_items(path=DEFAULT_DATASET, require_audio=False):
+def load_items(path=DEFAULT_DATASET, require_audio=False, categories=None):
     """Items with audio_path resolved to something that exists on disk.
 
-    dataset_audio/ is gitignored, so on a fresh clone the audio is absent and
-    every audio-bearing item resolves to None. Callers that need audio should
-    pass require_audio=True and get told immediately rather than 300 items in.
+    dataset_audio/ is gitignored, so a corpus is often only partly present --
+    RAVDESS is redistributable and MUStARD is not, so in practice the two
+    RAVDESS categories are available and sarcasm_pacing is not.
+
+    require_audio therefore *drops* audio-bearing items whose file is missing
+    and reports what went, rather than refusing to run. It only aborts when
+    nothing usable is left, so a partial corpus still lets you evaluate the
+    categories you do have. Nothing is dropped silently.
     """
     data = R.load_dataset(path)
     items = data if isinstance(data, list) else data.get("examples", data)
@@ -57,14 +62,31 @@ def load_items(path=DEFAULT_DATASET, require_audio=False):
         item["_audio"] = R.resolve_audio_path(raw, path) if raw else None
         out.append(item)
 
-    if require_audio:
-        need = [i for i in out if i.get("modality") in ("audio_only", "text_audio")]
-        missing = [i for i in need if not i["_audio"]]
-        if missing:
-            raise SystemExit(
-                "{} of {} audio-bearing items have no audio on disk (e.g. {}).\n"
-                "dataset_audio/ is gitignored -- put the corpus in place first."
-                .format(len(missing), len(need), missing[0].get("audio_path")))
+    if categories:
+        out = [i for i in out if i.get("category") in categories]
+
+    if not require_audio:
+        return out
+
+    def needs_audio(i):
+        return i.get("modality") in ("audio_only", "text_audio")
+
+    missing = [i for i in out if needs_audio(i) and not i["_audio"]]
+    if missing:
+        by_cat = {}
+        for i in missing:
+            by_cat[i.get("category")] = by_cat.get(i.get("category"), 0) + 1
+        print("WARNING: dropping {} items with no audio on disk:".format(len(missing)))
+        for cat, n in sorted(by_cat.items()):
+            total = sum(1 for i in out if i.get("category") == cat and needs_audio(i))
+            print("   {:<20} {}/{} audio items missing".format(cat, n, total))
+        print("   example: {}".format(missing[0].get("audio_path")))
+        out = [i for i in out if not (needs_audio(i) and not i["_audio"])]
+
+    if not any(needs_audio(i) for i in out):
+        raise SystemExit(
+            "No audio-bearing item has a file on disk. dataset_audio/ is "
+            "gitignored -- put the corpus in place first.")
     return out
 
 
@@ -232,6 +254,32 @@ def audio_span(inputs, audio_token_id):
 
 def audio_token_id(model):
     return model.config.audio_token_index
+
+
+def find_span(processor, inputs, text):
+    """Token span (first, last) of a prompt substring, or None.
+
+    Tokenizing a fragment in isolation can differ from its tokenization in
+    context at the edges -- a leading space merges, a trailing period splits --
+    so this retries progressively trimmed variants rather than giving up on the
+    first miss. Returns None instead of guessing when nothing matches.
+    """
+    ids = inputs["input_ids"][0].tolist()
+    tok = processor.tokenizer
+    text = (text or "").strip()
+    if len(text) < 2:
+        return None
+    for variant in (text, " " + text, "\n" + text):
+        sub = tok.encode(variant, add_special_tokens=False)
+        for lo in (0, 1):
+            for hi in (0, 1):
+                s = sub[lo:len(sub) - hi] if hi else sub[lo:]
+                if len(s) < 2:
+                    continue
+                for i in range(len(ids) - len(s) + 1):
+                    if ids[i:i + len(s)] == s:
+                        return i, i + len(s) - 1
+    return None
 
 
 # --------------------------------------------------------------------------- #
