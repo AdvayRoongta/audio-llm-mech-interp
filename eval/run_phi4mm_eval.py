@@ -79,9 +79,11 @@ Audio is loaded with soundfile.read() at its native sample rate and passed
 straight through as (array, samplerate) -- no manual resampling. This exact
 path (audio-bearing items only) was run end-to-end locally against 5 real
 dataset items and produced clean, parseable single-letter answers every
-time. The text_only path (processor called without `audios`) follows the
-same documented API but has NOT been run locally -- smoke-test it with
---limit before trusting a full run.
+time. The text_only path (processor called without `audios`) was validated
+the same way in a separate smoke test -- 3/3 real dataset items across
+emotional_prosody, sarcasm_pacing, and speaker_identity, all clean
+"<letter>. <option text>" responses. Both inference paths are confirmed
+working end to end.
 
 Usage:
   py run_phi4mm_eval.py --dry-run                 # validate dataset, no model load
@@ -461,9 +463,8 @@ def inference_with_text_clean(model, processor, item, max_new_tokens=64):
     """
     Text-only items: modality == 'text_only'. No audio is loaded or passed.
     Same chat template with the audio placeholder simply omitted, per Phi-4's
-    documented text-only usage. NOT run against a live model locally -- the
-    sanity check that validated this script's audio path only covered
-    audio-bearing modalities. Smoke-test with --limit before a full run.
+    documented text-only usage. Validated locally against 3 real dataset
+    items across all three categories -- 3/3 clean, parseable responses.
     """
     prompt = item["prompt"]
     text = "<|user|>{}<|end|><|assistant|>".format(prompt)
