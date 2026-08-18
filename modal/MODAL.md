@@ -17,10 +17,10 @@ Use `python3 -m modal` rather than a bare `modal` if the CLI isn't on your PATH
 Then, from the repo root, in order:
 
 ```bash
-python3 -m modal run modal_app.py::fetch_ravdess     # ~10 min, once
-python3 -m modal run modal_app.py::fetch_mustard     # ~20 min, once (1.4 GB)
-python3 -m modal run modal_app.py::warm_model        # ~10 min, once (16.8 GB)
-python3 -m modal run modal_app.py::corpus_status     # check coverage first
+python3 -m modal run modal/modal_app.py::fetch_ravdess     # ~10 min, once
+python3 -m modal run modal/modal_app.py::fetch_mustard     # ~20 min, once (1.4 GB)
+python3 -m modal run modal/modal_app.py::warm_model        # ~10 min, once (16.8 GB)
+python3 -m modal run modal/modal_app.py::corpus_status     # check coverage first
 ```
 
 `corpus_status` should report roughly `119/119`, `120/120`, `76/120`. If it
@@ -29,24 +29,24 @@ reports zeros, the fetches haven't run.
 ## Running
 
 ```bash
-python3 -m modal run modal_app.py                    # everything, ~80 min
+python3 -m modal run modal/modal_app.py                    # everything, ~80 min
 ```
 
 Results are copied to `./results/` automatically when it finishes. To pull them
 again without rerunning:
 
 ```bash
-python3 -m modal run modal_app.py --fetch-only
+python3 -m modal run modal/modal_app.py --fetch-only
 ```
 
 Individual experiments:
 
 ```bash
-python3 -m modal run modal_app.py::experiment --name exp1_capability_screen
-python3 -m modal run modal_app.py::experiment --name exp2_encoder_probe --args "--category speaker_identity"
-python3 -m modal run modal_app.py::experiment --name exp3_circuit_localization --args "--category emotional_prosody"
-python3 -m modal run modal_app.py::experiment --name exp4_backpatching --args "--category emotional_prosody"
-python3 -m modal run modal_app.py::main_eval         # the behavioural eval
+python3 -m modal run modal/modal_app.py::experiment --name exp1_capability_screen
+python3 -m modal run modal/modal_app.py::experiment --name exp2_encoder_probe --args "--category speaker_identity"
+python3 -m modal run modal/modal_app.py::experiment --name exp3_circuit_localization --args "--category emotional_prosody"
+python3 -m modal run modal/modal_app.py::experiment --name exp4_backpatching --args "--category emotional_prosody"
+python3 -m modal run modal/modal_app.py::main_eval         # the behavioural eval
 ```
 
 ## Smoke test before spending GPU time
@@ -55,8 +55,8 @@ Roughly two minutes, and it catches infrastructure problems before a long run
 queues behind them:
 
 ```bash
-python3 -m modal run modal_app.py::experiment --name exp1_capability_screen --args "--category speaker_identity --limit 8"
-python3 -m modal run modal_app.py::experiment --name exp3_circuit_localization --args "--category emotional_prosody --max-pairs 1"
+python3 -m modal run modal/modal_app.py::experiment --name exp1_capability_screen --args "--category speaker_identity --limit 8"
+python3 -m modal run modal/modal_app.py::experiment --name exp3_circuit_localization --args "--category emotional_prosody --max-pairs 1"
 ```
 
 exp3 is the one to watch: it is the only experiment that holds a backward graph
@@ -76,7 +76,7 @@ If it does, change `GPU = "A100-40GB"` to `"H100"` in `modal_app.py`.
 with no rebuild. If output ever looks stale, check rather than guess:
 
 ```bash
-python3 -m modal run modal_app.py::code_version
+python3 -m modal run modal/modal_app.py::code_version
 ```
 
 It hashes the `eval/*.py` files as Modal sees them and reports whether the

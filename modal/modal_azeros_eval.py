@@ -31,9 +31,9 @@ Setup (see MODAL_SETUP.md for the full walkthrough)
   anonymous-download rate limits, same as the other wrappers.
 
 Usage:
-  modal run modal_azeros_eval.py --dry-run          # CPU dataset audit, no GPU
-  modal run modal_azeros_eval.py --sanity-check      # 5-example smoke test on GPU, stop there
-  modal run modal_azeros_eval.py --experiments all --limit 5
+  modal run modal/modal_azeros_eval.py --dry-run          # CPU dataset audit, no GPU
+  modal run modal/modal_azeros_eval.py --sanity-check      # 5-example smoke test on GPU, stop there
+  modal run modal/modal_azeros_eval.py --experiments all --limit 5
 """
 
 import os
@@ -41,7 +41,7 @@ from pathlib import Path
 
 import modal
 
-LOCAL_ROOT = Path(__file__).parent
+LOCAL_ROOT = Path(__file__).parent.parent
 CONTAINER_ROOT = "/repo"
 VOLUME_NAME = "qwen2audio-results"  # shared with the other four wrappers: results/ + HF cache
 SCRIPT_NAME = "run_azeros_eval.py"

@@ -28,9 +28,9 @@ Setup (see MODAL_SETUP.md for the full walkthrough)
   rate limits. No github-token secret is needed: this image clones nothing.
 
 Usage:
-  modal run modal_phi4mm_eval.py --dry-run
-  modal run modal_phi4mm_eval.py --experiments all --limit 5
-  modal run modal_phi4mm_eval.py --experiments emotional_prosody --limit 20
+  modal run modal/modal_phi4mm_eval.py --dry-run
+  modal run modal/modal_phi4mm_eval.py --experiments all --limit 5
+  modal run modal/modal_phi4mm_eval.py --experiments emotional_prosody --limit 20
 """
 
 import os
@@ -38,7 +38,7 @@ from pathlib import Path
 
 import modal
 
-LOCAL_ROOT = Path(__file__).parent
+LOCAL_ROOT = Path(__file__).parent.parent
 CONTAINER_ROOT = "/repo"
 VOLUME_NAME = "qwen2audio-results"  # shared with modal_qwen2audio_eval.py / modal_desta25_eval.py / modal_salmonn_eval.py
 SCRIPT_NAME = "run_phi4mm_eval.py"

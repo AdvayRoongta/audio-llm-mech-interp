@@ -16,21 +16,21 @@ One-time setup on your machine:
 
 Then, in order:
 
-    modal run modal_app.py::fetch_ravdess         # ~10 min, once
-    modal run modal_app.py::fetch_mustard         # ~20 min, once (1.4 GB zip)
-    modal run modal_app.py::warm_model            # ~10 min, once (16.8 GB)
-    modal run modal_app.py                        # runs everything, saves to ./results
+    modal run modal/modal_app.py::fetch_ravdess         # ~10 min, once
+    modal run modal/modal_app.py::fetch_mustard         # ~20 min, once (1.4 GB zip)
+    modal run modal/modal_app.py::warm_model            # ~10 min, once (16.8 GB)
+    modal run modal/modal_app.py                        # runs everything, saves to ./results
 
 Results are copied to ./results automatically at the end. To pull them again
 without rerunning:
 
-    modal run modal_app.py --fetch-only
+    modal run modal/modal_app.py --fetch-only
 
 Individual pieces:
 
-    modal run modal_app.py::experiment --name exp1_capability_screen
-    modal run modal_app.py::experiment --name exp2_encoder_probe --args "--category speaker_identity"
-    modal run modal_app.py::main_eval --args "--experiments emotional_prosody"
+    modal run modal/modal_app.py::experiment --name exp1_capability_screen
+    modal run modal/modal_app.py::experiment --name exp2_encoder_probe --args "--category speaker_identity"
+    modal run modal/modal_app.py::main_eval --args "--experiments emotional_prosody"
 
 Audio coverage. RAVDESS is fetched in full, so emotional_prosody and
 speaker_identity are complete. MUStARD is only partly available: our items were
@@ -49,7 +49,7 @@ import sys
 
 import modal
 
-REPO = pathlib.Path(__file__).parent
+REPO = pathlib.Path(__file__).parent.parent
 MODEL_ID = "Qwen/Qwen2-Audio-7B-Instruct"
 # The model is 16.8 GB in fp16. exp1/2/4 are forward-only and memory-light;
 # exp3 backprops through the whole model, which needs the headroom. A100-40GB
@@ -352,7 +352,7 @@ def main(fetch_only: bool = False):
     fetch_only just pulls existing results down without rerunning anything.
     It is a flag rather than a second local_entrypoint because Modal only
     auto-selects an entrypoint when there is exactly one, and a second one
-    breaks plain `modal run modal_app.py`.
+    breaks plain `modal run modal/modal_app.py`.
 
     exp1 runs across all categories with audio -- it is the gate, and its
     verdict decides whether exp2-4 mean anything for that category. exp3 and
