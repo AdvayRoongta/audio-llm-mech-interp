@@ -5,3 +5,4 @@ __pycache__/
 
 # audio corpus - don't commit
 dataset_audio/**/*.wav
+dataset_audio.zip
