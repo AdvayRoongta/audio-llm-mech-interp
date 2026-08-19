@@ -6,3 +6,6 @@ __pycache__/
 # audio corpus - don't commit
 dataset_audio/**/*.wav
 dataset_audio.zip
+
+# generated figures - rebuild with viz/make_figures.py
+figures/

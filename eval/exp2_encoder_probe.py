@@ -262,7 +262,11 @@ def main(argv=None):
         verdicts[res["category"]] = verdict(res)
 
     os.makedirs(args.output_dir, exist_ok=True)
-    out = os.path.join(args.output_dir, "exp2_encoder_probe.json")
+    # Name the file after the category, as exp3 and exp4 do. A fixed name
+    # meant a per-category run silently overwrote the previous one, which
+    # already cost us one emotional_prosody probe.
+    suffix = "_{}".format(args.category) if args.category else ""
+    out = os.path.join(args.output_dir, "exp2_encoder_probe{}.json".format(suffix))
     with open(out, "w") as f:
         json.dump({"run": dict(info, seed=args.seed, folds=args.folds,
                                dataset=args.input,
