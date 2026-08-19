@@ -142,7 +142,8 @@ def summarise_failure(out):
 def parse_args(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--stage", required=True, choices=["audit", "smoke", "full"])
+    ap.add_argument("--stage", required=True,
+                    choices=["audit", "smoke", "full", "fetch"])
     ap.add_argument("--models", nargs="+", choices=list(MODELS), default=list(MODELS))
     ap.add_argument("--experiments", default=None,
                     help='"all", or a quoted space-separated subset. Defaults to '
@@ -184,8 +185,53 @@ def complete_categories():
     return sorted(seen - missing), sorted(missing)
 
 
+MODEL_VOLUME = "qwen2audio-results"   # every wrapper shares this one
+
+
+def fetch_results(dest="results"):
+    """Pull the per-model summaries out of the shared Modal volume.
+
+    The five wrappers write to volume "qwen2audio-results" at /results, which is
+    a different volume from the one modal_app.py uses for the mechanistic
+    experiments -- so `modal_app.py --fetch-only` does not bring these down.
+    """
+    os.makedirs(dest, exist_ok=True)
+    listing = subprocess.run(
+        [sys.executable, "-m", "modal", "volume", "ls", MODEL_VOLUME, "/results"],
+        cwd=REPO, capture_output=True, text=True)
+    if listing.returncode:
+        print(listing.stderr.strip()[:400])
+        return 1
+
+    names = [l.strip() for l in listing.stdout.splitlines()
+             if l.strip().endswith("_summary.json")]
+    if not names:
+        print("no *_summary.json in {}:/results yet".format(MODEL_VOLUME))
+        return 0
+
+    got = 0
+    for name in names:
+        remote = "/" + name.lstrip("/")
+        r = subprocess.run(
+            [sys.executable, "-m", "modal", "volume", "get",
+             MODEL_VOLUME, remote, dest],
+            cwd=REPO, capture_output=True, text=True)
+        if r.returncode == 0:
+            print("  pulled {}".format(os.path.basename(name)))
+            got += 1
+        else:
+            print("  FAILED {}: {}".format(os.path.basename(name),
+                                           r.stderr.strip()[:120]))
+    print("\n{} summary file(s) in ./{}/".format(got, dest))
+    print("Now run: python viz/make_figures.py")
+    return 0
+
+
 def main(argv=None):
     args = parse_args(argv)
+
+    if args.stage == "fetch":
+        return fetch_results()
 
     if args.experiments is None:
         found = complete_categories()
