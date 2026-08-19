@@ -31,9 +31,15 @@ import math
 import os
 
 # Headless by default: this usually runs over ssh or in CI.
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+try:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+except ImportError:                                   # noqa: E402
+    raise SystemExit(
+        "matplotlib is not installed.\n"
+        "    pip3 install matplotlib\n"
+        "Nothing else here needs a third-party package.")
 
 CATEGORIES = ["emotional_prosody", "speaker_identity", "sarcasm_pacing"]
 PRETTY = {"emotional_prosody": "Emotional prosody",

@@ -14,22 +14,50 @@ python3 -m modal setup          # opens a browser to authenticate
 Use `python3 -m modal` rather than a bare `modal` if the CLI isn't on your PATH
 (common with Homebrew/pyenv).
 
-Then, from the repo root, in order:
+**Never put `#` comments on a `modal run` line.** `modal run` parses trailing
+words as arguments and dies with "Got unexpected extra arguments".
+
+## The audio lives in two places, and you need both
+
+This trips everyone once. There are two separate corpora:
+
+| what | where | who needs it |
+|---|---|---|
+| Modal volume `audio-corpus` | in the cloud | `modal_app.py` (the mechanistic experiments) |
+| local `dataset_audio/` | on your machine | `modal_*_eval.py` (the five per-model behavioural evals) |
+
+The per-model wrappers mount the corpus with
+`add_local_dir(LOCAL_ROOT / "dataset_audio")`, so a Modal volume does not help
+them -- without a local directory every one of them fails immediately with
+`local dir .../dataset_audio does not exist`.
+
+**Build the local corpus first** (needs ffmpeg for MUStARD):
 
 ```bash
-python3 -m modal run modal/modal_app.py::fetch_ravdess     # ~10 min, once
-python3 -m modal run modal/modal_app.py::fetch_mustard     # ~20 min, once (1.4 GB)
-python3 -m modal run modal/modal_app.py::warm_model        # ~10 min, once (16.8 GB)
-python3 -m modal run modal/modal_app.py::corpus_status     # check coverage first
+pip3 install datasets soundfile
+python3 scripts/fetch_audio.py
+python3 scripts/fetch_audio.py --check
 ```
 
-`corpus_status` should report roughly `119/119`, `120/120`, `76/120`. If it
-reports zeros, the fetches haven't run.
+Then the volume, for the mechanistic experiments, from the repo root:
+
+```bash
+python3 -m modal run modal/modal_app.py::fetch_ravdess
+python3 -m modal run modal/modal_app.py::fetch_mustard
+python3 -m modal run modal/modal_app.py::warm_model
+python3 -m modal run modal/modal_app.py::corpus_status
+```
+
+Those take roughly 10, 20 and 10 minutes, once each. `corpus_status` should
+report near-complete counts for the two RAVDESS categories; if it reports zeros
+the fetches have not run. Both fetchers work out what the dataset references at
+runtime, so **re-run them whenever the dataset grows** -- otherwise most items
+are dropped with only a warning line.
 
 ## Running
 
 ```bash
-python3 -m modal run modal/modal_app.py                    # everything, ~80 min
+python3 -m modal run modal/modal_app.py
 ```
 
 Results are copied to `./results/` automatically when it finishes. To pull them
@@ -46,7 +74,7 @@ python3 -m modal run modal/modal_app.py::experiment --name exp1_capability_scree
 python3 -m modal run modal/modal_app.py::experiment --name exp2_encoder_probe --args "--category speaker_identity"
 python3 -m modal run modal/modal_app.py::experiment --name exp3_circuit_localization --args "--category emotional_prosody"
 python3 -m modal run modal/modal_app.py::experiment --name exp4_backpatching --args "--category emotional_prosody"
-python3 -m modal run modal/modal_app.py::main_eval         # the behavioural eval
+python3 -m modal run modal/modal_app.py::main_eval
 ```
 
 ## Smoke test before spending GPU time

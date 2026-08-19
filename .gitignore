@@ -9,3 +9,7 @@ dataset_audio.zip
 
 # generated figures - rebuild with viz/make_figures.py
 figures/
+
+# local audio corpus - large, fetched with scripts/fetch_audio.py
+dataset_audio/
+.mustard_raw/

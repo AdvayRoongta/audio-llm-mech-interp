@@ -67,7 +67,43 @@ def run_one(model, script, stage, experiments, seed, extra):
 
     out = (proc.stdout or "") + (proc.stderr or "")
     print(out[-4000:] if len(out) > 4000 else out, flush=True)
-    return proc.returncode == 0, elapsed, out.strip().splitlines()[-1:] or [""]
+    return proc.returncode == 0, elapsed, summarise_failure(out)
+
+
+# Lines that carry no diagnostic value: Modal draws its errors in a box, and
+# apt/pip chatter dominates the tail of a failed build.
+_NOISE = ("╭", "╰", "│ ", "─", "Unpacking ", "Setting up ", "Selecting ",
+          "Preparing to unpack", "Downloading ", "Collecting ", "Reading database",
+          "Get:", "Fetched ", "Installing collected", "Successfully installed",
+          "[notice]", "Processing triggers")
+
+
+def summarise_failure(out):
+    """Pull the actual reason out of a failed run.
+
+    The last line of Modal output is usually the bottom edge of its error box,
+    which tells you nothing. This looks for the message inside the box, then
+    for common exception text, before giving up and using the last real line.
+    """
+    lines = [l.rstrip() for l in out.splitlines() if l.strip()]
+
+    # Modal renders errors as "│ <message> │"; take the longest such body.
+    boxed = [l.strip("│ ").strip() for l in lines if l.startswith("│")]
+    boxed = [b for b in boxed if b and not set(b) <= set("─ ")]
+    if boxed:
+        return " ".join(boxed)[:300]
+
+    for line in reversed(lines):
+        if any(line.lstrip().startswith(k) for k in _NOISE):
+            continue
+        if any(tok in line for tok in ("Error", "error:", "Exception", "Traceback",
+                                       "FileNotFoundError", "Usage:", "not exist")):
+            return line.strip()[:300]
+
+    for line in reversed(lines):
+        if not any(line.lstrip().startswith(k) for k in _NOISE):
+            return line.strip()[:300]
+    return "(no output)"
 
 
 def parse_args(argv=None):
@@ -78,6 +114,8 @@ def parse_args(argv=None):
     ap.add_argument("--experiments", default="all",
                     help='"all" or a space-separated subset, quoted')
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--delay", type=int, default=20,
+                    help="seconds between models; Modal rate-limits app creation")
     ap.add_argument("--extra", nargs=argparse.REMAINDER, default=[],
                     help="anything after this is passed through to modal run")
     return ap.parse_args(argv)
@@ -91,23 +129,36 @@ def main(argv=None):
         print("Run --stage audit and --stage smoke first if you have not.\n")
 
     results = []
-    for model in args.models:
-        ok, secs, tail = run_one(model, MODELS[model], args.stage,
-                                 args.experiments, args.seed, args.extra)
-        results.append((model, ok, secs, tail[0] if tail else ""))
+    for n, model in enumerate(args.models):
+        if n and args.delay:
+            # Modal rate-limits app creation; five back-to-back launches trips
+            # "App create rate limit exceeded" and the later models fail for a
+            # reason that has nothing to do with them.
+            print("\n... waiting {}s before the next model "
+                  "(Modal app-create rate limit)".format(args.delay), flush=True)
+            time.sleep(args.delay)
+        ok, secs, why = run_one(model, MODELS[model], args.stage,
+                                args.experiments, args.seed, args.extra)
+        results.append((model, ok, secs, why))
 
     print("\n" + "=" * 74)
     print("SUMMARY -- stage: {}".format(args.stage))
     print("=" * 74)
-    print("{:<14}{:>8}{:>10}   {}".format("model", "result", "seconds", "last line"))
-    for model, ok, secs, tail in results:
-        print("{:<14}{:>8}{:>10.0f}   {}".format(
-            model, "ok" if ok else "FAIL", secs, tail[:60]))
+    print("{:<14}{:>8}{:>7}   {}".format("model", "result", "secs", "why"))
+    for model, ok, secs, why in results:
+        print("{:<14}{:>8}{:>7.0f}   {}".format(
+            model, "ok" if ok else "FAIL", secs, "" if ok else why[:90]))
 
-    failed = [m for m, ok, _, _ in results if not ok]
+    failed = [(m, w) for m, ok, _, w in results if not ok]
     if failed:
-        print("\n{} model(s) failed: {}".format(len(failed), ", ".join(failed)))
-        print("Fix those before spending GPU time on a full sweep.")
+        print("\n{} model(s) failed: {}".format(
+            len(failed), ", ".join(m for m, _ in failed)))
+        reasons = {w[:90] for _, w in failed}
+        if len(reasons) == 1 and len(failed) == len(results):
+            print("\nEvery model failed with the same message, so this is one")
+            print("shared cause, not five separate ones:")
+            print("  {}".format(next(iter(reasons))))
+        print("\nFix that before spending GPU time on a full sweep.")
         return 1
     print("\nall {} model(s) passed".format(len(results)))
     return 0
