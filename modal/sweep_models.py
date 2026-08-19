@@ -70,34 +70,67 @@ def run_one(model, script, stage, experiments, seed, extra):
     return proc.returncode == 0, elapsed, summarise_failure(out)
 
 
-# Lines that carry no diagnostic value: Modal draws its errors in a box, and
-# apt/pip chatter dominates the tail of a failed build.
-_NOISE = ("╭", "╰", "│ ", "─", "Unpacking ", "Setting up ", "Selecting ",
-          "Preparing to unpack", "Downloading ", "Collecting ", "Reading database",
-          "Get:", "Fetched ", "Installing collected", "Successfully installed",
-          "[notice]", "Processing triggers")
+import re
+
+# Lines that carry no diagnostic value: apt/pip chatter dominates the tail of a
+# failed build, and Modal's "Created objects" tree is drawn with the same box
+# characters as its error box.
+_NOISE = ("Unpacking ", "Setting up ", "Selecting ", "Preparing to unpack",
+          "Downloading ", "Collecting ", "Reading database", "Get:", "Fetched ",
+          "Installing collected", "Successfully installed", "[notice]",
+          "Processing triggers", "✓ ", "├──", "└──", "🔨")
+
+# Audit counters that mean trouble when non-zero.
+_AUDIT_FLAGS = ("unresolved claimed->letter:",
+                "claimed letter == correct letter (data bug if >0):",
+                "audio modality items with no audio_path:",
+                "audio_path set but file not found on disk:")
 
 
 def summarise_failure(out):
     """Pull the actual reason out of a failed run.
 
-    The last line of Modal output is usually the bottom edge of its error box,
-    which tells you nothing. This looks for the message inside the box, then
-    for common exception text, before giving up and using the last real line.
+    Three sources, most specific first. The dataset audit is checked before
+    Modal's error box because an audit failure exits via SystemExit and prints
+    no box at all -- and because "335 files not found" is far more useful than
+    "SystemExit(1)".
     """
     lines = [l.rstrip() for l in out.splitlines() if l.strip()]
 
-    # Modal renders errors as "│ <message> │"; take the longest such body.
-    boxed = [l.strip("│ ").strip() for l in lines if l.startswith("│")]
-    boxed = [b for b in boxed if b and not set(b) <= set("─ ")]
-    if boxed:
-        return " ".join(boxed)[:300]
+    # 1. our own dataset audit
+    if any("FLAGGED ISSUES" in l for l in lines):
+        bad, cat = [], "?"
+        for line in lines:
+            m = re.match(r"\[(\w+)\] n=", line.strip())
+            if m:
+                cat = m.group(1)
+            for flag in _AUDIT_FLAGS:
+                if flag in line:
+                    value = line.rsplit(":", 1)[-1].strip()
+                    if value.isdigit() and int(value) > 0:
+                        bad.append("{} {} {}".format(cat, flag.rstrip(":"), value))
+        if bad:
+            return "audit flagged: " + "; ".join(bad[:2])
+        return "dataset audit flagged issues"
 
+    # 2. Modal's error box, which is drawn as ╭─ Error ... ╰
+    for i, line in enumerate(lines):
+        if line.lstrip().startswith("╭") and "Error" in line:
+            body = []
+            for nxt in lines[i + 1:]:
+                if nxt.lstrip().startswith("╰"):
+                    break
+                body.append(nxt.strip("│ ").strip())
+            body = [b for b in body if b and not set(b) <= set("─ ")]
+            if body:
+                return " ".join(body)[:300]
+
+    # 3. last line that looks like a real error
     for line in reversed(lines):
         if any(line.lstrip().startswith(k) for k in _NOISE):
             continue
         if any(tok in line for tok in ("Error", "error:", "Exception", "Traceback",
-                                       "FileNotFoundError", "Usage:", "not exist")):
+                                       "SystemExit", "Usage:", "not exist")):
             return line.strip()[:300]
 
     for line in reversed(lines):
@@ -111,8 +144,9 @@ def parse_args(argv=None):
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--stage", required=True, choices=["audit", "smoke", "full"])
     ap.add_argument("--models", nargs="+", choices=list(MODELS), default=list(MODELS))
-    ap.add_argument("--experiments", default="all",
-                    help='"all" or a space-separated subset, quoted')
+    ap.add_argument("--experiments", default=None,
+                    help='"all", or a quoted space-separated subset. Defaults to '
+                         'the categories whose audio is actually complete.')
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--delay", type=int, default=20,
                     help="seconds between models; Modal rate-limits app creation")
@@ -121,8 +155,53 @@ def parse_args(argv=None):
     return ap.parse_args(argv)
 
 
+def complete_categories():
+    """Categories whose referenced audio is fully present locally.
+
+    The per-model audit fails outright when any audio_path is missing, so
+    defaulting to "all" means one incomplete corpus blocks the categories that
+    are ready. MUStARD++ episode ids are unobtainable from the public release,
+    so sarcasm_pacing is normally the one left out.
+    """
+    import json
+
+    dataset = os.path.join(REPO, "data", "combined_examples.json")
+    # audio_path values already begin with "dataset_audio/", so they resolve
+    # against the repo root, not against dataset_audio/ itself.
+    if not os.path.exists(dataset):
+        return None
+
+    seen, missing = set(), set()
+    with open(dataset) as f:
+        for item in json.load(f):
+            path = item.get("audio_path")
+            if not path or item.get("modality") not in ("audio_only", "text_audio"):
+                continue
+            cat = item.get("category")
+            seen.add(cat)
+            if not os.path.exists(os.path.join(REPO, path)):
+                missing.add(cat)
+    return sorted(seen - missing), sorted(missing)
+
+
 def main(argv=None):
     args = parse_args(argv)
+
+    if args.experiments is None:
+        found = complete_categories()
+        if not found or not found[0]:
+            args.experiments = "all"
+            print("Could not determine audio coverage; using --experiments all.\n")
+        else:
+            ready, incomplete = found
+            args.experiments = " ".join(ready)
+            print("Categories with complete audio: {}".format(", ".join(ready)))
+            if incomplete:
+                print("Skipping (audio incomplete): {}".format(", ".join(incomplete)))
+                print("The per-model audit fails outright on a missing file, so")
+                print("including these would block the ones that are ready.")
+                print("Override with --experiments all once the audio is in place.")
+            print()
 
     if args.stage == "full":
         print("Full runs are billed GPU time across {} model(s).".format(len(args.models)))
