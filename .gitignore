@@ -13,3 +13,6 @@ figures/
 # local audio corpus - large, fetched with scripts/fetch_audio.py
 dataset_audio/
 .mustard_raw/
+
+# local virtualenv
+.venv/

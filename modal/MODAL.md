@@ -7,12 +7,29 @@ laptop. `modal_app.py` packages the repo, fetches the audio corpus, and runs
 ## One-time setup
 
 ```bash
-pip3 install modal
-python3 -m modal setup          # opens a browser to authenticate
+python3 -m venv .venv
+source .venv/bin/activate
+pip install modal datasets soundfile matplotlib scipy
+modal setup
 ```
 
-Use `python3 -m modal` rather than a bare `modal` if the CLI isn't on your PATH
-(common with Homebrew/pyenv).
+**Use a venv.** Homebrew's Python refuses `pip install` system-wide with
+`error: externally-managed-environment` (PEP 668). Do not run
+`python3 -m venv .` -- with `.` as the target it drops `bin/`, `lib/`,
+`include/` into the repo root *and overwrites `.gitignore` with `*`*, which
+makes git ignore the entire project.
+
+If you'd rather not activate, prefix commands with `.venv/bin/python` instead
+of `python3`.
+
+**Create the HF secret once.** Every wrapper declares
+`secrets=[modal.Secret.from_name("hf-token")]`, so Modal refuses to start
+without it -- even for `--dry-run`, and even for public models. Get a token
+from <https://huggingface.co/settings/tokens>:
+
+```bash
+modal secret create hf-token HF_TOKEN=hf_xxxxxxxx
+```
 
 **Never put `#` comments on a `modal run` line.** `modal run` parses trailing
 words as arguments and dies with "Got unexpected extra arguments".
