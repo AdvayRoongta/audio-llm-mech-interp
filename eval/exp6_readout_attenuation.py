@@ -340,6 +340,9 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
     decided = said_claim + said_true
     n_gen = len(scores)
     return {"generative_tdr": (said_claim / decided) if decided else None,
+            "generative_tdr_ci95": C.wilson_ci(said_claim, decided) if decided else None,
+            "names_true_ci95": C.wilson_ci(named_true, n_gen) if n_gen else None,
+            "n_items": n_gen,
             # names the true label; on matched items the claim agrees with the
             # audio, so this is the generative capability control
             "names_true_rate": (named_true / n_gen) if n_gen else None,
@@ -568,10 +571,10 @@ def main(argv=None):
     def fmt(v, spec="{:.3f}"):
         return "n/a" if v is None else spec.format(v)
 
-    print("  {:<16}{:>9}{:>11}{:>11}{:>10}{:>7}".format(
-        "condition", "gen-TDR", "mis:true", "mat:true", "logprob", "rep"))
-    print("  {:<16}{:>9}{:>11}{:>11}{:>10}{:>7}".format(
-        "", "lower=fix", "higher=fix", "capability", "", ""))
+    print("  {:<12}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
+        "condition", "gen-TDR", "95% CI", "mis:true", "mat:true", "logprob", "rep"))
+    print("  {:<12}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
+        "", "lower=fix", "", "higher=fix", "= capab.", "", ""))
 
     ff_rows = []
     conditions = [("baseline", None)] + [(b, band_for(b, n_layers))
@@ -582,8 +585,11 @@ def main(argv=None):
         f_mat = freeform_fluency(model, processor, ff_mat, layers, 0.0,
                                  args.max_new_tokens)
         ff_rows.append({"condition": name, "mismatched": f_mis, "matched": f_mat})
-        print("  {:<16}{:>9}{:>11}{:>11}{:>10}{:>7}".format(
-            name, fmt(f_mis.get("generative_tdr")),
+        ci = f_mis.get("generative_tdr_ci95")
+        ci_s = "[{:.2f},{:.2f}] n={}".format(ci[0], ci[1], f_mis.get("decided")) \
+            if ci else ""
+        print("  {:<12}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
+            name, fmt(f_mis.get("generative_tdr")), ci_s,
             fmt(f_mis.get("names_true_rate")), fmt(f_mat.get("names_true_rate")),
             fmt(f_mis.get("mean_token_logprob"), "{:+.2f}"),
             fmt(f_mis.get("repetition_rate"), "{:.2f}")))
@@ -597,10 +603,21 @@ def main(argv=None):
     print("  agrees with the audio, so a drop there is the cost of the fix.")
 
     # pick the best free-form condition on gen-TDR, not on the closed-set sweep
+    base_cap = clean_mat.get("names_true_rate")
     cand = [r for r in ff_rows[1:]
             if r["mismatched"].get("generative_tdr") is not None]
-    ff_best_row = min(cand, key=lambda r: r["mismatched"]["generative_tdr"]) \
-        if cand else None
+    # a condition that buys gen-TDR by losing matched-item accuracy is not a
+    # fix, so it cannot win the selection either
+    keeps_cap = [r for r in cand
+                 if base_cap is None
+                 or (r["matched"].get("names_true_rate") is not None
+                     and r["matched"]["names_true_rate"] >= base_cap - 0.05)]
+    pool = keeps_cap or cand
+    ff_best_row = min(pool, key=lambda r: r["mismatched"]["generative_tdr"]) \
+        if pool else None
+    if cand and not keeps_cap:
+        print("\n  (no condition held matched-item accuracy; selecting on "
+              "gen-TDR alone)")
     ff_best = ff_best_row["mismatched"] if ff_best_row else None
 
     if ff_best_row:
@@ -615,6 +632,9 @@ def main(argv=None):
             print("    {:<8}: {!r}".format(ff_best_row["condition"], smp))
 
     # ---- verdict ---------------------------------------------------------- #
+    # best closed-set row, for the closed-vs-free-form contrast below
+    best = max(rows, key=lambda r: r["margin_delta"]) if rows else None
+
     print("\n" + "=" * 78)
     print("VERDICT")
     print("=" * 78)
