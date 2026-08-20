@@ -86,8 +86,12 @@ class ClaimAttenuator:
                 mask = kwargs.get("attention_mask")
                 if mask is None or mask.dim() != 4:
                     raise RuntimeError(
-                        "layer {} received no 4D attention mask; the graded "
-                        "knockout needs one to modify".format(i))
+                        "layer {} received {} instead of a 4D attention mask. "
+                        "The graded knockout modifies the mask, so one has to "
+                        "exist: load with eager (sdpa passes None and applies "
+                        "causality inside the kernel).".format(
+                            i, "None" if mask is None else
+                            "a {}D tensor".format(mask.dim())))
                 m = mask.clone()
                 hi = min(self.hi, m.shape[-1] - 1)
                 if self.lo > hi:
@@ -253,7 +257,11 @@ def main(argv=None):
     if not mism:
         raise SystemExit("no mismatched text_audio items for " + args.category)
 
-    model, processor, info = C.load_model(four_bit=args.four_bit)
+    # eager, not sdpa: sdpa skips building an explicit mask whenever causality
+    # is inferable (batch 1, no padding), and hands the layer attention_mask=None
+    # while the kernel applies is_causal internally. There is then no mask object
+    # to add log(gamma) to. eager always materialises a 4D float mask.
+    model, processor, info = C.load_model(eager=True, four_bit=args.four_bit)
     n_layers = len(C.decoder_layers(model))
     print("{}: {} mismatched, {} matched | {} decoder layers".format(
         args.category, len(mism), len(matched), n_layers))
