@@ -380,6 +380,9 @@ def parse_args(argv=None):
     ap.add_argument("--freeform-items", type=int, default=30,
                     help="items used for the coherence control (generation is slow)")
     ap.add_argument("--max-new-tokens", type=int, default=30)
+    ap.add_argument("--freeform-gammas", type=float, nargs="+", default=[0.0, 0.25],
+                    help="attenuation strengths for the generative sweep; the "
+                         "graded knockout only shows its value here")
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
     ap.add_argument("--output-dir", default="results")
     ap.add_argument("--seed", type=int, default=0)
@@ -571,24 +574,33 @@ def main(argv=None):
     def fmt(v, spec="{:.3f}"):
         return "n/a" if v is None else spec.format(v)
 
-    print("  {:<12}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
+    print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
         "condition", "gen-TDR", "95% CI", "mis:true", "mat:true", "logprob", "rep"))
-    print("  {:<12}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
+    print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
         "", "lower=fix", "", "higher=fix", "= capab.", "", ""))
 
     ff_rows = []
-    conditions = [("baseline", None)] + [(b, band_for(b, n_layers))
-                                         for b in args.bands]
-    for name, layers in conditions:
-        f_mis = freeform_fluency(model, processor, ff_mis, layers, 0.0,
+    # gamma is swept here, not fixed at a hard block. The knockout is graded on
+    # purpose, and generation is the only place that choice has ever mattered --
+    # the closed-set sweep is flat at every gamma. A partial attenuation that
+    # keeps more of the claim while still yielding to the audio is the operating
+    # point worth finding.
+    conditions = [("baseline", None, 1.0)]
+    for b in args.bands:
+        for g in args.freeform_gammas:
+            conditions.append(("{} g={:g}".format(b, g), band_for(b, n_layers), g))
+
+    for name, layers, gamma in conditions:
+        f_mis = freeform_fluency(model, processor, ff_mis, layers, gamma,
                                  args.max_new_tokens)
-        f_mat = freeform_fluency(model, processor, ff_mat, layers, 0.0,
+        f_mat = freeform_fluency(model, processor, ff_mat, layers, gamma,
                                  args.max_new_tokens)
-        ff_rows.append({"condition": name, "mismatched": f_mis, "matched": f_mat})
+        ff_rows.append({"condition": name, "band": None if layers is None else name.split()[0],
+                        "gamma": gamma, "mismatched": f_mis, "matched": f_mat})
         ci = f_mis.get("generative_tdr_ci95")
         ci_s = "[{:.2f},{:.2f}] n={}".format(ci[0], ci[1], f_mis.get("decided")) \
             if ci else ""
-        print("  {:<12}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
+        print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
             name, fmt(f_mis.get("generative_tdr")), ci_s,
             fmt(f_mis.get("names_true_rate")), fmt(f_mat.get("names_true_rate")),
             fmt(f_mis.get("mean_token_logprob"), "{:+.2f}"),
