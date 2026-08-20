@@ -39,6 +39,7 @@ Run from the repo root:
 import argparse
 import json
 import math
+import re
 import os
 import sys
 
@@ -75,10 +76,13 @@ class ClaimAttenuator:
         self.lo, self.hi = claim_span
         self.gen_pos = gen_pos
         self.gamma = gamma
-        # "gen"  -- only the answer position's view of the claim (the experiment)
-        # "all"  -- every position's view, i.e. the claim is removed from the
-        #           model's input entirely. Only meaningful as a positive
-        #           control, never as a proposed fix.
+        # "gen"        -- only the answer position's view of the claim
+        # "post_claim" -- every position downstream of the claim. Tests whether
+        #                 the claim reaches the readout via relay positions
+        #                 (query/option tokens) rather than by direct attention.
+        # "all"        -- every position, i.e. the claim is removed from the
+        #                 model's input entirely. A positive control, never a
+        #                 proposed fix.
         self.rows = rows
         self._handles = []
 
@@ -106,6 +110,10 @@ class ClaimAttenuator:
                 if self.rows == "all":
                     # every query position loses sight of the claim
                     rows = slice(0, q_len)
+                elif self.rows == "post_claim":
+                    # decode: the single row is downstream by construction
+                    rows = slice(0, 1) if q_len == 1 else slice(
+                        min(hi + 1, q_len - 1), q_len)
                 else:
                     # prefill: the answer row onward. decode: the only row is
                     # the answer position, so row 0.
@@ -156,6 +164,27 @@ def prepare(model, processor, item, fixed_seconds):
     return inputs, claim, seq - 1
 
 
+def prepare_freeform(model, processor, item, fixed_seconds):
+    """Encode an open-ended item and locate its claim.
+
+    exp3's position_groups anchors on the option list (it looks for "\nA. ") to
+    bound the claim search, and the open-ended prompt has no option list -- so
+    it finds no claim and every item would be silently dropped. The claim line
+    itself is unchanged, so search the whole prompt for it directly, matching
+    exp3's rule: the line mentioning the asserted label, excluding the
+    transcript, which quotes the words rather than asserting the label.
+    """
+    inputs = C.encode(model, processor, item, fixed_seconds=fixed_seconds)
+    claim = E3.claim_value(item)
+    span = None
+    if claim:
+        for line in item.get("prompt", "").splitlines():
+            if claim.lower() in line.lower() and "transcript" not in line.lower():
+                span = C.find_span(processor, inputs, line.strip())
+                break
+    return inputs, span, inputs["input_ids"].shape[1] - 1
+
+
 def predict(model, processor, item, inputs, layers=None,
             claim=None, gen_pos=None, gamma=1.0, rows="gen"):
     letters = list(C.option_map(item).keys())
@@ -165,6 +194,31 @@ def predict(model, processor, item, inputs, layers=None,
     with ClaimAttenuator(model, layers, claim, gen_pos, gamma, rows):
         pred, sc = C.predict_letter(model, processor, inputs, letters)
     return pred, margin(sc, item)
+
+
+FREEFORM_INSTRUCTION = ("Given the information above, describe the speaker in "
+                        "one or two sentences.")
+
+
+def freeform_item(item):
+    """The same item with the option list removed, so generation runs on.
+
+    The closed-set prompt ends in "Answer with the letter", so the model emits
+    one letter and stops -- roughly two tokens, on which a fluency measure means
+    nothing. The claim sentence is kept verbatim, so the claim span is still
+    locatable and attenuating it is still the same intervention.
+    """
+    lines, keep = item["prompt"].split("\n"), []
+    for ln in lines:
+        if re.match(r"^[A-Z]\.\s", ln.strip()):
+            break
+        keep.append(ln)
+    head = "\n".join(keep).rstrip()
+    # the closing question presupposes the option list that was just dropped
+    head = re.sub(r"\n[^\n]*\?\s*$", "", head).rstrip()
+    out = dict(item)
+    out["prompt"] = head + "\n\n" + FREEFORM_INSTRUCTION
+    return out
 
 
 def condition(model, processor, prep_mis, prep_mat, layers, gamma, rows="gen"):
@@ -192,7 +246,8 @@ def summarise(records):
 # --------------------------------------------------------------------------- #
 # the free-form coherence control
 # --------------------------------------------------------------------------- #
-def freeform_fluency(model, processor, prepared, layers, gamma, max_new_tokens=30):
+def freeform_fluency(model, processor, prepared, layers, gamma,
+                     max_new_tokens=30, rows="gen"):
     """Generate under the intervention, score the text with the clean model.
 
     Closed-set accuracy cannot see the degeneration Cho et al. reported, so this
@@ -203,12 +258,12 @@ def freeform_fluency(model, processor, prepared, layers, gamma, max_new_tokens=3
     """
     import torch
 
-    scores, reps, samples = [], [], []
+    scores, reps, samples, lens = [], [], [], []
     for item, inputs, claim, gen_pos in prepared:
         ctx = {k: v for k, v in inputs.items()}
         with torch.no_grad():
             if layers is not None:
-                with ClaimAttenuator(model, layers, claim, gen_pos, gamma):
+                with ClaimAttenuator(model, layers, claim, gen_pos, gamma, rows):
                     out = model.generate(**ctx, max_new_tokens=max_new_tokens,
                                          do_sample=False)
             else:
@@ -216,8 +271,9 @@ def freeform_fluency(model, processor, prepared, layers, gamma, max_new_tokens=3
                                      do_sample=False)
 
         new = out[0, inputs["input_ids"].shape[1]:]
-        if new.numel() < 2:
+        if new.numel() < 1:
             continue
+        lens.append(int(new.numel()))
         text = processor.tokenizer.decode(new, skip_special_tokens=True)
 
         # Score the produced continuation with the UNMODIFIED model.
@@ -237,9 +293,12 @@ def freeform_fluency(model, processor, prepared, layers, gamma, max_new_tokens=3
         if len(samples) < 3:
             samples.append(text.replace("\n", " ")[:90])
 
+    med = sorted(lens)[len(lens) // 2] if lens else 0
     return {"mean_token_logprob": (sum(scores) / len(scores)) if scores else float("nan"),
             "repetition_rate": (sum(reps) / len(reps)) if reps else float("nan"),
-            "n": len(scores), "samples": samples}
+            "n": len(scores), "samples": samples, "median_tokens": med,
+            # a fluency number computed on one or two tokens says nothing
+            "informative": med >= 5}
 
 
 # --------------------------------------------------------------------------- #
@@ -389,6 +448,42 @@ def main(argv=None):
             print("  {:<7}{:>7.2f}{:>9.3f}   [{:.2f},{:.2f}]{:>9.2f}{:>+10.2f}{:>12.3f}"
                   .format(band, gamma, acc, lo, hi, mg_, mg_ - b_marg, cap))
 
+    # ---- routing ----------------------------------------------------------- #
+    # The gen-row sweep and the positive control differ only in WHICH positions
+    # lose sight of the claim, so the gap between them localises the route.
+    # post_claim blocks every downstream position from reading the claim; if
+    # that recovers most of the control's effect, the claim reaches the readout
+    # through relay positions rather than by direct attention.
+    print("\n" + "=" * 78)
+    print("ROUTING -- which positions carry the claim to the readout")
+    print("=" * 78)
+    print("  All at every layer, gamma=0. 'gen' and 'all' repeat the two")
+    print("  extremes above so the bisection reads in one table.\n")
+    print("  {:<12}{:>9}{:>16}{:>9}{:>10}{:>12}".format(
+        "rows", "audio", "95% CI", "margin", "d(marg)", "capability"))
+
+    route = []
+    for mode in ["gen", "post_claim", "all"]:
+        r_mis, r_mat = condition(model, processor, prep_mis, prep_mat,
+                                 list(range(n_layers)), 0.0, rows=mode)
+        acc, lo, hi_, mg_ = summarise(r_mis)
+        cap, _, _, _ = summarise(r_mat)
+        t = C.tdr_block(r_mis)
+        route.append({"rows": mode, "audio": acc, "ci95": [lo, hi_], "margin": mg_,
+                      "margin_delta": mg_ - b_marg, "capability": cap,
+                      "tdr": t.get("tdr")})
+        print("  {:<12}{:>9.3f}   [{:.2f},{:.2f}]{:>9.2f}{:>+10.2f}{:>12.3f}"
+              .format(mode, acc, lo, hi_, mg_, mg_ - b_marg, cap))
+
+    span = route[-1]["margin_delta"] - route[0]["margin_delta"]
+    if abs(span) > 1e-9:
+        recovered = (route[1]["margin_delta"] - route[0]["margin_delta"]) / span
+        print("\n  blocking downstream positions recovers {:.0%} of the effect of"
+              .format(recovered))
+        print("  removing the claim outright.")
+    else:
+        recovered = float("nan")
+
     # ---- coherence control ------------------------------------------------ #
     print("\n" + "=" * 78)
     print("FREE-FORM COHERENCE CONTROL")
@@ -397,7 +492,20 @@ def main(argv=None):
     print("  because their ablation also looked healthy in closed-set choice.")
     print("  Generating under the intervention and scoring with the clean model.\n")
 
-    ff_prep = prep_mis[:args.freeform_items]
+    # rebuilt without the option list, or the model answers with one letter and
+    # a fluency measure over two tokens means nothing
+    ff_prep = []
+    for it, _, _, _ in prep_mis[:args.freeform_items]:
+        fi = freeform_item(it)
+        f_inputs, f_claim, f_gen = prepare_freeform(
+            model, processor, fi, args.fixed_seconds)
+        if f_claim is not None:
+            ff_prep.append((fi, f_inputs, f_claim, f_gen))
+    print("  open-ended prompt, {} items\n".format(len(ff_prep)))
+    if not ff_prep:
+        print("  *** no claim span located in the open-ended prompt; the")
+        print("  coherence control did not run ***\n")
+
     clean_ff = freeform_fluency(model, processor, ff_prep, None, 1.0,
                                 args.max_new_tokens)
     print("  {:<22}{:>10}{:>14}".format("condition", "logprob", "repetition"))
@@ -415,8 +523,13 @@ def main(argv=None):
             "{} gamma={}".format(best["band"], best["gamma"]),
             ff_best["mean_token_logprob"], ff_best["repetition_rate"]))
         drop = clean_ff["mean_token_logprob"] - ff_best["mean_token_logprob"]
-        print("\n  fluency drop: {:+.3f} nats/token, repetition {:+.3f}".format(
+        print("\n  median generated length: {} tokens (baseline), {} (intervened)"
+              .format(clean_ff["median_tokens"], ff_best["median_tokens"]))
+        print("  fluency drop: {:+.3f} nats/token, repetition {:+.3f}".format(
             -drop, ff_best["repetition_rate"] - clean_ff["repetition_rate"]))
+        if not (clean_ff["informative"] and ff_best["informative"]):
+            print("  *** too few tokens generated for this to mean anything; "
+                  "treat the fluency numbers as absent, not as passing ***")
         for s in ff_best["samples"]:
             print("    sample: {!r}".format(s))
 
@@ -440,9 +553,10 @@ def main(argv=None):
         broke_closed = best["capability"] < b_cap - 0.05
         fl_drop = (clean_ff["mean_token_logprob"] -
                    ff_best["mean_token_logprob"]) if ff_best else 0.0
-        broke_free = fl_drop > 0.5 or (
-            ff_best and ff_best["repetition_rate"] -
-            clean_ff["repetition_rate"] > 0.2)
+        ff_informative = bool(ff_best and ff_best["informative"]
+                              and clean_ff["informative"])
+        broke_free = ff_informative and (fl_drop > 0.5 or (
+            ff_best["repetition_rate"] - clean_ff["repetition_rate"] > 0.2))
 
         print("  best targeted: {} gamma={}  margin {:+.2f} ({:.0%} of the gap), "
               "audio {:.3f}".format(best["band"], best["gamma"],
@@ -457,10 +571,12 @@ def main(argv=None):
             text = ("REJECT: capability fell {:.3f} -> {:.3f}.".format(
                 b_cap, best["capability"]))
         elif closed > 0.5 and best["audio"] > b_acc + 0.05:
-            text = ("VIABLE: targeted attenuation closes {:.0%} of the gap, lifts "
-                    "audio accuracy {:.3f} -> {:.3f}, and free-form fluency holds. "
-                    "This is the intervention to develop."
-                    .format(closed, b_acc, best["audio"]))
+            text = ("VIABLE: targeted attenuation closes {:.0%} of the gap and "
+                    "lifts audio accuracy {:.3f} -> {:.3f}{}."
+                    .format(closed, b_acc, best["audio"],
+                            ", with free-form fluency intact" if ff_informative
+                            else "; FREE-FORM FLUENCY UNTESTED, verify before "
+                                 "claiming this is usable"))
         elif closed > 0.1:
             text = ("PARTIAL: {:.0%} of the gap closed with fluency intact. Real "
                     "but not sufficient; worth pushing on layer selection."
@@ -487,6 +603,8 @@ def main(argv=None):
                    "baseline": {"audio": b_acc, "capability": b_cap,
                                 "margin": b_marg, "tdr": b_tdr.get("tdr")},
                    "sweep": rows,
+                   "routing": route,
+                   "routing_recovered_fraction": recovered,
                    "freeform_baseline": clean_ff,
                    "freeform_best": ff_best,
                    "verdict": text}, f, indent=2)
