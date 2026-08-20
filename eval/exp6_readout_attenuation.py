@@ -246,6 +246,36 @@ def summarise(records):
 # --------------------------------------------------------------------------- #
 # the free-form coherence control
 # --------------------------------------------------------------------------- #
+def strip_claim(item):
+    """The item with the claim line removed, for neutral scoring."""
+    claim = E3.claim_value(item)
+    if not claim:
+        return item
+    keep = [ln for ln in item["prompt"].splitlines()
+            if not (claim.lower() in ln.lower()
+                    and "transcript" not in ln.lower())]
+    out = dict(item)
+    out["prompt"] = "\n".join(keep)
+    return out
+
+
+def label_texts(item):
+    """(claimed label, true label) as they would appear in prose."""
+    claimed = E3.claim_value(item)
+    opts = C.option_map(item)
+    true = opts.get(C.correct_letter(item))
+    return (str(claimed) if claimed else None, str(true) if true else None)
+
+
+def mentions(text, label):
+    """Does the description name this label? Prefix match, so 'disgust'
+    catches 'disgusted' and 'surprise' catches 'surprised', while the leading
+    word boundary keeps 'male' from matching inside 'female'."""
+    if not label:
+        return False
+    return re.search(r"\b" + re.escape(label.lower()), text.lower()) is not None
+
+
 def freeform_fluency(model, processor, prepared, layers, gamma,
                      max_new_tokens=30, rows="gen"):
     """Generate under the intervention, score the text with the clean model.
@@ -259,7 +289,8 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
     import torch
 
     scores, reps, samples, lens = [], [], [], []
-    for item, inputs, claim, gen_pos in prepared:
+    said_claim = said_true = 0
+    for item, inputs, claim, gen_pos, score_inputs in prepared:
         ctx = {k: v for k, v in inputs.items()}
         with torch.no_grad():
             if layers is not None:
@@ -276,17 +307,28 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
         lens.append(int(new.numel()))
         text = processor.tokenizer.decode(new, skip_special_tokens=True)
 
-        # Score the produced continuation with the UNMODIFIED model.
-        full = torch.cat([inputs["input_ids"], new.unsqueeze(0)], dim=1)
-        kw = {k: v for k, v in inputs.items()}
+        # Score with the UNMODIFIED model, in a context with the claim REMOVED.
+        # Scoring against the claim-bearing prompt conflates two different
+        # things: text that is incoherent, and text that simply contradicts the
+        # claim. The second is exactly what a working intervention produces, so
+        # scoring there would penalise success as if it were degeneration.
+        ctx_ids = score_inputs["input_ids"]
+        full = torch.cat([ctx_ids, new.unsqueeze(0)], dim=1)
+        kw = {k: v for k, v in score_inputs.items()}
         kw["input_ids"] = full
         if "attention_mask" in kw:
             kw["attention_mask"] = torch.ones_like(full)
         with torch.no_grad():
             logits = model(**kw, use_cache=False).logits.float()
-        lp = torch.log_softmax(logits[0, inputs["input_ids"].shape[1] - 1:-1], -1)
+        lp = torch.log_softmax(logits[0, ctx_ids.shape[1] - 1:-1], -1)
         tok_lp = lp.gather(-1, new.unsqueeze(-1)).squeeze(-1)
         scores.append(float(tok_lp.mean()))
+
+        claimed_lab, true_lab = label_texts(item)
+        m_claim, m_true = mentions(text, claimed_lab), mentions(text, true_lab)
+        if m_claim != m_true:                 # ignore "both" and "neither"
+            said_claim += int(m_claim)
+            said_true += int(m_true)
 
         toks = new.tolist()
         reps.append(1.0 - len(set(toks)) / len(toks))
@@ -294,7 +336,10 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
             samples.append(text.replace("\n", " ")[:90])
 
     med = sorted(lens)[len(lens) // 2] if lens else 0
-    return {"mean_token_logprob": (sum(scores) / len(scores)) if scores else float("nan"),
+    decided = said_claim + said_true
+    return {"generative_tdr": (said_claim / decided) if decided else None,
+            "said_claim": said_claim, "said_true": said_true, "decided": decided,
+            "mean_token_logprob": (sum(scores) / len(scores)) if scores else float("nan"),
             "repetition_rate": (sum(reps) / len(reps)) if reps else float("nan"),
             "n": len(scores), "samples": samples, "median_tokens": med,
             # a fluency number computed on one or two tokens says nothing
@@ -500,7 +545,10 @@ def main(argv=None):
         f_inputs, f_claim, f_gen = prepare_freeform(
             model, processor, fi, args.fixed_seconds)
         if f_claim is not None:
-            ff_prep.append((fi, f_inputs, f_claim, f_gen))
+            # neutral context for scoring: same audio and question, no claim
+            score_inputs = C.encode(model, processor, strip_claim(fi),
+                                    fixed_seconds=args.fixed_seconds)
+            ff_prep.append((fi, f_inputs, f_claim, f_gen, score_inputs))
     print("  open-ended prompt, {} items\n".format(len(ff_prep)))
     if not ff_prep:
         print("  *** no claim span located in the open-ended prompt; the")
@@ -508,9 +556,15 @@ def main(argv=None):
 
     clean_ff = freeform_fluency(model, processor, ff_prep, None, 1.0,
                                 args.max_new_tokens)
-    print("  {:<22}{:>10}{:>14}".format("condition", "logprob", "repetition"))
-    print("  {:<22}{:>10.3f}{:>14.3f}".format(
-        "baseline", clean_ff["mean_token_logprob"], clean_ff["repetition_rate"]))
+    def gtdr(f):
+        v = f.get("generative_tdr")
+        return "n/a" if v is None else "{:.3f}".format(v)
+
+    print("  {:<22}{:>10}{:>13}{:>10}".format(
+        "condition", "logprob", "repetition", "gen-TDR"))
+    print("  {:<22}{:>10.3f}{:>13.3f}{:>10}".format(
+        "baseline", clean_ff["mean_token_logprob"],
+        clean_ff["repetition_rate"], gtdr(clean_ff)))
 
     candidates = list(rows)
     best = max(candidates, key=lambda r: r["margin_delta"]) if candidates else None
@@ -519,9 +573,16 @@ def main(argv=None):
         layers = band_for(best["band"], n_layers)
         ff_best = freeform_fluency(model, processor, ff_prep, layers,
                                    best["gamma"], args.max_new_tokens)
-        print("  {:<22}{:>10.3f}{:>14.3f}".format(
+        print("  {:<22}{:>10.3f}{:>13.3f}{:>10}".format(
             "{} gamma={}".format(best["band"], best["gamma"]),
-            ff_best["mean_token_logprob"], ff_best["repetition_rate"]))
+            ff_best["mean_token_logprob"], ff_best["repetition_rate"],
+            gtdr(ff_best)))
+        print("\n  gen-TDR is the free-form analogue of TDR: of the descriptions")
+        print("  that name exactly one label, the fraction naming the CLAIMED one.")
+        print("  Scored in a claim-free context, so contradicting the claim is")
+        print("  not itself penalised.")
+        for smp in clean_ff["samples"]:
+            print("    baseline: {!r}".format(smp))
         drop = clean_ff["mean_token_logprob"] - ff_best["mean_token_logprob"]
         print("\n  median generated length: {} tokens (baseline), {} (intervened)"
               .format(clean_ff["median_tokens"], ff_best["median_tokens"]))
@@ -562,11 +623,22 @@ def main(argv=None):
               "audio {:.3f}".format(best["band"], best["gamma"],
                                     best["margin_delta"], closed, best["audio"]))
 
-        if broke_free:
+        g0 = clean_ff.get("generative_tdr")
+        g1 = ff_best.get("generative_tdr") if ff_best else None
+        gen_gain = (g0 - g1) if (g0 is not None and g1 is not None) else None
+
+        if gen_gain is not None and gen_gain > 0.2 and not broke_free:
+            text = ("FREE-FORM EFFECT: closed-set choice is unmoved ({:.0%} of "
+                    "the gap) but in open generation the description flips "
+                    "toward the audio, gen-TDR {:.3f} -> {:.3f}, with fluency "
+                    "intact. The closed-set null is not the whole story -- "
+                    "follow this up before concluding no patch exists."
+                    .format(closed, g0, g1))
+        elif broke_free:
             text = ("REPRODUCES CHO ET AL.'S NEGATIVE: the intervention moves the "
-                    "decision but free-form fluency drops {:.2f} nats/token. "
-                    "Closed-set accuracy did not show this. Not a usable fix."
-                    .format(fl_drop))
+                    "decision but free-form fluency drops {:.2f} nats/token in a "
+                    "claim-free scoring context, so this is degeneration rather "
+                    "than disagreement. Not a usable fix.".format(fl_drop))
         elif broke_closed:
             text = ("REJECT: capability fell {:.3f} -> {:.3f}.".format(
                 b_cap, best["capability"]))
@@ -606,6 +678,7 @@ def main(argv=None):
                    "routing": route,
                    "routing_recovered_fraction": recovered,
                    "freeform_baseline": clean_ff,
+                   "generative_tdr_baseline": clean_ff.get("generative_tdr"),
                    "freeform_best": ff_best,
                    "verdict": text}, f, indent=2)
     print("\nwrote {}".format(out))
