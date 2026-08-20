@@ -68,12 +68,18 @@ class ClaimAttenuator:
     just removes the claim from the model's view.
     """
 
-    def __init__(self, model, layers_to_change, claim_span, gen_pos, gamma):
+    def __init__(self, model, layers_to_change, claim_span, gen_pos, gamma,
+                 rows="gen"):
         self.layers = C.decoder_layers(model)
         self.targets = set(layers_to_change)
         self.lo, self.hi = claim_span
         self.gen_pos = gen_pos
         self.gamma = gamma
+        # "gen"  -- only the answer position's view of the claim (the experiment)
+        # "all"  -- every position's view, i.e. the claim is removed from the
+        #           model's input entirely. Only meaningful as a positive
+        #           control, never as a proposed fix.
+        self.rows = rows
         self._handles = []
 
     def __enter__(self):
@@ -97,16 +103,24 @@ class ClaimAttenuator:
                 if self.lo > hi:
                     return args, kwargs
                 q_len = m.shape[-2]
-                # prefill: the answer row onward. decode: the only row is the
-                # answer position, so row 0.
-                rows = slice(0, 1) if q_len == 1 else slice(
-                    min(self.gen_pos, q_len - 1), q_len)
+                if self.rows == "all":
+                    # every query position loses sight of the claim
+                    rows = slice(0, q_len)
+                else:
+                    # prefill: the answer row onward. decode: the only row is
+                    # the answer position, so row 0.
+                    rows = slice(0, 1) if q_len == 1 else slice(
+                        min(self.gen_pos, q_len - 1), q_len)
                 if self.gamma <= 0:
                     # finfo.min rather than -inf: an actual -inf can propagate to
                     # NaN in fp16 softmax, and min is already a hard block.
                     m[..., rows, self.lo:hi + 1] = torch.finfo(m.dtype).min
                 else:
                     m[..., rows, self.lo:hi + 1] += math.log(self.gamma)
+                    # rows="all" touches entries causality already masked to
+                    # finfo.min; subtracting more underflows to -inf in fp16,
+                    # and a row of all -inf gives NaN out of softmax.
+                    m.clamp_(min=torch.finfo(m.dtype).min)
                 kwargs = dict(kwargs)
                 kwargs["attention_mask"] = m
                 return args, kwargs
@@ -143,14 +157,29 @@ def prepare(model, processor, item, fixed_seconds):
 
 
 def predict(model, processor, item, inputs, layers=None,
-            claim=None, gen_pos=None, gamma=1.0):
+            claim=None, gen_pos=None, gamma=1.0, rows="gen"):
     letters = list(C.option_map(item).keys())
     if layers is None or claim is None:
         pred, sc = C.predict_letter(model, processor, inputs, letters)
         return pred, margin(sc, item)
-    with ClaimAttenuator(model, layers, claim, gen_pos, gamma):
+    with ClaimAttenuator(model, layers, claim, gen_pos, gamma, rows):
         pred, sc = C.predict_letter(model, processor, inputs, letters)
     return pred, margin(sc, item)
+
+
+def condition(model, processor, prep_mis, prep_mat, layers, gamma, rows="gen"):
+    """Score both item sets under one intervention. Returns (mismatched, matched)."""
+    out = []
+    for prep in (prep_mis, prep_mat):
+        recs = []
+        for it, inputs, claim, gen_pos in prep:
+            p, mg = predict(model, processor, it, inputs, layers,
+                            claim, gen_pos, gamma, rows)
+            recs.append(dict(prediction=p, correct_letter=C.correct_letter(it),
+                             claimed=C.claimed_letter(it),
+                             correct=p == C.correct_letter(it), margin=mg))
+        out.append(recs)
+    return out[0], out[1]
 
 
 def summarise(records):
@@ -302,12 +331,45 @@ def main(argv=None):
           .format(b_acc, b_lo, b_hi, b_cap, b_tdr.get("tdr", float("nan"))))
     print("  margin {:+.2f}  <- the gap attenuation has to close".format(b_marg))
 
+    # ---- positive control -------------------------------------------------- #
+    # Without this the sweep is uninterpretable: a null result is indistinguish-
+    # able from a mask edit that never took effect. Removing the claim from
+    # EVERY position at EVERY layer has to collapse TDR -- the model cannot
+    # follow a claim it cannot read. If this moves nothing, nothing below is
+    # evidence about anything.
+    print("\n" + "=" * 78)
+    print("POSITIVE CONTROL -- claim removed from every position, every layer")
+    print("=" * 78)
+    print("  Not a candidate fix: a model that cannot see the claim is not a")
+    print("  model that resists it. This only certifies the knockout works.\n")
+
+    pc_mis, pc_mat = condition(model, processor, prep_mis, prep_mat,
+                               list(range(n_layers)), 0.0, rows="all")
+    pc_acc, pc_lo, pc_hi, pc_marg = summarise(pc_mis)
+    pc_cap, _, _, _ = summarise(pc_mat)
+    pc_tdr = C.tdr_block(pc_mis).get("tdr")
+    print("  audio accuracy {:.3f} [{:.2f},{:.2f}]   capability {:.3f}   TDR {:.3f}"
+          .format(pc_acc, pc_lo, pc_hi, pc_cap, pc_tdr if pc_tdr is not None else float("nan")))
+    print("  margin {:+.2f}   d(margin) {:+.2f}".format(pc_marg, pc_marg - b_marg))
+
+    control_ok = abs(pc_marg - b_marg) > 1.0
+    if control_ok:
+        print("\n  Knockout verified: blocking the claim moves the margin.")
+    else:
+        print("\n  *** POSITIVE CONTROL FAILED ***")
+        print("  Blocking the claim everywhere changed the margin by {:+.2f} nats."
+              .format(pc_marg - b_marg))
+        print("  The model cannot be reading the claim through the attention")
+        print("  mask at all, so every row below is a null of the method, not")
+        print("  a fact about the model. Check the claim span before reporting.")
+
     # ---- sweep ------------------------------------------------------------ #
     print("\n" + "=" * 78)
     print("ATTENUATING THE GENERATION POSITION'S VIEW OF THE CLAIM")
     print("=" * 78)
-    print("  'all' is the input-ablation reference, not a candidate fix: a model")
-    print("  that cannot see the claim is not a model that resists it.\n")
+    print("  Bands are layer ranges; all of them attenuate only the answer")
+    print("  position's row. Contrast with the positive control above, which")
+    print("  attenuates every row.\n")
     print("  {:<7}{:>7}{:>9}{:>16}{:>9}{:>10}{:>12}".format(
         "band", "gamma", "audio", "95% CI", "margin", "d(marg)", "capability"))
 
@@ -315,19 +377,8 @@ def main(argv=None):
     for band in args.bands:
         layers = band_for(band, n_layers)
         for gamma in args.gammas:
-            mis, mat = [], []
-            for it, inputs, claim, gen_pos in prep_mis:
-                p, mg = predict(model, processor, it, inputs, layers,
-                                claim, gen_pos, gamma)
-                mis.append(dict(prediction=p, correct_letter=C.correct_letter(it),
-                                claimed=C.claimed_letter(it),
-                                correct=p == C.correct_letter(it), margin=mg))
-            for it, inputs, claim, gen_pos in prep_mat:
-                p, mg = predict(model, processor, it, inputs, layers,
-                                claim, gen_pos, gamma)
-                mat.append(dict(prediction=p, correct_letter=C.correct_letter(it),
-                                claimed=C.claimed_letter(it),
-                                correct=p == C.correct_letter(it), margin=mg))
+            mis, mat = condition(model, processor, prep_mis, prep_mat,
+                                 layers, gamma)
             acc, lo, hi, mg_ = summarise(mis)
             cap, _, _, _ = summarise(mat)
             t = C.tdr_block(mis)
@@ -353,7 +404,7 @@ def main(argv=None):
     print("  {:<22}{:>10.3f}{:>14.3f}".format(
         "baseline", clean_ff["mean_token_logprob"], clean_ff["repetition_rate"]))
 
-    candidates = [r for r in rows if r["band"] != "all"]
+    candidates = list(rows)
     best = max(candidates, key=lambda r: r["margin_delta"]) if candidates else None
     ff_best = None
     if best:
@@ -373,14 +424,16 @@ def main(argv=None):
     print("\n" + "=" * 78)
     print("VERDICT")
     print("=" * 78)
-    all_rows = [r for r in rows if r["band"] == "all"]
-    if all_rows:
-        a = max(all_rows, key=lambda r: r["margin_delta"])
-        print("  reference: deleting the claim entirely moves the margin {:+.2f}"
-              .format(a["margin_delta"]))
-        print("  (that is the ceiling any targeted intervention is working toward)")
+    print("  reference: removing the claim from every position moves the margin "
+          "{:+.2f}".format(pc_marg - b_marg))
+    print("  (that is the ceiling any targeted intervention is working toward)")
 
-    if not best:
+    if not control_ok:
+        text = ("INCONCLUSIVE: the positive control did not move the margin, so "
+                "the knockout is not reaching the model's use of the claim. "
+                "Nothing here is evidence about where the override lives; fix "
+                "the intervention before reading the sweep.")
+    elif not best:
         text = "no targeted band tested"
     else:
         closed = best["margin_delta"] / abs(b_marg) if b_marg else 0.0
@@ -427,6 +480,10 @@ def main(argv=None):
                                limit=args.limit, bands=args.bands,
                                gammas=args.gammas, n_items=len(prep_mis),
                                skipped_no_claim_span=skipped),
+                   "positive_control": {"audio": pc_acc, "margin": pc_marg,
+                                        "margin_delta": pc_marg - b_marg,
+                                        "capability": pc_cap, "tdr": pc_tdr,
+                                        "passed": control_ok},
                    "baseline": {"audio": b_acc, "capability": b_cap,
                                 "margin": b_marg, "tdr": b_tdr.get("tdr")},
                    "sweep": rows,
