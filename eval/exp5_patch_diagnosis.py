@@ -125,15 +125,31 @@ def cache_item(model, processor, item, fixed_seconds):
     return inputs, span, cache.acts
 
 
+def margin(scores, item):
+    """log P(audio truth) - log P(text claim).
+
+    Argmax alone cannot tell an inert patch from one that moves the logits but
+    not far enough to flip a large margin. Every accuracy in this experiment is
+    therefore paired with this gap, which is continuous.
+    """
+    a, c = C.correct_letter(item), C.claimed_letter(item)
+    if a not in scores or c not in scores:
+        return None
+    return scores[a] - scores[c]
+
+
 def predict_with(model, processor, item, inputs, span, acts,
                  src, dst, window, n_layers, match_norm=False):
+    """Returns (predicted_letter, audio-minus-claim margin)."""
     letters = list(C.option_map(item).keys())
     if acts is None or src not in acts:
-        return C.predict_letter(model, processor, inputs, letters)[0]
+        pred, sc = C.predict_letter(model, processor, inputs, letters)
+        return pred, margin(sc, item)
     donor = acts[src][:, span[0]:span[1] + 1, :][0]
     source = {dst + i: donor for i in range(window) if dst + i < n_layers}
     with PatchSpan(model, source, span, match_norm=match_norm):
-        return C.predict_letter(model, processor, inputs, letters)[0]
+        pred, sc = C.predict_letter(model, processor, inputs, letters)
+    return pred, margin(sc, item)
 
 
 def score(records):
@@ -145,12 +161,19 @@ def score(records):
 def evaluate(prepared, predict_fn):
     out = []
     for item, inputs, span, acts in prepared:
-        pred = predict_fn(item, inputs, span, acts)
+        got = predict_fn(item, inputs, span, acts)
+        pred, marg = got if isinstance(got, tuple) else (got, None)
         out.append({"prediction": pred,
                     "correct_letter": C.correct_letter(item),
                     "claimed": C.claimed_letter(item),
-                    "correct": pred == C.correct_letter(item)})
+                    "correct": pred == C.correct_letter(item),
+                    "margin": marg})
     return out
+
+
+def mean_margin(records):
+    vals = [r["margin"] for r in records if r.get("margin") is not None]
+    return sum(vals) / len(vals) if vals else float("nan")
 
 
 # --------------------------------------------------------------------------- #
@@ -204,17 +227,23 @@ def test_b_source_sweep(model, processor, prep_mis, prep_mat, args, n_layers):
     print("at layers 29-31. Cho et al. source from the end. If depth is the")
     print("story, sourcing near the peak should beat sourcing near the end.\n")
 
-    base_mis = evaluate(prep_mis, lambda it, i, s, a:
-                        C.predict_letter(model, processor, i,
-                                         list(C.option_map(it).keys()))[0])
-    base_mat = evaluate(prep_mat, lambda it, i, s, a:
-                        C.predict_letter(model, processor, i,
-                                         list(C.option_map(it).keys()))[0])
+    def unpatched(it, i, s, a):
+        """Baseline must return the margin too, or every delta below is NaN."""
+        pred, sc = C.predict_letter(model, processor, i,
+                                    list(C.option_map(it).keys()))
+        return pred, margin(sc, it)
+
+    base_mis = evaluate(prep_mis, unpatched)
+    base_mat = evaluate(prep_mat, unpatched)
     b_audio, b_lo, b_hi = score(base_mis)
     b_cap, _, _ = score(base_mat)
     b_tdr = C.tdr_block(base_mis)
-    print("  baseline audio accuracy {:.3f} [{:.2f},{:.2f}]   capability {:.3f}   TDR {:.3f}"
-          .format(b_audio, b_lo, b_hi, b_cap, b_tdr.get("tdr", float("nan"))))
+    b_marg = mean_margin(base_mis)
+    print("  baseline audio accuracy {:.3f} [{:.2f},{:.2f}]   capability {:.3f}   "
+          "TDR {:.3f}".format(b_audio, b_lo, b_hi, b_cap, b_tdr.get("tdr", float("nan"))))
+    print("  baseline margin  log P(audio) - log P(claim) = {:+.2f}".format(b_marg))
+    print("  (that is the gap any intervention has to close; accuracy cannot")
+    print("   move until it reaches 0)")
 
     # Identity control: patching layer d with layer d's own cached output is a
     # no-op. If it does not reproduce the baseline exactly, the patching
@@ -231,8 +260,8 @@ def test_b_source_sweep(model, processor, prep_mis, prep_mat, args, n_layers):
             "Identity patch did not reproduce the baseline. The hook is not "
             "applying as intended; fix that before reading any result here.")
 
-    print("\n  {:>5}{:>9}{:>16}{:>12}{:>8}".format(
-        "src", "audio", "95% CI", "capability", "TDR"))
+    print("\n  {:>5}{:>9}{:>16}{:>12}{:>8}{:>10}{:>9}".format(
+        "src", "audio", "95% CI", "capability", "TDR", "margin", "d(marg)"))
     rows = []
     for src in args.sources:
         if src == args.dst:
@@ -246,13 +275,16 @@ def test_b_source_sweep(model, processor, prep_mis, prep_mat, args, n_layers):
         a_, lo, hi = score(mis)
         cap, _, _ = score(mat)
         t = C.tdr_block(mis)
+        m = mean_margin(mis)
         rows.append({"src": src, "audio": a_, "ci95": [lo, hi],
-                     "capability": cap, "tdr": t.get("tdr")})
-        print("  {:>5}{:>9.3f}   [{:.2f},{:.2f}]{:>12.3f}{:>8.3f}".format(
-            src, a_, lo, hi, cap, t.get("tdr") or float("nan")))
+                     "capability": cap, "tdr": t.get("tdr"),
+                     "margin": m, "margin_delta": m - b_marg})
+        print("  {:>5}{:>9.3f}   [{:.2f},{:.2f}]{:>12.3f}{:>8.3f}{:>10.2f}{:>+9.2f}"
+              .format(src, a_, lo, hi, cap, t.get("tdr") or float("nan"),
+                      m, m - b_marg))
 
     return {"baseline": {"audio": b_audio, "capability": b_cap,
-                         "tdr": b_tdr.get("tdr")},
+                         "tdr": b_tdr.get("tdr"), "margin": b_marg},
             "identity_control": {"src": args.dst, "audio": i_audio,
                                  "reproduces_baseline": ok},
             "sweep": rows}
@@ -278,10 +310,11 @@ def test_c_norm_matched(model, processor, prep_mis, prep_mat, args, n_layers, be
     a_, lo, hi = score(mis)
     cap, _, _ = score(mat)
     t = C.tdr_block(mis)
-    print("  audio {:.3f} [{:.2f},{:.2f}]   capability {:.3f}   TDR {:.3f}".format(
-        a_, lo, hi, cap, t.get("tdr") or float("nan")))
+    m = mean_margin(mis)
+    print("  audio {:.3f} [{:.2f},{:.2f}]   capability {:.3f}   TDR {:.3f}   "
+          "margin {:+.2f}".format(a_, lo, hi, cap, t.get("tdr") or float("nan"), m))
     return {"src": best_src, "audio": a_, "ci95": [lo, hi],
-            "capability": cap, "tdr": t.get("tdr")}
+            "capability": cap, "tdr": t.get("tdr"), "margin": m}
 
 
 # --------------------------------------------------------------------------- #
@@ -310,8 +343,25 @@ def verdict(res_a, res_b, res_c, b_cap):
     helped = gain > 0.05
     norm_helped = (res_c["audio"] - base) > 0.05
 
+    # Did the patch perturb the model at all? Accuracy is argmax, which is blind
+    # to a large logit movement that never crosses the margin. If no source
+    # shifts the margin either, the intervention is inert and the null says
+    # nothing about paralinguistic content.
+    b_marg = res_b["baseline"].get("margin")
+    shifts = [abs(r.get("margin_delta") or 0.0) for r in sweep]
+    biggest_shift = max(shifts) if shifts else 0.0
+    inert = biggest_shift < 0.05
+
+    print("  baseline margin    {:+.2f}   (log P(audio) - log P(claim))".format(b_marg))
+    print("  largest |d margin| {:.2f} across all source layers".format(biggest_shift))
+
     print()
-    if broke and helped:
+    if inert:
+        out = ("INERT PATCH: no source layer shifts the logit margin by even 0.05. "
+               "The intervention is not perturbing the decision at all, so this "
+               "null is about the implementation, not about paralinguistic "
+               "content. Check that the donor differs from what is already there.")
+    elif broke and helped:
         out = ("AMBIGUOUS: the best source gained {:+.3f} but capability fell "
                "{:.3f} -> {:.3f}. A gain bought by damaging the model is not a fix."
                .format(gain, b_cap, best["capability"]))
@@ -327,10 +377,12 @@ def verdict(res_a, res_b, res_c, b_cap):
                "Cho et al.'s method needs rescaling for this model, and the exp4 "
                "null was an artifact.")
     else:
-        out = ("FLOOR / READOUT: no source layer and no rescaling moves it. "
-               "Availability is not the lever. The remaining target is the text "
-               "circuit at the generation position, where exp3 measured a 16:1 "
-               "text-to-audio attribution ratio.")
+        out = ("MARGIN TOO LARGE: the patch does move the decision (largest margin "
+               "shift {:.2f}) but never closes a {:+.2f} gap, so accuracy cannot "
+               "change. Availability is not the lever. The remaining target is the "
+               "text circuit at the generation position, where exp3 measured a "
+               "16:1 text-to-audio attribution ratio."
+               .format(biggest_shift, b_marg))
     print("  " + out)
     return out
 
