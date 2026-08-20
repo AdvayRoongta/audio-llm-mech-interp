@@ -289,7 +289,7 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
     import torch
 
     scores, reps, samples, lens = [], [], [], []
-    said_claim = said_true = 0
+    said_claim = said_true = named_true = 0
     for item, inputs, claim, gen_pos, score_inputs in prepared:
         ctx = {k: v for k, v in inputs.items()}
         with torch.no_grad():
@@ -326,6 +326,7 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
 
         claimed_lab, true_lab = label_texts(item)
         m_claim, m_true = mentions(text, claimed_lab), mentions(text, true_lab)
+        named_true += int(m_true)
         if m_claim != m_true:                 # ignore "both" and "neither"
             said_claim += int(m_claim)
             said_true += int(m_true)
@@ -337,7 +338,11 @@ def freeform_fluency(model, processor, prepared, layers, gamma,
 
     med = sorted(lens)[len(lens) // 2] if lens else 0
     decided = said_claim + said_true
+    n_gen = len(scores)
     return {"generative_tdr": (said_claim / decided) if decided else None,
+            # names the true label; on matched items the claim agrees with the
+            # audio, so this is the generative capability control
+            "names_true_rate": (named_true / n_gen) if n_gen else None,
             "said_claim": said_claim, "said_true": said_true, "decided": decided,
             "mean_token_logprob": (sum(scores) / len(scores)) if scores else float("nan"),
             "repetition_rate": (sum(reps) / len(reps)) if reps else float("nan"),
@@ -369,7 +374,7 @@ def parse_args(argv=None):
                     choices=["early", "mid", "late", "all"])
     ap.add_argument("--gammas", type=float, nargs="+", default=[0.0, 0.25])
     ap.add_argument("--fixed-seconds", type=float, default=3.0)
-    ap.add_argument("--freeform-items", type=int, default=12,
+    ap.add_argument("--freeform-items", type=int, default=30,
                     help="items used for the coherence control (generation is slow)")
     ap.add_argument("--max-new-tokens", type=int, default=30)
     ap.add_argument("--4bit", dest="four_bit", action="store_true")
@@ -539,60 +544,75 @@ def main(argv=None):
 
     # rebuilt without the option list, or the model answers with one letter and
     # a fluency measure over two tokens means nothing
-    ff_prep = []
-    for it, _, _, _ in prep_mis[:args.freeform_items]:
-        fi = freeform_item(it)
-        f_inputs, f_claim, f_gen = prepare_freeform(
-            model, processor, fi, args.fixed_seconds)
-        if f_claim is not None:
+    def build_ff(prep):
+        out = []
+        for it, _, _, _ in prep[:args.freeform_items]:
+            fi = freeform_item(it)
+            f_inputs, f_claim, f_gen = prepare_freeform(
+                model, processor, fi, args.fixed_seconds)
+            if f_claim is None:
+                continue
             # neutral context for scoring: same audio and question, no claim
             score_inputs = C.encode(model, processor, strip_claim(fi),
                                     fixed_seconds=args.fixed_seconds)
-            ff_prep.append((fi, f_inputs, f_claim, f_gen, score_inputs))
-    print("  open-ended prompt, {} items\n".format(len(ff_prep)))
-    if not ff_prep:
+            out.append((fi, f_inputs, f_claim, f_gen, score_inputs))
+        return out
+
+    ff_mis, ff_mat = build_ff(prep_mis), build_ff(prep_mat)
+    print("  open-ended prompt: {} mismatched, {} matched items\n".format(
+        len(ff_mis), len(ff_mat)))
+    if not ff_mis:
         print("  *** no claim span located in the open-ended prompt; the")
         print("  coherence control did not run ***\n")
 
-    clean_ff = freeform_fluency(model, processor, ff_prep, None, 1.0,
-                                args.max_new_tokens)
-    def gtdr(f):
-        v = f.get("generative_tdr")
-        return "n/a" if v is None else "{:.3f}".format(v)
+    def fmt(v, spec="{:.3f}"):
+        return "n/a" if v is None else spec.format(v)
 
-    print("  {:<22}{:>10}{:>13}{:>10}".format(
-        "condition", "logprob", "repetition", "gen-TDR"))
-    print("  {:<22}{:>10.3f}{:>13.3f}{:>10}".format(
-        "baseline", clean_ff["mean_token_logprob"],
-        clean_ff["repetition_rate"], gtdr(clean_ff)))
+    print("  {:<16}{:>9}{:>11}{:>11}{:>10}{:>7}".format(
+        "condition", "gen-TDR", "mis:true", "mat:true", "logprob", "rep"))
+    print("  {:<16}{:>9}{:>11}{:>11}{:>10}{:>7}".format(
+        "", "lower=fix", "higher=fix", "capability", "", ""))
 
-    candidates = list(rows)
-    best = max(candidates, key=lambda r: r["margin_delta"]) if candidates else None
-    ff_best = None
-    if best:
-        layers = band_for(best["band"], n_layers)
-        ff_best = freeform_fluency(model, processor, ff_prep, layers,
-                                   best["gamma"], args.max_new_tokens)
-        print("  {:<22}{:>10.3f}{:>13.3f}{:>10}".format(
-            "{} gamma={}".format(best["band"], best["gamma"]),
-            ff_best["mean_token_logprob"], ff_best["repetition_rate"],
-            gtdr(ff_best)))
-        print("\n  gen-TDR is the free-form analogue of TDR: of the descriptions")
-        print("  that name exactly one label, the fraction naming the CLAIMED one.")
-        print("  Scored in a claim-free context, so contradicting the claim is")
-        print("  not itself penalised.")
-        for smp in clean_ff["samples"]:
+    ff_rows = []
+    conditions = [("baseline", None)] + [(b, band_for(b, n_layers))
+                                         for b in args.bands]
+    for name, layers in conditions:
+        f_mis = freeform_fluency(model, processor, ff_mis, layers, 0.0,
+                                 args.max_new_tokens)
+        f_mat = freeform_fluency(model, processor, ff_mat, layers, 0.0,
+                                 args.max_new_tokens)
+        ff_rows.append({"condition": name, "mismatched": f_mis, "matched": f_mat})
+        print("  {:<16}{:>9}{:>11}{:>11}{:>10}{:>7}".format(
+            name, fmt(f_mis.get("generative_tdr")),
+            fmt(f_mis.get("names_true_rate")), fmt(f_mat.get("names_true_rate")),
+            fmt(f_mis.get("mean_token_logprob"), "{:+.2f}"),
+            fmt(f_mis.get("repetition_rate"), "{:.2f}")))
+
+    clean_ff = ff_rows[0]["mismatched"]
+    clean_mat = ff_rows[0]["matched"]
+    print("\n  gen-TDR: of descriptions naming exactly one label, the fraction")
+    print("  naming the CLAIMED one -- the free-form analogue of TDR. Scored in")
+    print("  a claim-free context, so contradicting the claim is not penalised.")
+    print("  mat:true is the capability control: on matched items the claim")
+    print("  agrees with the audio, so a drop there is the cost of the fix.")
+
+    # pick the best free-form condition on gen-TDR, not on the closed-set sweep
+    cand = [r for r in ff_rows[1:]
+            if r["mismatched"].get("generative_tdr") is not None]
+    ff_best_row = min(cand, key=lambda r: r["mismatched"]["generative_tdr"]) \
+        if cand else None
+    ff_best = ff_best_row["mismatched"] if ff_best_row else None
+
+    if ff_best_row:
+        print("\n  best free-form condition: {}".format(ff_best_row["condition"]))
+        print("  median generated length: {} tokens (baseline), {} (intervened)"
+              .format(clean_ff.get("median_tokens"), ff_best.get("median_tokens")))
+        if not (clean_ff.get("informative") and ff_best.get("informative")):
+            print("  *** too few tokens generated for this to mean anything ***")
+        for smp in clean_ff.get("samples", []):
             print("    baseline: {!r}".format(smp))
-        drop = clean_ff["mean_token_logprob"] - ff_best["mean_token_logprob"]
-        print("\n  median generated length: {} tokens (baseline), {} (intervened)"
-              .format(clean_ff["median_tokens"], ff_best["median_tokens"]))
-        print("  fluency drop: {:+.3f} nats/token, repetition {:+.3f}".format(
-            -drop, ff_best["repetition_rate"] - clean_ff["repetition_rate"]))
-        if not (clean_ff["informative"] and ff_best["informative"]):
-            print("  *** too few tokens generated for this to mean anything; "
-                  "treat the fluency numbers as absent, not as passing ***")
-        for s in ff_best["samples"]:
-            print("    sample: {!r}".format(s))
+        for smp in ff_best.get("samples", []):
+            print("    {:<8}: {!r}".format(ff_best_row["condition"], smp))
 
     # ---- verdict ---------------------------------------------------------- #
     print("\n" + "=" * 78)
@@ -626,14 +646,31 @@ def main(argv=None):
         g0 = clean_ff.get("generative_tdr")
         g1 = ff_best.get("generative_tdr") if ff_best else None
         gen_gain = (g0 - g1) if (g0 is not None and g1 is not None) else None
+        # the capability control: matched items, where the claim is TRUE.
+        # An intervention that merely stops the model reading text drops this
+        # as hard as it drops gen-TDR, and is not a fix.
+        c0 = clean_mat.get("names_true_rate")
+        c1 = (ff_best_row["matched"].get("names_true_rate")
+              if ff_best_row else None)
+        cap_cost = (c0 - c1) if (c0 is not None and c1 is not None) else None
 
         if gen_gain is not None and gen_gain > 0.2 and not broke_free:
-            text = ("FREE-FORM EFFECT: closed-set choice is unmoved ({:.0%} of "
-                    "the gap) but in open generation the description flips "
-                    "toward the audio, gen-TDR {:.3f} -> {:.3f}, with fluency "
-                    "intact. The closed-set null is not the whole story -- "
-                    "follow this up before concluding no patch exists."
-                    .format(closed, g0, g1))
+            if cap_cost is not None and cap_cost > 0.5 * gen_gain:
+                text = ("NOT A FIX -- INDISCRIMINATE: gen-TDR falls {:.3f} -> "
+                        "{:.3f} on mismatched items, but matched-item accuracy "
+                        "falls {:.3f} -> {:.3f} alongside it. The intervention "
+                        "suppresses the text claim whether or not it is true, "
+                        "so it buys resistance to false claims by discarding "
+                        "true ones."
+                        .format(g0, g1, c0, c1))
+            else:
+                text = ("FREE-FORM EFFECT: closed-set choice is unmoved ({:.0%} "
+                        "of the gap) but in open generation the description "
+                        "flips toward the audio, gen-TDR {:.3f} -> {:.3f}, "
+                        "with fluency intact and matched-item accuracy holding "
+                        "at {}. This is the strongest patch candidate so far."
+                        .format(closed, g0, g1,
+                                "n/a" if c1 is None else "{:.3f}".format(c1)))
         elif broke_free:
             text = ("REPRODUCES CHO ET AL.'S NEGATIVE: the intervention moves the "
                     "decision but free-form fluency drops {:.2f} nats/token in a "
@@ -677,6 +714,7 @@ def main(argv=None):
                    "sweep": rows,
                    "routing": route,
                    "routing_recovered_fraction": recovered,
+                   "freeform": ff_rows,
                    "freeform_baseline": clean_ff,
                    "generative_tdr_baseline": clean_ff.get("generative_tdr"),
                    "freeform_best": ff_best,
