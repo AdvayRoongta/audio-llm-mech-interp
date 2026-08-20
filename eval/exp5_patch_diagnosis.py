@@ -31,6 +31,9 @@ Three tests, cheapest first:
                        from the peak beat sourcing from the end?
   C  norm-matched      the best src from B, rescaled to the destination layer's
                        own norm before writing.
+  D  scaling           does the effect accumulate? a wider destination window,
+                       and in-place amplification of the span. Decides whether an
+                       audio-side fix is worth pursuing at all.
 
 Every test carries exp4's two controls: capability on Matched items must not
 drop, and results are reported against the unpatched baseline.
@@ -103,6 +106,46 @@ class PatchSpan:
         self._handles = []
 
 
+class ScaleSpan:
+    """Multiply the audio span's residual by alpha at the chosen layers.
+
+    Back-patching *relocates* a representation. This *amplifies* the one already
+    there, which is the other reading of exp3: if the audio's influence is real
+    but small, scaling it up is the more direct lever than moving it earlier.
+    No donor is involved, so nothing out-of-distribution is injected -- only the
+    existing content is made louder.
+    """
+
+    def __init__(self, model, layers_to_scale, span, alpha):
+        self.layers = C.decoder_layers(model)
+        self.targets = set(layers_to_scale)
+        self.lo, self.hi = span
+        self.alpha = alpha
+        self._handles = []
+
+    def __enter__(self):
+        def mk(i):
+            def hook(mod, inp, out):
+                if i not in self.targets:
+                    return out
+                is_tuple = isinstance(out, tuple)
+                h = (out[0] if is_tuple else out).clone()
+                if h.shape[1] <= self.hi:
+                    return out
+                h[:, self.lo:self.hi + 1, :] *= self.alpha
+                return (h,) + out[1:] if is_tuple else h
+            return hook
+
+        self._handles = [l.register_forward_hook(mk(i))
+                         for i, l in enumerate(self.layers)]
+        return self
+
+    def __exit__(self, *exc):
+        for h in self._handles:
+            h.remove()
+        self._handles = []
+
+
 # --------------------------------------------------------------------------- #
 # one item, many source layers, one cached forward
 # --------------------------------------------------------------------------- #
@@ -148,6 +191,14 @@ def predict_with(model, processor, item, inputs, span, acts,
     donor = acts[src][:, span[0]:span[1] + 1, :][0]
     source = {dst + i: donor for i in range(window) if dst + i < n_layers}
     with PatchSpan(model, source, span, match_norm=match_norm):
+        pred, sc = C.predict_letter(model, processor, inputs, letters)
+    return pred, margin(sc, item)
+
+
+def predict_scaled(model, processor, item, inputs, span, layers_to_scale, alpha):
+    """Predict with the audio span amplified in place."""
+    letters = list(C.option_map(item).keys())
+    with ScaleSpan(model, layers_to_scale, span, alpha):
         pred, sc = C.predict_letter(model, processor, inputs, letters)
     return pred, margin(sc, item)
 
@@ -318,7 +369,91 @@ def test_c_norm_matched(model, processor, prep_mis, prep_mat, args, n_layers, be
 
 
 # --------------------------------------------------------------------------- #
-def verdict(res_a, res_b, res_c, b_cap):
+# test D -- does the effect scale?
+# --------------------------------------------------------------------------- #
+def test_d_scaling(model, processor, prep_mis, prep_mat, args, n_layers,
+                   best_src, b_marg, b_cap, best_delta_b=0.0):
+    """Does the mid-layer effect accumulate, or saturate?
+
+    Test B moved the margin +0.51 against a gap of about -7.3, using a single
+    layer. Two ways to push harder: patch a wider destination window, or
+    amplify the span in place. If either scales roughly with strength, an
+    audio-side fix is worth pursuing; if both saturate near 0.6, availability is
+    capped and only the readout is left.
+    """
+    print("\n" + "=" * 74)
+    print("TEST D -- does the effect scale with intervention strength?")
+    print("=" * 74)
+    print("gap to close: {:+.2f} nats. Test B's best single layer bought {:+.2f}."
+          .format(b_marg, best_delta_b))
+    print()
+
+    rows_w = []
+    print("  D1 -- wider destination window, donor from L{}".format(best_src))
+    print("  {:>4}{:>9}{:>10}{:>9}{:>12}".format("w", "audio", "margin", "d(marg)", "capability"))
+    for w in args.windows:
+        mis = evaluate(prep_mis, lambda it, i, sp, a, W=w: predict_with(
+            model, processor, it, i, sp, a, best_src, args.dst, W, n_layers))
+        mat = evaluate(prep_mat, lambda it, i, sp, a, W=w: predict_with(
+            model, processor, it, i, sp, a, best_src, args.dst, W, n_layers))
+        a_, _, _ = score(mis)
+        cap, _, _ = score(mat)
+        m = mean_margin(mis)
+        rows_w.append({"window": w, "audio": a_, "margin": m,
+                       "margin_delta": m - b_marg, "capability": cap})
+        print("  {:>4}{:>9.3f}{:>10.2f}{:>+9.2f}{:>12.3f}".format(
+            w, a_, m, m - b_marg, cap))
+
+    # Amplification: scale the span in place over a band centred on the peak.
+    band = [l for l in range(best_src, min(best_src + args.amp_band, n_layers))]
+    rows_a = []
+    print("\n  D2 -- amplify the span in place at layers {}".format(band))
+    print("  {:>6}{:>9}{:>10}{:>9}{:>12}".format(
+        "alpha", "audio", "margin", "d(marg)", "capability"))
+    for alpha in args.alphas:
+        mis = evaluate(prep_mis, lambda it, i, sp, a, A=alpha: predict_scaled(
+            model, processor, it, i, sp, band, A))
+        mat = evaluate(prep_mat, lambda it, i, sp, a, A=alpha: predict_scaled(
+            model, processor, it, i, sp, band, A))
+        a_, _, _ = score(mis)
+        cap, _, _ = score(mat)
+        m = mean_margin(mis)
+        rows_a.append({"alpha": alpha, "audio": a_, "margin": m,
+                       "margin_delta": m - b_marg, "capability": cap})
+        flag = "  <- capability damaged" if cap < b_cap - 0.05 else ""
+        print("  {:>6.1f}{:>9.3f}{:>10.2f}{:>+9.2f}{:>12.3f}{}".format(
+            alpha, a_, m, m - b_marg, cap, flag))
+
+    # How far does the best usable intervention get, and does it look linear?
+    usable = [r for r in rows_w + rows_a if r["capability"] >= b_cap - 0.05]
+    best = max(usable, key=lambda r: r["margin_delta"]) if usable else None
+    print()
+    if best:
+        frac = best["margin_delta"] / abs(b_marg) if b_marg else float("nan")
+        print("  best intervention that keeps capability: {:+.2f} nats "
+              "({:.0%} of the {:+.2f} gap)".format(
+                  best["margin_delta"], frac, b_marg))
+        if len(rows_w) >= 2:
+            first, last = rows_w[0], rows_w[-1]
+            per_layer = ((last["margin_delta"] - first["margin_delta"]) /
+                         max(1, last["window"] - first["window"]))
+            print("  window scaling: {:+.3f} nats per extra destination layer"
+                  .format(per_layer))
+            if per_layer > 0.02:
+                need = abs(b_marg) / per_layer
+                print("  -> extrapolating linearly, closing the gap needs ~{:.0f} "
+                      "layers. Treat as an upper bound on plausibility, not a plan."
+                      .format(need))
+            else:
+                print("  -> widening the window buys almost nothing; the effect "
+                      "saturates.")
+    return {"window_sweep": rows_w, "amplitude_sweep": rows_a,
+            "amp_band": band,
+            "best_usable_delta": best["margin_delta"] if best else None}
+
+
+# --------------------------------------------------------------------------- #
+def verdict(res_a, res_b, res_c, res_d, b_cap):
     print("\n" + "=" * 74)
     print("VERDICT")
     print("=" * 74)
@@ -377,12 +512,20 @@ def verdict(res_a, res_b, res_c, b_cap):
                "Cho et al.'s method needs rescaling for this model, and the exp4 "
                "null was an artifact.")
     else:
-        out = ("MARGIN TOO LARGE: the patch does move the decision (largest margin "
-               "shift {:.2f}) but never closes a {:+.2f} gap, so accuracy cannot "
-               "change. Availability is not the lever. The remaining target is the "
-               "text circuit at the generation position, where exp3 measured a "
-               "16:1 text-to-audio attribution ratio."
-               .format(biggest_shift, b_marg))
+        scaled = (res_d or {}).get("best_usable_delta")
+        reach = (scaled / abs(b_marg)) if (scaled and b_marg) else 0.0
+        if scaled and reach > 0.5:
+            out = ("AUDIO-SIDE VIABLE: stronger intervention closes {:.0%} of the "
+                   "{:+.2f} gap without harming capability. Push this further "
+                   "before moving to the readout.".format(reach, b_marg))
+        else:
+            out = ("MARGIN TOO LARGE: the patch moves the decision (best single "
+                   "layer {:.2f}, best scaled {:.2f}) but closes only {:.0%} of a "
+                   "{:+.2f} gap. Availability is not the lever even when pushed. "
+                   "The remaining target is the text circuit at the generation "
+                   "position, where exp3 measured a 16:1 text-to-audio "
+                   "attribution ratio.".format(
+                       biggest_shift, scaled or 0.0, reach, b_marg))
     print("  " + out)
     return out
 
@@ -397,7 +540,14 @@ def parse_args(argv=None):
     ap.add_argument("--sources", type=int, nargs="+",
                     default=[4, 9, 13, 16, 20, 24, 28, 31])
     ap.add_argument("--dst", type=int, default=0)
-    ap.add_argument("--window", type=int, default=1)
+    ap.add_argument("--window", type=int, default=1,
+                    help="destination window for tests B and C")
+    ap.add_argument("--windows", type=int, nargs="+", default=[1, 3, 5, 7],
+                    help="test D: destination windows to sweep")
+    ap.add_argument("--alphas", type=float, nargs="+", default=[1.5, 2.0, 3.0, 5.0],
+                    help="test D: in-place amplification factors")
+    ap.add_argument("--amp-band", type=int, default=3,
+                    help="test D: how many layers from the peak to amplify")
     ap.add_argument("--fixed-seconds", type=float, default=3.0)
     ap.add_argument("--norm-items", type=int, default=10,
                     help="items averaged for the norm profile; it is very stable")
@@ -439,7 +589,12 @@ def main(argv=None):
     best_src = max(res_b["sweep"], key=lambda r: r["audio"])["src"] if res_b["sweep"] else 9
     res_c = test_c_norm_matched(model, processor, prep_mis, prep_mat, args,
                                 n_layers, best_src)
-    text = verdict(res_a, res_b, res_c, res_b["baseline"]["capability"])
+    best_delta_b = max((r.get("margin_delta") or 0.0)
+                       for r in res_b["sweep"]) if res_b["sweep"] else 0.0
+    res_d = test_d_scaling(model, processor, prep_mis, prep_mat, args, n_layers,
+                           best_src, res_b["baseline"]["margin"],
+                           res_b["baseline"]["capability"], best_delta_b)
+    text = verdict(res_a, res_b, res_c, res_d, res_b["baseline"]["capability"])
 
     os.makedirs(args.output_dir, exist_ok=True)
     out = os.path.join(args.output_dir,
@@ -455,6 +610,7 @@ def main(argv=None):
                                     for k, v in res_a.items()},
                    "test_b_source_sweep": res_b,
                    "test_c_norm_matched": res_c,
+                   "test_d_scaling": res_d,
                    "verdict": text}, f, indent=2)
     print("\nwrote {}".format(out))
     return 0
