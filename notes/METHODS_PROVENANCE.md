@@ -189,6 +189,65 @@ Nothing worked. "No effect" is now tested first.
 
 ---
 
+## exp5 — patch diagnosis
+
+Not from a paper. exp4 returned a flat null, and this asks which of its
+assumptions failed before abandoning the approach. The sweep structure (vary
+the source layer, the width of the destination window, the amplitude) is the
+standard way activation-patching work isolates a null, e.g. the layer sweeps in
+Meng et al. (arXiv:2202.05262).
+
+The **margin**, log P(audio option) - log P(claimed option), replaces accuracy
+because accuracy was saturated at 0.000 and could not show partial movement. A
+continuous read-out of a saturated binary is ours, and should be labelled so.
+
+The **identity control** -- patch a span with itself and require the baseline
+back -- is the standard patching sanity check, and it aborts the run rather
+than warning, because a patching harness that fails it produces numbers that
+look fine.
+
+## exp6 — readout attenuation
+
+**Attention knockout**, Geva et al. (arXiv:2304.14767). They set attention
+weights from a target position to a source span to zero to test whether a
+specific edge carries information. Ours is the graded form: adding log(gamma)
+to the claim's keys before softmax scales those weights by gamma and lets the
+rest renormalise, with gamma=0 recovering their hard knockout.
+
+The **layer bands** follow their practice of restricting the knockout to a
+contiguous range rather than applying it everywhere; the restriction is the
+experiment, since knocking out at every layer merely deletes the claim.
+
+The **positive control** (remove the claim from every position, every layer) is
+ours, added after a six-condition sweep of nulls proved uninterpretable: a null
+from "this edge does not carry the claim" and a null from "the intervention is
+not reaching the model" are indistinguishable without a condition that must
+work. It is not a proposed fix.
+
+The **free-form coherence control** answers Cho et al. (arXiv:2606.18924), who
+found circuit ablation lifting closed-set accuracy while degrading open
+generation. Since our capability control is itself multiple-choice, it is
+structurally blind to that failure. Generating under the intervention and
+scoring with the unmodified model is the natural test.
+
+Two details are ours and load-bearing:
+
+- Scoring happens in a **claim-free context**. Scoring against the prompt that
+  contains the claim conflates incoherent text with text that merely
+  contradicts the claim -- and the second is what success looks like. Scored
+  the wrong way, a working intervention is reported as degeneration; that
+  happened before the fix.
+- **gen-TDR**, the free-form analogue of TDR: of descriptions naming exactly
+  one label, the fraction naming the claimed one. Descriptions naming both or
+  neither are excluded, matching how TDR treats undecided cases, so its
+  denominator is below the item count and is reported. `names_true_rate` is
+  computed over all items and is the exclusion-free version.
+
+The **matched-item generative control** is ours and decides the result. An
+intervention that stops the model reading text at all produces the same
+gen-TDR drop as one that resists false claims. Matched items, where the claim
+is true, separate them.
+
 ## Statistics
 
 | choice | source | why |
@@ -256,6 +315,11 @@ are unaffected -- only the summary sentence is wrong.
 ## Open at the time of writing
 
 - No integrated gradients (plain AtP only) — a stated divergence from Cho et al.
+- exp6's fix is demonstrated in open generation, not closed-set choice, which
+  is unmoved. The routing table is the reason the two differ, but the
+  free-form result is one category on one model so far.
+- exp6 assumes the claim's token span is known. That holds by construction here
+  and would need a way to identify the span in deployment.
 - exp2/exp3/exp4 have run on Qwen2-Audio only; the accessors are architecture-specific.
 - `sarcasm_pacing` is excluded for incomplete MUStARD++ audio, not for any
   scientific reason.
