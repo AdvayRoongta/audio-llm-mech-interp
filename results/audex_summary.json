@@ -1,0 +1,1663 @@
+{
+  "timestamp": "20260820_025522",
+  "model_path": "merged: audio-conditioned (old account) + text-only (theabsentavenger8)",
+  "dtype": "bfloat16",
+  "backend": "native",
+  "input": "data/combined_examples.json",
+  "seed": 0,
+  "limit": null,
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "top_k": 0,
+  "experiments": [
+    "emotional_prosody",
+    "speaker_identity",
+    "sarcasm_pacing"
+  ],
+  "per_category": {
+    "emotional_prosody": {
+      "category": "emotional_prosody",
+      "result_file": "C:/Users/vishn/AppData/Local/Temp/claude/C--Users-vishn/f0a38b7d-469d-4dc2-acde-daacc199f345/scratchpad/audex\\audex_emotional_prosody_20260820_025522.json",
+      "claimed_key": "claimed_emotion",
+      "metrics": {
+        "n_total": 1197,
+        "n_scored": 1197,
+        "n_invalid": 0,
+        "n_error": 0,
+        "weighted_accuracy": 0.6808688387635756,
+        "uar": 0.680630005304133,
+        "macro_f1": 0.6805487593627855,
+        "micro_f1": 0.6808688387635756,
+        "accuracy_invalid_as_wrong": 0.6808688387635756,
+        "per_class": {
+          "angry": {
+            "precision": 0.8376068376068376,
+            "recall": 0.6950354609929078,
+            "f1": 0.7596899224806202,
+            "support": 141
+          },
+          "calm": {
+            "precision": 0.6446280991735537,
+            "recall": 0.5098039215686274,
+            "f1": 0.5693430656934305,
+            "support": 153
+          },
+          "disgust": {
+            "precision": 0.8189655172413793,
+            "recall": 0.6934306569343066,
+            "f1": 0.7509881422924901,
+            "support": 137
+          },
+          "fearful": {
+            "precision": 0.6374269005847953,
+            "recall": 0.68125,
+            "f1": 0.6586102719033233,
+            "support": 160
+          },
+          "happy": {
+            "precision": 0.6883116883116883,
+            "recall": 0.7162162162162162,
+            "f1": 0.7019867549668874,
+            "support": 148
+          },
+          "neutral": {
+            "precision": 0.6619047619047619,
+            "recall": 0.8910256410256411,
+            "f1": 0.7595628415300546,
+            "support": 156
+          },
+          "sad": {
+            "precision": 0.6181818181818182,
+            "recall": 0.6754966887417219,
+            "f1": 0.6455696202531647,
+            "support": 151
+          },
+          "surprised": {
+            "precision": 0.6153846153846154,
+            "recall": 0.5827814569536424,
+            "f1": 0.5986394557823129,
+            "support": 151
+          }
+        }
+      },
+      "by_condition": {
+        "Neutral-Text": {
+          "n_total": 266,
+          "n_scored": 266,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.7593984962406015,
+          "uar": 0.674812030075188,
+          "macro_f1": 0.6691609697606008,
+          "micro_f1": 0.7593984962406015,
+          "accuracy_invalid_as_wrong": 0.7593984962406015,
+          "per_class": {
+            "angry": {
+              "precision": 0.9,
+              "recall": 0.9473684210526315,
+              "f1": 0.9230769230769231,
+              "support": 19
+            },
+            "calm": {
+              "precision": 0.2857142857142857,
+              "recall": 0.10526315789473684,
+              "f1": 0.15384615384615385,
+              "support": 19
+            },
+            "disgust": {
+              "precision": 0.8888888888888888,
+              "recall": 0.8421052631578947,
+              "f1": 0.8648648648648649,
+              "support": 19
+            },
+            "fearful": {
+              "precision": 0.8571428571428571,
+              "recall": 0.631578947368421,
+              "f1": 0.7272727272727273,
+              "support": 19
+            },
+            "happy": {
+              "precision": 0.7619047619047619,
+              "recall": 0.8421052631578947,
+              "f1": 0.8,
+              "support": 19
+            },
+            "neutral": {
+              "precision": 0.8405797101449275,
+              "recall": 0.8721804511278195,
+              "f1": 0.8560885608856088,
+              "support": 133
+            },
+            "sad": {
+              "precision": 0.5652173913043478,
+              "recall": 0.6842105263157895,
+              "f1": 0.6190476190476191,
+              "support": 19
+            },
+            "surprised": {
+              "precision": 0.36,
+              "recall": 0.47368421052631576,
+              "f1": 0.40909090909090906,
+              "support": 19
+            }
+          }
+        },
+        "Matched": {
+          "n_total": 399,
+          "n_scored": 399,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.9924812030075187,
+          "uar": 0.9924812030075189,
+          "macro_f1": 0.8695076716415895,
+          "micro_f1": 0.9924812030075187,
+          "accuracy_invalid_as_wrong": 0.9924812030075187,
+          "per_class": {
+            "angry": {
+              "precision": 1.0,
+              "recall": 0.9824561403508771,
+              "f1": 0.9911504424778761,
+              "support": 57
+            },
+            "calm": {
+              "precision": 0.9824561403508771,
+              "recall": 0.9824561403508771,
+              "f1": 0.9824561403508771,
+              "support": 57
+            },
+            "disgust": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 57
+            },
+            "fearful": {
+              "precision": 0.9827586206896551,
+              "recall": 1.0,
+              "f1": 0.9913043478260869,
+              "support": 57
+            },
+            "happy": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 57
+            },
+            "neutral": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "sad": {
+              "precision": 1.0,
+              "recall": 0.9824561403508771,
+              "f1": 0.9911504424778761,
+              "support": 57
+            },
+            "surprised": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 57
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.9849624060150376,
+                "uar": 0.9849624060150376,
+                "macro_f1": 0.8650426742532006,
+                "micro_f1": 0.9849624060150376,
+                "accuracy_invalid_as_wrong": 0.9849624060150376,
+                "per_class": {
+                  "angry": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "calm": {
+                    "precision": 0.9473684210526315,
+                    "recall": 0.9473684210526315,
+                    "f1": 0.9473684210526315,
+                    "support": 19
+                  },
+                  "disgust": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "fearful": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "happy": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "neutral": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "sad": {
+                    "precision": 1.0,
+                    "recall": 0.9473684210526315,
+                    "f1": 0.972972972972973,
+                    "support": 19
+                  },
+                  "surprised": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.9924812030075187,
+                "uar": 0.9924812030075189,
+                "macro_f1": 0.9924759924759925,
+                "micro_f1": 0.9924812030075187,
+                "accuracy_invalid_as_wrong": 0.9924812030075187,
+                "per_class": {
+                  "angry": {
+                    "precision": 1.0,
+                    "recall": 0.9473684210526315,
+                    "f1": 0.972972972972973,
+                    "support": 19
+                  },
+                  "calm": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "disgust": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "fearful": {
+                    "precision": 0.95,
+                    "recall": 1.0,
+                    "f1": 0.9743589743589743,
+                    "support": 19
+                  },
+                  "happy": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "sad": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  },
+                  "surprised": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 19
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Mismatched": {
+          "n_total": 399,
+          "n_scored": 399,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.3408521303258145,
+          "uar": 0.37745699123276844,
+          "macro_f1": 0.33018881897244784,
+          "micro_f1": 0.3408521303258145,
+          "accuracy_invalid_as_wrong": 0.3408521303258145,
+          "per_class": {
+            "angry": {
+              "precision": 0.36,
+              "recall": 0.1956521739130435,
+              "f1": 0.2535211267605634,
+              "support": 46
+            },
+            "calm": {
+              "precision": 0.3508771929824561,
+              "recall": 0.3448275862068966,
+              "f1": 0.34782608695652173,
+              "support": 58
+            },
+            "disgust": {
+              "precision": 0.38461538461538464,
+              "recall": 0.11904761904761904,
+              "f1": 0.18181818181818182,
+              "support": 42
+            },
+            "fearful": {
+              "precision": 0.32926829268292684,
+              "recall": 0.4153846153846154,
+              "f1": 0.3673469387755102,
+              "support": 65
+            },
+            "happy": {
+              "precision": 0.32653061224489793,
+              "recall": 0.3018867924528302,
+              "f1": 0.31372549019607837,
+              "support": 53
+            },
+            "neutral": {
+              "precision": 0.35384615384615387,
+              "recall": 1.0,
+              "f1": 0.5227272727272727,
+              "support": 23
+            },
+            "sad": {
+              "precision": 0.3333333333333333,
+              "recall": 0.32142857142857145,
+              "f1": 0.32727272727272727,
+              "support": 56
+            },
+            "surprised": {
+              "precision": 0.3333333333333333,
+              "recall": 0.32142857142857145,
+              "f1": 0.32727272727272727,
+              "support": 56
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.007518796992481203,
+                "uar": 0.007518796992481203,
+                "macro_f1": 0.008928571428571428,
+                "micro_f1": 0.007518796992481203,
+                "accuracy_invalid_as_wrong": 0.007518796992481203,
+                "per_class": {
+                  "angry": {
+                    "precision": 0.1111111111111111,
+                    "recall": 0.05263157894736842,
+                    "f1": 0.07142857142857142,
+                    "support": 19
+                  },
+                  "calm": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "disgust": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "fearful": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "happy": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "neutral": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "sad": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "surprised": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.015037593984962405,
+                "uar": 0.015037593984962405,
+                "macro_f1": 0.017361111111111112,
+                "micro_f1": 0.015037593984962405,
+                "accuracy_invalid_as_wrong": 0.015037593984962405,
+                "per_class": {
+                  "angry": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "calm": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "disgust": {
+                    "precision": 0.2,
+                    "recall": 0.05263157894736842,
+                    "f1": 0.08333333333333333,
+                    "support": 19
+                  },
+                  "fearful": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "happy": {
+                    "precision": 0.058823529411764705,
+                    "recall": 0.05263157894736842,
+                    "f1": 0.05555555555555555,
+                    "support": 19
+                  },
+                  "neutral": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "sad": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  },
+                  "surprised": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 19
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Paralinguistic": {
+          "n_total": 133,
+          "n_scored": 133,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.6090225563909775,
+          "uar": 0.6090225563909775,
+          "macro_f1": 0.492228421409599,
+          "micro_f1": 0.6090225563909775,
+          "accuracy_invalid_as_wrong": 0.6090225563909775,
+          "per_class": {
+            "angry": {
+              "precision": 0.9375,
+              "recall": 0.7894736842105263,
+              "f1": 0.8571428571428572,
+              "support": 19
+            },
+            "calm": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 19
+            },
+            "disgust": {
+              "precision": 0.6071428571428571,
+              "recall": 0.8947368421052632,
+              "f1": 0.7234042553191489,
+              "support": 19
+            },
+            "fearful": {
+              "precision": 0.7647058823529411,
+              "recall": 0.6842105263157895,
+              "f1": 0.7222222222222222,
+              "support": 19
+            },
+            "happy": {
+              "precision": 0.6296296296296297,
+              "recall": 0.8947368421052632,
+              "f1": 0.7391304347826088,
+              "support": 19
+            },
+            "neutral": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "sad": {
+              "precision": 0.46875,
+              "recall": 0.7894736842105263,
+              "f1": 0.5882352941176471,
+              "support": 19
+            },
+            "surprised": {
+              "precision": 0.5714285714285714,
+              "recall": 0.21052631578947367,
+              "f1": 0.3076923076923077,
+              "support": 19
+            }
+          }
+        }
+      },
+      "tdr": {
+        "n_mismatched": 399,
+        "n_usable": 399,
+        "follow_text": 390,
+        "follow_audio": 3,
+        "follow_neither": 6,
+        "invalid": 0,
+        "claim_unresolved": 0,
+        "tdr": 0.9774436090225563,
+        "by_modality": {
+          "text_only": {
+            "n": 133,
+            "n_usable": 133,
+            "text_claim": 133,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          },
+          "audio_only": {
+            "n": 0,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "text_audio": {
+            "n": 266,
+            "n_usable": 266,
+            "text_claim": 257,
+            "audio_truth": 3,
+            "neither": 6,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.9661654135338346
+          }
+        },
+        "by_order": {
+          "claim_first": {
+            "n": 133,
+            "n_usable": 133,
+            "text_claim": 128,
+            "audio_truth": 1,
+            "neither": 4,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.9624060150375939
+          },
+          "claim_last": {
+            "n": 133,
+            "n_usable": 133,
+            "text_claim": 129,
+            "audio_truth": 2,
+            "neither": 2,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.9699248120300752
+          }
+        }
+      }
+    },
+    "speaker_identity": {
+      "category": "speaker_identity",
+      "result_file": "C:/Users/vishn/AppData/Local/Temp/claude/C--Users-vishn/f0a38b7d-469d-4dc2-acde-daacc199f345/scratchpad/audex\\audex_speaker_identity_20260820_025522.json",
+      "claimed_key": "claimed_gender",
+      "metrics": {
+        "n_total": 1200,
+        "n_scored": 1200,
+        "n_invalid": 0,
+        "n_error": 0,
+        "weighted_accuracy": 0.7433333333333333,
+        "uar": 0.7433333333333334,
+        "macro_f1": 0.743247035809258,
+        "micro_f1": 0.7433333333333333,
+        "accuracy_invalid_as_wrong": 0.7433333333333333,
+        "per_class": {
+          "female": {
+            "precision": 0.7347266881028939,
+            "recall": 0.7616666666666667,
+            "f1": 0.7479541734860883,
+            "support": 600
+          },
+          "male": {
+            "precision": 0.7525951557093425,
+            "recall": 0.725,
+            "f1": 0.7385398981324278,
+            "support": 600
+          }
+        }
+      },
+      "by_condition": {
+        "Neutral-Text": {
+          "n_total": 150,
+          "n_scored": 150,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.9266666666666666,
+          "uar": 0.9266666666666667,
+          "macro_f1": 0.926401712832865,
+          "micro_f1": 0.9266666666666666,
+          "accuracy_invalid_as_wrong": 0.9266666666666666,
+          "per_class": {
+            "female": {
+              "precision": 0.8809523809523809,
+              "recall": 0.9866666666666667,
+              "f1": 0.930817610062893,
+              "support": 75
+            },
+            "male": {
+              "precision": 0.9848484848484849,
+              "recall": 0.8666666666666667,
+              "f1": 0.9219858156028369,
+              "support": 75
+            }
+          }
+        },
+        "Matched": {
+          "n_total": 450,
+          "n_scored": 450,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.9933333333333333,
+          "uar": 0.9933333333333334,
+          "macro_f1": 0.99333330041136,
+          "micro_f1": 0.9933333333333333,
+          "accuracy_invalid_as_wrong": 0.9933333333333333,
+          "per_class": {
+            "female": {
+              "precision": 0.9955357142857143,
+              "recall": 0.9911111111111112,
+              "f1": 0.9933184855233853,
+              "support": 225
+            },
+            "male": {
+              "precision": 0.9911504424778761,
+              "recall": 0.9955555555555555,
+              "f1": 0.9933481152993349,
+              "support": 225
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 150,
+                "n_scored": 150,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 1.0,
+                "uar": 1.0,
+                "macro_f1": 1.0,
+                "micro_f1": 1.0,
+                "accuracy_invalid_as_wrong": 1.0,
+                "per_class": {
+                  "female": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 75
+                  },
+                  "male": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 75
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 150,
+                "n_scored": 150,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.98,
+                "uar": 0.98,
+                "macro_f1": 0.9799991110716032,
+                "micro_f1": 0.98,
+                "accuracy_invalid_as_wrong": 0.98,
+                "per_class": {
+                  "female": {
+                    "precision": 0.9864864864864865,
+                    "recall": 0.9733333333333334,
+                    "f1": 0.9798657718120806,
+                    "support": 75
+                  },
+                  "male": {
+                    "precision": 0.9736842105263158,
+                    "recall": 0.9866666666666667,
+                    "f1": 0.9801324503311258,
+                    "support": 75
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Mismatched": {
+          "n_total": 450,
+          "n_scored": 450,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.37333333333333335,
+          "uar": 0.3733333333333333,
+          "macro_f1": 0.37332095448798985,
+          "micro_f1": 0.37333333333333335,
+          "accuracy_invalid_as_wrong": 0.37333333333333335,
+          "per_class": {
+            "female": {
+              "precision": 0.3744493392070485,
+              "recall": 0.37777777777777777,
+              "f1": 0.37610619469026546,
+              "support": 225
+            },
+            "male": {
+              "precision": 0.3721973094170404,
+              "recall": 0.3688888888888889,
+              "f1": 0.37053571428571425,
+              "support": 225
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 150,
+                "n_scored": 150,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.02,
+                "uar": 0.02,
+                "macro_f1": 0.019956442508555935,
+                "micro_f1": 0.02,
+                "accuracy_invalid_as_wrong": 0.02,
+                "per_class": {
+                  "female": {
+                    "precision": 0.02631578947368421,
+                    "recall": 0.02666666666666667,
+                    "f1": 0.026490066225165563,
+                    "support": 75
+                  },
+                  "male": {
+                    "precision": 0.013513513513513514,
+                    "recall": 0.013333333333333334,
+                    "f1": 0.013422818791946308,
+                    "support": 75
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 150,
+                "n_scored": 150,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.1,
+                "uar": 0.1,
+                "macro_f1": 0.0999599982221432,
+                "micro_f1": 0.1,
+                "accuracy_invalid_as_wrong": 0.1,
+                "per_class": {
+                  "female": {
+                    "precision": 0.10526315789473684,
+                    "recall": 0.10666666666666667,
+                    "f1": 0.10596026490066225,
+                    "support": 75
+                  },
+                  "male": {
+                    "precision": 0.0945945945945946,
+                    "recall": 0.09333333333333334,
+                    "f1": 0.09395973154362415,
+                    "support": 75
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Paralinguistic": {
+          "n_total": 150,
+          "n_scored": 150,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.92,
+          "uar": 0.9199999999999999,
+          "macro_f1": 0.9194847020933978,
+          "micro_f1": 0.92,
+          "accuracy_invalid_as_wrong": 0.92,
+          "per_class": {
+            "female": {
+              "precision": 0.8620689655172413,
+              "recall": 1.0,
+              "f1": 0.9259259259259259,
+              "support": 75
+            },
+            "male": {
+              "precision": 1.0,
+              "recall": 0.84,
+              "f1": 0.9130434782608696,
+              "support": 75
+            }
+          }
+        }
+      },
+      "tdr": {
+        "n_mismatched": 450,
+        "n_usable": 450,
+        "follow_text": 432,
+        "follow_audio": 18,
+        "follow_neither": 0,
+        "invalid": 0,
+        "claim_unresolved": 0,
+        "tdr": 0.96,
+        "by_modality": {
+          "text_only": {
+            "n": 150,
+            "n_usable": 150,
+            "text_claim": 150,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          },
+          "audio_only": {
+            "n": 0,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "text_audio": {
+            "n": 300,
+            "n_usable": 300,
+            "text_claim": 282,
+            "audio_truth": 18,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.94
+          }
+        },
+        "by_order": {
+          "claim_first": {
+            "n": 150,
+            "n_usable": 150,
+            "text_claim": 147,
+            "audio_truth": 3,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.98
+          },
+          "claim_last": {
+            "n": 150,
+            "n_usable": 150,
+            "text_claim": 135,
+            "audio_truth": 15,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.9
+          }
+        }
+      }
+    },
+    "sarcasm_pacing": {
+      "category": "sarcasm_pacing",
+      "result_file": "C:/Users/vishn/AppData/Local/Temp/claude/C--Users-vishn/f0a38b7d-469d-4dc2-acde-daacc199f345/scratchpad/audex\\audex_sarcasm_pacing_20260820_025522.json",
+      "claimed_key": "claimed_emotion",
+      "metrics": {
+        "n_total": 1197,
+        "n_scored": 1197,
+        "n_invalid": 0,
+        "n_error": 0,
+        "weighted_accuracy": 0.2673350041771094,
+        "uar": 0.2530955135328799,
+        "macro_f1": 0.2557605037520692,
+        "micro_f1": 0.2673350041771094,
+        "accuracy_invalid_as_wrong": 0.2673350041771094,
+        "per_class": {
+          "Anger": {
+            "precision": 0.5,
+            "recall": 0.1271186440677966,
+            "f1": 0.2027027027027027,
+            "support": 118
+          },
+          "Disgust": {
+            "precision": 0.2545454545454545,
+            "recall": 0.10526315789473684,
+            "f1": 0.14893617021276595,
+            "support": 133
+          },
+          "Excitement": {
+            "precision": 0.27692307692307694,
+            "recall": 0.20454545454545456,
+            "f1": 0.23529411764705882,
+            "support": 88
+          },
+          "Fear": {
+            "precision": 0.5,
+            "recall": 0.13333333333333333,
+            "f1": 0.2105263157894737,
+            "support": 30
+          },
+          "Frustration": {
+            "precision": 0.16216216216216217,
+            "recall": 0.25,
+            "f1": 0.19672131147540983,
+            "support": 120
+          },
+          "Happiness": {
+            "precision": 0.35443037974683544,
+            "recall": 0.20588235294117646,
+            "f1": 0.26046511627906976,
+            "support": 136
+          },
+          "Neutral": {
+            "precision": 0.4026548672566372,
+            "recall": 0.35546875,
+            "f1": 0.3775933609958506,
+            "support": 256
+          },
+          "Ridicule": {
+            "precision": 0.1485148514851485,
+            "recall": 0.4580152671755725,
+            "f1": 0.22429906542056072,
+            "support": 131
+          },
+          "Sadness": {
+            "precision": 0.5375,
+            "recall": 0.3049645390070922,
+            "f1": 0.3891402714932126,
+            "support": 141
+          },
+          "Surprise": {
+            "precision": 0.26153846153846155,
+            "recall": 0.38636363636363635,
+            "f1": 0.3119266055045871,
+            "support": 44
+          }
+        }
+      },
+      "by_condition": {
+        "Neutral-Text": {
+          "n_total": 266,
+          "n_scored": 266,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.20300751879699247,
+          "uar": 0.16412953397830513,
+          "macro_f1": 0.14132087122621562,
+          "micro_f1": 0.20300751879699247,
+          "accuracy_invalid_as_wrong": 0.20300751879699247,
+          "per_class": {
+            "Anger": {
+              "precision": 0.42857142857142855,
+              "recall": 0.125,
+              "f1": 0.19354838709677416,
+              "support": 24
+            },
+            "Disgust": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 15
+            },
+            "Excitement": {
+              "precision": 0.23529411764705882,
+              "recall": 0.18181818181818182,
+              "f1": 0.20512820512820512,
+              "support": 22
+            },
+            "Fear": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 8
+            },
+            "Frustration": {
+              "precision": 0.09259259259259259,
+              "recall": 0.2631578947368421,
+              "f1": 0.136986301369863,
+              "support": 19
+            },
+            "Happiness": {
+              "precision": 0.3,
+              "recall": 0.09375,
+              "f1": 0.14285714285714285,
+              "support": 32
+            },
+            "Neutral": {
+              "precision": 0.40350877192982454,
+              "recall": 0.27710843373493976,
+              "f1": 0.3285714285714285,
+              "support": 83
+            },
+            "Ridicule": {
+              "precision": 0.13953488372093023,
+              "recall": 0.5714285714285714,
+              "f1": 0.22429906542056074,
+              "support": 21
+            },
+            "Sadness": {
+              "precision": 0.3076923076923077,
+              "recall": 0.12903225806451613,
+              "f1": 0.18181818181818182,
+              "support": 31
+            },
+            "Surprise": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 11
+            }
+          }
+        },
+        "Matched": {
+          "n_total": 399,
+          "n_scored": 399,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.46115288220551376,
+          "uar": 0.44722413031591773,
+          "macro_f1": 0.42416511044369154,
+          "micro_f1": 0.46115288220551376,
+          "accuracy_invalid_as_wrong": 0.46115288220551376,
+          "per_class": {
+            "Anger": {
+              "precision": 0.5555555555555556,
+              "recall": 0.30303030303030304,
+              "f1": 0.3921568627450981,
+              "support": 33
+            },
+            "Disgust": {
+              "precision": 0.5217391304347826,
+              "recall": 0.4444444444444444,
+              "f1": 0.48,
+              "support": 27
+            },
+            "Excitement": {
+              "precision": 0.55,
+              "recall": 0.28205128205128205,
+              "f1": 0.3728813559322034,
+              "support": 39
+            },
+            "Fear": {
+              "precision": 0.5714285714285714,
+              "recall": 0.2222222222222222,
+              "f1": 0.32,
+              "support": 18
+            },
+            "Frustration": {
+              "precision": 0.27631578947368424,
+              "recall": 0.7,
+              "f1": 0.39622641509433965,
+              "support": 30
+            },
+            "Happiness": {
+              "precision": 0.6785714285714286,
+              "recall": 0.3333333333333333,
+              "f1": 0.4470588235294118,
+              "support": 57
+            },
+            "Neutral": {
+              "precision": 0.7341772151898734,
+              "recall": 0.5370370370370371,
+              "f1": 0.6203208556149733,
+              "support": 108
+            },
+            "Ridicule": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "Sadness": {
+              "precision": 0.8409090909090909,
+              "recall": 0.5362318840579711,
+              "f1": 0.6548672566371683,
+              "support": 69
+            },
+            "Surprise": {
+              "precision": 0.48,
+              "recall": 0.6666666666666666,
+              "f1": 0.5581395348837209,
+              "support": 18
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.6240601503759399,
+                "uar": 0.6347652531100281,
+                "macro_f1": 0.6204723268617792,
+                "micro_f1": 0.6240601503759399,
+                "accuracy_invalid_as_wrong": 0.6240601503759399,
+                "per_class": {
+                  "Anger": {
+                    "precision": 0.6666666666666666,
+                    "recall": 0.36363636363636365,
+                    "f1": 0.4705882352941177,
+                    "support": 11
+                  },
+                  "Disgust": {
+                    "precision": 0.7777777777777778,
+                    "recall": 0.7777777777777778,
+                    "f1": 0.7777777777777778,
+                    "support": 9
+                  },
+                  "Excitement": {
+                    "precision": 1.0,
+                    "recall": 0.3076923076923077,
+                    "f1": 0.47058823529411764,
+                    "support": 13
+                  },
+                  "Fear": {
+                    "precision": 1.0,
+                    "recall": 0.5,
+                    "f1": 0.6666666666666666,
+                    "support": 6
+                  },
+                  "Frustration": {
+                    "precision": 0.5,
+                    "recall": 0.9,
+                    "f1": 0.6428571428571429,
+                    "support": 10
+                  },
+                  "Happiness": {
+                    "precision": 0.9,
+                    "recall": 0.47368421052631576,
+                    "f1": 0.6206896551724138,
+                    "support": 19
+                  },
+                  "Neutral": {
+                    "precision": 0.9259259259259259,
+                    "recall": 0.6944444444444444,
+                    "f1": 0.7936507936507936,
+                    "support": 36
+                  },
+                  "Ridicule": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Sadness": {
+                    "precision": 0.8421052631578947,
+                    "recall": 0.6956521739130435,
+                    "f1": 0.761904761904762,
+                    "support": 23
+                  },
+                  "Surprise": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 6
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.5037593984962406,
+                "uar": 0.4804157576468789,
+                "macro_f1": 0.48818047829601097,
+                "micro_f1": 0.5037593984962406,
+                "accuracy_invalid_as_wrong": 0.5037593984962406,
+                "per_class": {
+                  "Anger": {
+                    "precision": 0.75,
+                    "recall": 0.5454545454545454,
+                    "f1": 0.631578947368421,
+                    "support": 11
+                  },
+                  "Disgust": {
+                    "precision": 0.45454545454545453,
+                    "recall": 0.5555555555555556,
+                    "f1": 0.5,
+                    "support": 9
+                  },
+                  "Excitement": {
+                    "precision": 0.8,
+                    "recall": 0.3076923076923077,
+                    "f1": 0.4444444444444444,
+                    "support": 13
+                  },
+                  "Fear": {
+                    "precision": 1.0,
+                    "recall": 0.16666666666666666,
+                    "f1": 0.2857142857142857,
+                    "support": 6
+                  },
+                  "Frustration": {
+                    "precision": 0.3888888888888889,
+                    "recall": 0.7,
+                    "f1": 0.5,
+                    "support": 10
+                  },
+                  "Happiness": {
+                    "precision": 0.875,
+                    "recall": 0.3684210526315789,
+                    "f1": 0.5185185185185185,
+                    "support": 19
+                  },
+                  "Neutral": {
+                    "precision": 0.7037037037037037,
+                    "recall": 0.5277777777777778,
+                    "f1": 0.6031746031746033,
+                    "support": 36
+                  },
+                  "Ridicule": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Sadness": {
+                    "precision": 0.8333333333333334,
+                    "recall": 0.6521739130434783,
+                    "f1": 0.7317073170731708,
+                    "support": 23
+                  },
+                  "Surprise": {
+                    "precision": 1.0,
+                    "recall": 0.5,
+                    "f1": 0.6666666666666666,
+                    "support": 6
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Mismatched": {
+          "n_total": 399,
+          "n_scored": 399,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.14035087719298245,
+          "uar": 0.1411367675034622,
+          "macro_f1": 0.12140580988837343,
+          "micro_f1": 0.14035087719298245,
+          "accuracy_invalid_as_wrong": 0.14035087719298245,
+          "per_class": {
+            "Anger": {
+              "precision": 0.5,
+              "recall": 0.04878048780487805,
+              "f1": 0.08888888888888888,
+              "support": 41
+            },
+            "Disgust": {
+              "precision": 0.13333333333333333,
+              "recall": 0.02702702702702703,
+              "f1": 0.0449438202247191,
+              "support": 74
+            },
+            "Excitement": {
+              "precision": 0.10714285714285714,
+              "recall": 0.16666666666666666,
+              "f1": 0.13043478260869565,
+              "support": 18
+            },
+            "Frustration": {
+              "precision": 0.021739130434782608,
+              "recall": 0.019230769230769232,
+              "f1": 0.02040816326530612,
+              "support": 52
+            },
+            "Happiness": {
+              "precision": 0.15,
+              "recall": 0.16666666666666666,
+              "f1": 0.15789473684210525,
+              "support": 36
+            },
+            "Neutral": {
+              "precision": 0.07575757575757576,
+              "recall": 0.09615384615384616,
+              "f1": 0.0847457627118644,
+              "support": 52
+            },
+            "Ridicule": {
+              "precision": 0.1987179487179487,
+              "recall": 0.36904761904761907,
+              "f1": 0.25833333333333336,
+              "support": 84
+            },
+            "Sadness": {
+              "precision": 0.09090909090909091,
+              "recall": 0.06896551724137931,
+              "f1": 0.0784313725490196,
+              "support": 29
+            },
+            "Surprise": {
+              "precision": 0.18181818181818182,
+              "recall": 0.3076923076923077,
+              "f1": 0.2285714285714286,
+              "support": 13
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.12781954887218044,
+                "uar": 0.08912087912087913,
+                "macro_f1": 0.05321146227117401,
+                "micro_f1": 0.12781954887218044,
+                "accuracy_invalid_as_wrong": 0.12781954887218044,
+                "per_class": {
+                  "Anger": {
+                    "precision": 1.0,
+                    "recall": 0.05,
+                    "f1": 0.09523809523809523,
+                    "support": 20
+                  },
+                  "Disgust": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 37
+                  },
+                  "Excitement": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Frustration": {
+                    "precision": 0.2,
+                    "recall": 0.038461538461538464,
+                    "f1": 0.06451612903225806,
+                    "support": 26
+                  },
+                  "Happiness": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Neutral": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Ridicule": {
+                    "precision": 0.28846153846153844,
+                    "recall": 0.35714285714285715,
+                    "f1": 0.3191489361702128,
+                    "support": 42
+                  },
+                  "Sadness": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 8
+                  },
+                  "Surprise": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 133,
+                "n_scored": 133,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.13533834586466165,
+                "uar": 0.087001287001287,
+                "macro_f1": 0.045304530453045305,
+                "micro_f1": 0.13533834586466165,
+                "accuracy_invalid_as_wrong": 0.13533834586466165,
+                "per_class": {
+                  "Anger": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 20
+                  },
+                  "Disgust": {
+                    "precision": 0.2857142857142857,
+                    "recall": 0.05405405405405406,
+                    "f1": 0.09090909090909091,
+                    "support": 37
+                  },
+                  "Excitement": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Frustration": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 26
+                  },
+                  "Happiness": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Neutral": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "Ridicule": {
+                    "precision": 0.2711864406779661,
+                    "recall": 0.38095238095238093,
+                    "f1": 0.31683168316831684,
+                    "support": 42
+                  },
+                  "Sadness": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 8
+                  },
+                  "Surprise": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Paralinguistic": {
+          "n_total": 133,
+          "n_scored": 133,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 0.19548872180451127,
+          "uar": 0.16963562753036437,
+          "macro_f1": 0.11964825900605718,
+          "micro_f1": 0.19548872180451127,
+          "accuracy_invalid_as_wrong": 0.19548872180451127,
+          "per_class": {
+            "Anger": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 20
+            },
+            "Disgust": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 17
+            },
+            "Excitement": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 9
+            },
+            "Fear": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 4
+            },
+            "Frustration": {
+              "precision": 0.3333333333333333,
+              "recall": 0.15789473684210525,
+              "f1": 0.21428571428571427,
+              "support": 19
+            },
+            "Happiness": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 11
+            },
+            "Neutral": {
+              "precision": 0.20833333333333334,
+              "recall": 0.38461538461538464,
+              "f1": 0.2702702702702703,
+              "support": 13
+            },
+            "Ridicule": {
+              "precision": 0.20481927710843373,
+              "recall": 0.6538461538461539,
+              "f1": 0.3119266055045872,
+              "support": 26
+            },
+            "Sadness": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 12
+            },
+            "Surprise": {
+              "precision": 0.3333333333333333,
+              "recall": 0.5,
+              "f1": 0.4,
+              "support": 2
+            }
+          }
+        }
+      },
+      "tdr": {
+        "n_mismatched": 399,
+        "n_usable": 399,
+        "follow_text": 137,
+        "follow_audio": 35,
+        "follow_neither": 227,
+        "invalid": 0,
+        "claim_unresolved": 0,
+        "tdr": 0.3433583959899749,
+        "by_modality": {
+          "text_only": {
+            "n": 133,
+            "n_usable": 133,
+            "text_claim": 21,
+            "audio_truth": 0,
+            "neither": 112,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.15789473684210525
+          },
+          "audio_only": {
+            "n": 0,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "text_audio": {
+            "n": 266,
+            "n_usable": 266,
+            "text_claim": 116,
+            "audio_truth": 35,
+            "neither": 115,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.43609022556390975
+          }
+        },
+        "by_order": {
+          "claim_first": {
+            "n": 133,
+            "n_usable": 133,
+            "text_claim": 64,
+            "audio_truth": 17,
+            "neither": 52,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.48120300751879697
+          },
+          "claim_last": {
+            "n": 133,
+            "n_usable": 133,
+            "text_claim": 52,
+            "audio_truth": 18,
+            "neither": 63,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 0.39097744360902253
+          }
+        }
+      }
+    }
+  }
+}
