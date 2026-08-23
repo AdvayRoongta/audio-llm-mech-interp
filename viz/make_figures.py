@@ -452,11 +452,15 @@ def fig_readout_attenuation(results_dir, out_dir):
 
         # -- right: the generative intervention ----------------------------- #
         ax = axes[row][1]
-        ff = d.get("freeform", [])
+        # gamma=0.25 is a null at every band (the effect needs a hard block),
+        # and interleaving inert points turns the panel into a sawtooth that
+        # hides the result. The null belongs in the text, not the figure.
+        ff = [r for r in d.get("freeform", [])
+              if r.get("band") is None or r.get("gamma") in (None, 0.0)]
         if not ff:
             ax.set_visible(False)
             continue
-        names = [r["condition"] for r in ff]
+        names = [r["condition"].replace(" g=0", "") for r in ff]
         xs = list(range(len(ff)))
 
         gt = [r["mismatched"].get("generative_tdr") for r in ff]
