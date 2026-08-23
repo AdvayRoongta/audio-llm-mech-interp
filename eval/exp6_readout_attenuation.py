@@ -712,7 +712,26 @@ def main(argv=None):
               if ff_best_row else None)
         cap_cost = (c0 - c1) if (c0 is not None and c1 is not None) else None
 
-        if gen_gain is not None and gen_gain > 0.2 and not broke_free:
+        # An effect size alone is not a result. gen-TDR drops descriptions that
+        # name several labels or none, so its denominator can be far below the
+        # item count, and on a small denominator the point estimate moves freely.
+        # Require a usable sample and intervals that actually separate.
+        ci0 = clean_ff.get("generative_tdr_ci95")
+        ci1 = ff_best.get("generative_tdr_ci95") if ff_best else None
+        n_dec = min(clean_ff.get("decided") or 0,
+                    (ff_best.get("decided") or 0) if ff_best else 0)
+        overlap = bool(ci0 and ci1 and ci0[0] <= ci1[1] and ci1[0] <= ci0[1])
+        underpowered = n_dec < 15 or overlap
+
+        if gen_gain is not None and gen_gain > 0.2 and underpowered:
+            text = ("UNDERPOWERED: gen-TDR moves {:.3f} -> {:.3f}, but on only "
+                    "{} decided descriptions{}. Descriptions that name several "
+                    "labels or none are excluded, and when most of them are, the "
+                    "category is not answering the question cleanly enough to "
+                    "measure. Not evidence of an effect."
+                    .format(g0, g1, n_dec,
+                            " with overlapping intervals" if overlap else ""))
+        elif gen_gain is not None and gen_gain > 0.2 and not broke_free:
             if cap_cost is not None and cap_cost > 0.5 * gen_gain:
                 text = ("NOT A FIX -- INDISCRIMINATE: gen-TDR falls {:.3f} -> "
                         "{:.3f} on mismatched items, but matched-item accuracy "
