@@ -398,6 +398,14 @@ def main(argv=None):
                                 modality="text_audio") if i.get("_audio")][:args.limit]
     matched = [i for i in C.select(items, category=args.category, condition="Matched",
                                    modality="text_audio") if i.get("_audio")][:args.limit]
+    # Matched + text_only: no audio at all, so the claim is the only evidence.
+    # The intervention is unconditional -- it suppresses the claim whether or
+    # not the claim is right -- and this is where that costs something. Without
+    # it we cannot tell resisting false claims from ignoring text.
+    text_only = C.select(C.load_items(args.input, require_audio=False),
+                         category=args.category, condition="Matched",
+                         modality="text_only")[:args.freeform_items]
+
     if not mism:
         raise SystemExit("no mismatched text_audio items for " + args.category)
 
@@ -564,9 +572,16 @@ def main(argv=None):
             out.append((fi, f_inputs, f_claim, f_gen, score_inputs))
         return out
 
+    prep_txt = []
+    for it in text_only:
+        inputs, claim, gen_pos = prepare(model, processor, it, args.fixed_seconds)
+        if claim is not None:
+            prep_txt.append((it, inputs, claim, gen_pos))
+
     ff_mis, ff_mat = build_ff(prep_mis), build_ff(prep_mat)
-    print("  open-ended prompt: {} mismatched, {} matched items\n".format(
-        len(ff_mis), len(ff_mat)))
+    ff_txt = build_ff(prep_txt)
+    print("  open-ended prompt: {} mismatched, {} matched, {} text-only items\n"
+          .format(len(ff_mis), len(ff_mat), len(ff_txt)))
     if not ff_mis:
         print("  *** no claim span located in the open-ended prompt; the")
         print("  coherence control did not run ***\n")
@@ -574,10 +589,11 @@ def main(argv=None):
     def fmt(v, spec="{:.3f}"):
         return "n/a" if v is None else spec.format(v)
 
-    print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
-        "condition", "gen-TDR", "95% CI", "mis:true", "mat:true", "logprob", "rep"))
-    print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
-        "", "lower=fix", "", "higher=fix", "= capab.", "", ""))
+    print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>10}{:>7}".format(
+        "condition", "gen-TDR", "95% CI", "mis:true", "mat:true", "txt-only",
+        "rep"))
+    print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>10}{:>7}".format(
+        "", "lower=fix", "", "higher=fix", "= capab.", "= cost", ""))
 
     ff_rows = []
     # gamma is swept here, not fixed at a hard block. The knockout is graded on
@@ -595,15 +611,18 @@ def main(argv=None):
                                  args.max_new_tokens)
         f_mat = freeform_fluency(model, processor, ff_mat, layers, gamma,
                                  args.max_new_tokens)
+        f_txt = (freeform_fluency(model, processor, ff_txt, layers, gamma,
+                                  args.max_new_tokens) if ff_txt else {})
         ff_rows.append({"condition": name, "band": None if layers is None else name.split()[0],
-                        "gamma": gamma, "mismatched": f_mis, "matched": f_mat})
+                        "gamma": gamma, "mismatched": f_mis, "matched": f_mat,
+                        "text_only": f_txt})
         ci = f_mis.get("generative_tdr_ci95")
         ci_s = "[{:.2f},{:.2f}] n={}".format(ci[0], ci[1], f_mis.get("decided")) \
             if ci else ""
         print("  {:<14}{:>8}{:>15}{:>10}{:>10}{:>9}{:>7}".format(
             name, fmt(f_mis.get("generative_tdr")), ci_s,
             fmt(f_mis.get("names_true_rate")), fmt(f_mat.get("names_true_rate")),
-            fmt(f_mis.get("mean_token_logprob"), "{:+.2f}"),
+            fmt(f_txt.get("names_true_rate")),
             fmt(f_mis.get("repetition_rate"), "{:.2f}")))
 
     clean_ff = ff_rows[0]["mismatched"]
@@ -613,6 +632,9 @@ def main(argv=None):
     print("  a claim-free context, so contradicting the claim is not penalised.")
     print("  mat:true is the capability control: on matched items the claim")
     print("  agrees with the audio, so a drop there is the cost of the fix.")
+    print("  txt-only is the honest cost: no audio at all, so the claim is the")
+    print("  only evidence. The intervention is unconditional, and this is")
+    print("  where that is paid for.")
 
     # pick the best free-form condition on gen-TDR, not on the closed-set sweep
     base_cap = clean_mat.get("names_true_rate")
@@ -681,6 +703,10 @@ def main(argv=None):
         # the capability control: matched items, where the claim is TRUE.
         # An intervention that merely stops the model reading text drops this
         # as hard as it drops gen-TDR, and is not a fix.
+        clean_txt = ff_rows[0].get("text_only") or {}
+        t0 = clean_txt.get("names_true_rate")
+        t1 = ((ff_best_row.get("text_only") or {}).get("names_true_rate")
+              if ff_best_row else None)
         c0 = clean_mat.get("names_true_rate")
         c1 = (ff_best_row["matched"].get("names_true_rate")
               if ff_best_row else None)
@@ -696,13 +722,19 @@ def main(argv=None):
                         "true ones."
                         .format(g0, g1, c0, c1))
             else:
+                cost = ("" if (t0 is None or t1 is None) else
+                        " Cost: with no audio, where the claim is the only "
+                        "evidence, accuracy goes {:.3f} -> {:.3f} -- the "
+                        "intervention is unconditional and this is the price."
+                        .format(t0, t1))
                 text = ("FREE-FORM EFFECT: closed-set choice is unmoved ({:.0%} "
                         "of the gap) but in open generation the description "
                         "flips toward the audio, gen-TDR {:.3f} -> {:.3f}, "
                         "with fluency intact and matched-item accuracy holding "
-                        "at {}. This is the strongest patch candidate so far."
+                        "at {}.{}"
                         .format(closed, g0, g1,
-                                "n/a" if c1 is None else "{:.3f}".format(c1)))
+                                "n/a" if c1 is None else "{:.3f}".format(c1),
+                                cost))
         elif broke_free:
             text = ("REPRODUCES CHO ET AL.'S NEGATIVE: the intervention moves the "
                     "decision but free-form fluency drops {:.2f} nats/token in a "

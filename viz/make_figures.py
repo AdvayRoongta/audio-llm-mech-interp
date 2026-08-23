@@ -23,6 +23,7 @@ Figures:
   fig4_encoder_probe      where the signal lives in the audio encoder
   fig5_circuit_depth      the mechanism: audio influence peaks early, text late
   fig6_backpatching       the intervention that does not transfer
+  fig7_readout_attenuation  the routing bisection and the generative fix
 """
 import argparse
 import glob
@@ -407,6 +408,85 @@ def fig_backpatching(results_dir, out_dir):
     save(fig, out_dir, "fig6_backpatching")
 
 
+def fig_readout_attenuation(results_dir, out_dir):
+    """The result figure: where the claim travels, and what blocking it does.
+
+    Left panel is the routing bisection -- blocking the answer position's direct
+    view of the claim does nothing, blocking the positions in between recovers
+    the whole effect. Right panel is the generative intervention with Wilson
+    intervals, alongside the two controls that decide whether it is a fix.
+    """
+    files = sorted(glob.glob(os.path.join(
+        results_dir, "exp6_readout_attenuation_*.json")))
+    if not files:
+        print("  skip fig7: no exp6 results")
+        return
+
+    fig, axes = plt.subplots(len(files), 2, figsize=(9.2, 3.6 * len(files)),
+                             squeeze=False)
+    fig.subplots_adjust(hspace=0.75, wspace=0.28)
+    for row, path in enumerate(files):
+        d = json.load(open(path))
+        cat = d.get("run", {}).get("category", "?")
+
+        # -- left: routing -------------------------------------------------- #
+        ax = axes[row][0]
+        route = d.get("routing", [])
+        labels = {"gen": "answer position\nonly", "post_claim": "positions\nin between",
+                  "all": "every\nposition"}
+        xs = range(len(route))
+        base_audio = d.get("baseline", {}).get("audio", 0.0)
+        ax.bar(list(xs), [r["audio"] for r in route], color=C_AUDIO, width=0.6)
+        ax.axhline(base_audio, ls="--", lw=1.2, color=C_TEXT, label="no intervention")
+        ax.set_xticks(list(xs))
+        ax.set_xticklabels([labels.get(r["rows"], r["rows"]) for r in route])
+        ax.set_ylabel("audio accuracy under conflict")
+        ax.set_ylim(0, 1)
+        ax.set_title("which positions carry the claim", fontsize=9)
+        # category once per row, to the left of both panels
+        ax.text(-0.22, 0.5, PRETTY.get(cat, cat), transform=ax.transAxes,
+                rotation=90, va="center", ha="center", fontsize=10,
+                fontweight="bold")
+        ax.legend(loc="upper left", fontsize=7)
+        ax.grid(alpha=0.25, axis="y")
+
+        # -- right: the generative intervention ----------------------------- #
+        ax = axes[row][1]
+        ff = d.get("freeform", [])
+        if not ff:
+            ax.set_visible(False)
+            continue
+        names = [r["condition"] for r in ff]
+        xs = list(range(len(ff)))
+
+        gt = [r["mismatched"].get("generative_tdr") for r in ff]
+        ci = [r["mismatched"].get("generative_tdr_ci95") for r in ff]
+        lo = [(g - c[0]) if (g is not None and c) else 0 for g, c in zip(gt, ci)]
+        hi = [(c[1] - g) if (g is not None and c) else 0 for g, c in zip(gt, ci)]
+        ax.errorbar(xs, [g if g is not None else float("nan") for g in gt],
+                    yerr=[lo, hi], marker="o", ms=5, lw=1.6, capsize=3,
+                    color=C_TEXT, label="follows the false claim")
+        ax.plot(xs, [r["matched"].get("names_true_rate") for r in ff],
+                marker="s", ms=4, lw=1.4, color=C_NEUTRAL,
+                label="capability (claim true)")
+        txt = [(r.get("text_only") or {}).get("names_true_rate") for r in ff]
+        if any(v is not None for v in txt):
+            ax.plot(xs, [v if v is not None else float("nan") for v in txt],
+                    marker="^", ms=4, lw=1.4, ls=":", color=C_CHANCE,
+                    label="cost (no audio)")
+        ax.set_xticks(xs)
+        ax.set_xticklabels(names, rotation=30, ha="right")
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_ylabel("rate")
+        ax.set_title("attenuating the claim, open generation", fontsize=9)
+        ax.legend(fontsize=7, loc="center left")
+        ax.grid(alpha=0.25, axis="y")
+
+    fig.suptitle("The claim reaches the readout indirectly; blocking it "
+                 "mid-network restores the audio", y=0.98)
+    save(fig, out_dir, "fig7_readout_attenuation")
+
+
 def parse_args(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -422,7 +502,8 @@ def main(argv=None):
 
     print("reading {}/ -> writing {}/".format(args.results, args.out))
     for fn in (fig_condition_ladder, fig_tdr_by_model, fig_recency,
-               fig_encoder_probe, fig_circuit_depth, fig_backpatching):
+               fig_encoder_probe, fig_circuit_depth, fig_backpatching,
+               fig_readout_attenuation):
         try:
             fn(args.results, args.out)
         except Exception as exc:                      # keep going; one bad
