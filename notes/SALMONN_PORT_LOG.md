@@ -93,6 +93,34 @@ linearly decodable at 0.671 in the exact vectors the LM receives. The weak exp1
 number measures the model's *behaviour*, not the information's *availability* —
 which makes the negative intervention results stronger, not weaker.
 
+## Where Ankur's pre-refactor code is saved
+
+Three places, in order of authority:
+
+1. **Git history — the backup of record, and it is complete.** Nothing the port
+   touched is unrecoverable. `main` also still carries the untouched `eval/`
+   until the branch merges.
+
+   ```bash
+   git show cb0e4cf:eval/_common.py            # view an original
+   git checkout cb0e4cf -- eval/_common.py     # restore it
+   git diff cb0e4cf -- eval/                   # everything the port changed
+   ```
+
+2. **`archive/pre_salmonn_refactor/`** — verbatim copies of the three files the
+   port modified, taken from `cb0e4cf` and sha-verified against it:
+   `_common.py`, `exp2_encoder_probe.py`, `exp3_circuit_localization.py`, plus
+   `gitignore.txt` and a `README.md`. This is a convenience for reading the old
+   and new side by side without a checkout — not the backup of record. Do not
+   import from it.
+
+3. **`eval/test_refactor_equivalence.py`** reads the old `_common.py` from
+   **git**, not from the archive, deliberately: if someone edits the archived
+   copies the equivalence comparison must not silently drift with them.
+
+`cb0e4cf` is the reference point throughout — the last state of `main` before
+the backend split, and the version that produced every committed Qwen result.
+
 ## Verification performed
 
 - `eval/test_backend_salmonn.py` — 20 CPU checks on the adapter, no weights.
