@@ -22,6 +22,11 @@ what has and has not been re-verified.
 | `modal/modal_app_salmonn.py` | new | SALMONN's Modal app (its own pinned image) |
 | `.gitignore` | `*.pt`, `*.pth` | the BEATs checkpoint is 363 MB and sat in the repo root |
 
+The pre-refactor originals of every file touched here are preserved in
+**`archive/pre_salmonn_refactor/`** (verbatim `cb0e4cf` copies, sha-verified),
+and in git history at `cb0e4cf` — which is the backup of record. See that
+folder's README, or `notes/SALMONN_PORT_LOG.md`, for how to view or restore them.
+
 Select a backend with `MECH_BACKEND=qwen` (default) or `MECH_BACKEND=salmonn`.
 The Modal app sets it; nothing else has to know.
 

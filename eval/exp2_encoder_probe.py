@@ -75,7 +75,11 @@ def layer_vectors(model, processor, item, tower, proj):
     import torch
 
     inputs = C.encode(model, processor, item)
-    feats = inputs["input_features"].to(model.dtype)
+    # The tower's dtype, not the model's. They are the same on Qwen2-Audio, but
+    # SALMONN loads Whisper/BEATs/Q-Former in fp32 and only the LLM in fp16, so
+    # model.dtype would hand an fp32 encoder half-precision mel features
+    # ("Input type torch.cuda.HalfTensor and weight type torch.cuda.FloatTensor").
+    feats = inputs["input_features"].to(next(tower.parameters()).dtype)
 
     with torch.no_grad():
         out = tower(feats, output_hidden_states=True)
@@ -91,9 +95,12 @@ def layer_vectors(model, processor, item, tower, proj):
             n = max(1, min(n_enc, h.shape[1]))
             vecs.append(h[0, :n].float().mean(0).cpu().numpy())
 
-        projected = proj(out.last_hidden_state)
-        n = max(1, min(n_enc, projected.shape[1]))
-        vecs.append(projected[0, :n].float().mean(0).cpu().numpy())
+        # "What the LM receives" is architecture-specific, so the backend
+        # defines it. Qwen: projector(tower_out), pooled over valid frames --
+        # identical to the proj(out.last_hidden_state) this replaces. SALMONN:
+        # its projector sits after a Q-Former fed by Whisper AND BEATs
+        # concatenated, so raw tower output is the wrong input there.
+        vecs.append(C.projected_audio(model, processor, inputs, n_enc))
     return vecs
 
 

@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# audio corpus - don't commit
+dataset_audio/**/*.wav
+dataset_audio.zip
+
+# generated figures - rebuild with viz/make_figures.py
+figures/
+
+# local audio corpus - large, fetched with scripts/fetch_audio.py
+dataset_audio/
+.mustard_raw/
+
+# local virtualenv
+.venv/

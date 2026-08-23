@@ -322,8 +322,11 @@ def claim_value(item):
     """
     if item.get("_claim_swapped_to") is not None:
         return item["_claim_swapped_to"]
-    import run_qwen2audio_eval as R
-    key = R.first_present_key(item, R.CLAIMED_KEY_CANDIDATES.get(item.get("category"), []))
+    # C.R, not a direct run_qwen2audio_eval import: these are label helpers and
+    # they have to come from whichever model's eval script the active backend
+    # uses, or this silently applies Qwen's semantics to another model.
+    key = C.R.first_present_key(
+        item, C.R.CLAIMED_KEY_CANDIDATES.get(item.get("category"), []))
     return item.get(key) if key else None
 
 
@@ -430,8 +433,7 @@ def R_resolve(item, value):
     """Letter for `value` inside `item`'s option map, or None."""
     if value is None:
         return None
-    import run_qwen2audio_eval as R
-    return R.resolve_value_to_letter(C.option_map(item), value)
+    return C.R.resolve_value_to_letter(C.option_map(item), value)
 
 
 def run_pair(model, processor, clean, corrupt, letter_a, letter_b, fixed_seconds, ig_steps):
