@@ -1,0 +1,782 @@
+{
+  "run": {
+    "model_path": "tsinghua-ee/SALMONN (SALMONN-13B)",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "eager",
+    "gpu": "NVIDIA A100-SXM4-80GB",
+    "ckpt": "/root/.cache/huggingface/hub/models--tsinghua-ee--SALMONN/snapshots/e0e903b8a07f623616d1b950b8846b4535b76666/salmonn_v1.pth",
+    "llama_path": "lmsys/vicuna-13b-v1.1",
+    "whisper_path": "openai/whisper-large-v2",
+    "beats_path": "/vol/salmonn_artifacts/beats.pt",
+    "low_resource": false,
+    "n_layers": 40,
+    "n_audio_tokens": 88,
+    "category": "emotional_prosody",
+    "seed": 0,
+    "limit": 60,
+    "bands": [
+      "late",
+      "mid",
+      "all"
+    ],
+    "gammas": [
+      0.0,
+      0.25
+    ],
+    "n_items": 60,
+    "skipped_no_claim_span": 0
+  },
+  "positive_control": {
+    "audio": 0.13333333333333333,
+    "margin": 0.2794270823399226,
+    "margin_delta": 2.571354176600774,
+    "capability": 0.15,
+    "tdr": 0.016666666666666666,
+    "passed": true
+  },
+  "baseline": {
+    "audio": 0.03333333333333333,
+    "capability": 0.9333333333333333,
+    "margin": -2.2919270942608514,
+    "tdr": 0.7666666666666667
+  },
+  "sweep": [
+    {
+      "band": "late",
+      "layers": [
+        27,
+        39
+      ],
+      "gamma": 0.0,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.290885420764486,
+      "margin_delta": 0.001041673496365192,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7833333333333333
+    },
+    {
+      "band": "late",
+      "layers": [
+        27,
+        39
+      ],
+      "gamma": 0.25,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.2906250106791655,
+      "margin_delta": 0.001302083581685931,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7833333333333333
+    },
+    {
+      "band": "mid",
+      "layers": [
+        13,
+        26
+      ],
+      "gamma": 0.0,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.3369791528830928,
+      "margin_delta": -0.045052058622241375,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7666666666666667
+    },
+    {
+      "band": "mid",
+      "layers": [
+        13,
+        26
+      ],
+      "gamma": 0.25,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.3250000070780517,
+      "margin_delta": -0.03307291281720026,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7666666666666667
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        39
+      ],
+      "gamma": 0.0,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.3489583493520816,
+      "margin_delta": -0.05703125509123019,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7666666666666667
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        39
+      ],
+      "gamma": 0.25,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.3333333155761165,
+      "margin_delta": -0.04140622131526506,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7666666666666667
+    }
+  ],
+  "routing": [
+    {
+      "rows": "gen",
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -2.3489583493520816,
+      "margin_delta": -0.05703125509123019,
+      "capability": 0.9333333333333333,
+      "tdr": 0.7666666666666667
+    },
+    {
+      "rows": "post_claim",
+      "audio": 0.13333333333333333,
+      "ci95": [
+        0.06914026978309641,
+        0.241653945900721
+      ],
+      "margin": 0.2794270823399226,
+      "margin_delta": 2.571354176600774,
+      "capability": 0.15,
+      "tdr": 0.016666666666666666
+    },
+    {
+      "rows": "all",
+      "audio": 0.13333333333333333,
+      "ci95": [
+        0.06914026978309641,
+        0.241653945900721
+      ],
+      "margin": 0.2794270823399226,
+      "margin_delta": 2.571354176600774,
+      "capability": 0.15,
+      "tdr": 0.016666666666666666
+    }
+  ],
+  "routing_recovered_fraction": 1.0,
+  "freeform": [
+    {
+      "condition": "baseline",
+      "band": null,
+      "gamma": 1.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8620194241710247,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 24,
+        "said_true": 0,
+        "decided": 24,
+        "mean_token_logprob": -5.992139871915182,
+        "repetition_rate": 0.0055944055944055935,
+        "n": 30,
+        "samples": [
+          "The speaker's emotion is happy.",
+          "The speaker is expressing a happy emotion.",
+          "B"
+        ],
+        "median_tokens": 9,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.5907132766967573,
+          0.8820776078949878
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -6.022594777743022,
+        "repetition_rate": 0.002222222222222222,
+        "n": 30,
+        "samples": [
+          "The speaker is surprised.",
+          "The speaker is surprised.",
+          "The speaker is fearful."
+        ],
+        "median_tokens": 9,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.6643529481431982,
+          0.9266356575964831
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.8333333333333334,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -4.946343366305033,
+        "repetition_rate": 0.021335200746965453,
+        "n": 30,
+        "samples": [
+          "B The speaker is surprised by what they are hearing from the kids talking by the door.",
+          "B. Fearful",
+          "The speaker is disgusted by the presence of dogs."
+        ],
+        "median_tokens": 8,
+        "informative": true
+      }
+    },
+    {
+      "condition": "late g=0",
+      "band": "late",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8318156346315495,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 19,
+        "said_true": 0,
+        "decided": 19,
+        "mean_token_logprob": -6.443196900685629,
+        "repetition_rate": 0.01487401487401487,
+        "n": 30,
+        "samples": [
+          "The speaker's emotion is happy.",
+          "The speaker is expressing a happy emotion.",
+          "B"
+        ],
+        "median_tokens": 11,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.4877972581383026,
+          0.807697044731538
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.6666666666666666,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -6.089622290929158,
+        "repetition_rate": 0.011072874493927125,
+        "n": 30,
+        "samples": [
+          "The speaker is surprised.",
+          "The speaker is surprised.",
+          "The speaker is a child and is feeling scared."
+        ],
+        "median_tokens": 10,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.6269395261897257,
+          0.9049502189759876
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.8,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -5.728150200843811,
+        "repetition_rate": 0.012752525252525257,
+        "n": 30,
+        "samples": [
+          "B The speaker is surprised by the kids talking by the door.",
+          "B. Fearful",
+          "The speaker is feeling disgusted."
+        ],
+        "median_tokens": 7,
+        "informative": true
+      }
+    },
+    {
+      "condition": "late g=0.25",
+      "band": "late",
+      "gamma": 0.25,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8513404742740388,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 22,
+        "said_true": 0,
+        "decided": 22,
+        "mean_token_logprob": -6.343491951624553,
+        "repetition_rate": 0.012309912309912307,
+        "n": 30,
+        "samples": [
+          "The speaker's emotion is happy.",
+          "The speaker is expressing a happy emotion.",
+          "B"
+        ],
+        "median_tokens": 11,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.5212387898833981,
+          0.8333543735604106
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -6.184956765174865,
+        "repetition_rate": 0.007564102564102563,
+        "n": 30,
+        "samples": [
+          "The speaker is surprised.",
+          "The speaker is surprised.",
+          "The speaker is a child and is feeling fearful."
+        ],
+        "median_tokens": 10,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.6269395261897257,
+          0.9049502189759876
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.8,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -5.44285139242808,
+        "repetition_rate": 0.02059566250742722,
+        "n": 30,
+        "samples": [
+          "B The speaker is surprised by the kids talking by the door.",
+          "B. Fearful",
+          "The speaker is disgusted by the presence of dogs."
+        ],
+        "median_tokens": 7,
+        "informative": true
+      }
+    },
+    {
+      "condition": "mid g=0",
+      "band": "mid",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.4384939195509822,
+          1.0
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 3,
+        "said_true": 0,
+        "decided": 3,
+        "mean_token_logprob": -6.435984603563944,
+        "repetition_rate": 0.03429487179487179,
+        "n": 30,
+        "samples": [
+          "The speaker is neutral.",
+          "The speaker is a child expressing a neutral emotion.",
+          "B"
+        ],
+        "median_tokens": 9,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.005908437994857381,
+          0.16670751396958874
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.03333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -5.412477000554403,
+        "repetition_rate": 0.032686202686202676,
+        "n": 30,
+        "samples": [
+          "The speaker is female.",
+          "The speaker is a child.",
+          "The speaker is a child and is feeling scared."
+        ],
+        "median_tokens": 12,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.11792239210501229,
+          0.40928672330324267
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.23333333333333334,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -3.837104082107544,
+        "repetition_rate": 0.02936890838206628,
+        "n": 30,
+        "samples": [
+          "The speaker is a child.",
+          "B. Happy",
+          "The speaker is someone who dislikes dogs and finds them annoying."
+        ],
+        "median_tokens": 9,
+        "informative": true
+      }
+    },
+    {
+      "condition": "mid g=0.25",
+      "band": "mid",
+      "gamma": 0.25,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8388698745050667,
+          0.9999999999999998
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 20,
+        "said_true": 0,
+        "decided": 20,
+        "mean_token_logprob": -6.364582888285319,
+        "repetition_rate": 0.016842076052602368,
+        "n": 30,
+        "samples": [
+          "The speaker's emotion is happy.",
+          "The speaker is a child expressing happiness.",
+          "B"
+        ],
+        "median_tokens": 9,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.5555169795568831,
+          0.8581750444608938
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -6.245364681879679,
+        "repetition_rate": 0.014391748602274912,
+        "n": 30,
+        "samples": [
+          "The speaker is surprised.",
+          "The speaker is surprised.",
+          "The speaker is a child and is feeling fearful."
+        ],
+        "median_tokens": 9,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.5907132766967573,
+          0.8820776078949878
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -4.287675722440084,
+        "repetition_rate": 0.0455320686938334,
+        "n": 30,
+        "samples": [
+          "The speaker is a child.",
+          "B. Fearful",
+          "The speaker is disgusted by the presence of dogs sitting by the door."
+        ],
+        "median_tokens": 11,
+        "informative": true
+      }
+    },
+    {
+      "condition": "all g=0",
+      "band": "all",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.3423719528896193,
+          1.0
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 2,
+        "said_true": 0,
+        "decided": 2,
+        "mean_token_logprob": -6.445439171791077,
+        "repetition_rate": 0.02667950513538748,
+        "n": 30,
+        "samples": [
+          "The speaker is neutral.",
+          "The speaker is a child expressing a neutral emotion.",
+          "B"
+        ],
+        "median_tokens": 9,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.005908437994857381,
+          0.16670751396958874
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.03333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -5.322488005956014,
+        "repetition_rate": 0.022362188465129638,
+        "n": 30,
+        "samples": [
+          "The speaker is female.",
+          "The speaker is a child who is talking to someone by the door.",
+          "The speaker is a child who is talking by the door."
+        ],
+        "median_tokens": 12,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.05309569424218104,
+          0.2968168394441695
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.13333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -3.0901984294255573,
+        "repetition_rate": 0.03856516290726817,
+        "n": 30,
+        "samples": [
+          "The speaker is a child who is talking by the door.",
+          "B. Happy",
+          "The speaker is someone who is fond of dogs and has them sitting by the door."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      }
+    },
+    {
+      "condition": "all g=0.25",
+      "band": "all",
+      "gamma": 0.25,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8241154494176252,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 18,
+        "said_true": 0,
+        "decided": 18,
+        "mean_token_logprob": -6.3299598852793375,
+        "repetition_rate": 0.023871591371591373,
+        "n": 30,
+        "samples": [
+          "The speaker's emotion is happy.",
+          "The speaker is expressing a positive emotion.",
+          "B"
+        ],
+        "median_tokens": 10,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.39197009545408734,
+          0.7262276256938489
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.5666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -5.509320457776387,
+        "repetition_rate": 0.042713086134138774,
+        "n": 30,
+        "samples": [
+          "The speaker is surprised by the conversation happening by the door.",
+          "The speaker is surprised by the behavior of the kids talking by the door.",
+          "The speaker is a child who is talking by the door and is feeling scared."
+        ],
+        "median_tokens": 12,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.5212387898833981,
+          0.8333543735604106
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -3.81224791208903,
+        "repetition_rate": 0.053184927817280764,
+        "n": 30,
+        "samples": [
+          "The speaker is surprised by the conversation they overheard by the door.",
+          "B. Happy",
+          "The speaker is disgusted by the presence of dogs by the door."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      }
+    }
+  ],
+  "freeform_baseline": {
+    "generative_tdr": 1.0,
+    "generative_tdr_ci95": [
+      0.8620194241710247,
+      1.0000000000000002
+    ],
+    "names_true_ci95": [
+      -1.2302421700937121e-17,
+      0.11351709139047801
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.0,
+    "said_claim": 24,
+    "said_true": 0,
+    "decided": 24,
+    "mean_token_logprob": -5.992139871915182,
+    "repetition_rate": 0.0055944055944055935,
+    "n": 30,
+    "samples": [
+      "The speaker's emotion is happy.",
+      "The speaker is expressing a happy emotion.",
+      "B"
+    ],
+    "median_tokens": 9,
+    "informative": true
+  },
+  "generative_tdr_baseline": 1.0,
+  "freeform_best": {
+    "generative_tdr": 1.0,
+    "generative_tdr_ci95": [
+      0.8388698745050667,
+      0.9999999999999998
+    ],
+    "names_true_ci95": [
+      -1.2302421700937121e-17,
+      0.11351709139047801
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.0,
+    "said_claim": 20,
+    "said_true": 0,
+    "decided": 20,
+    "mean_token_logprob": -6.364582888285319,
+    "repetition_rate": 0.016842076052602368,
+    "n": 30,
+    "samples": [
+      "The speaker's emotion is happy.",
+      "The speaker is a child expressing happiness.",
+      "B"
+    ],
+    "median_tokens": 9,
+    "informative": true
+  },
+  "verdict": "NO: attenuating the readout closes only 0% of the gap. The override is not localised where exp3 pointed, or is distributed beyond what this granularity can reach."
+}

@@ -1,0 +1,118 @@
+{
+  "run": {
+    "model_path": "tsinghua-ee/SALMONN (SALMONN-13B)",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "eager",
+    "gpu": "NVIDIA A100 80GB PCIe",
+    "ckpt": "/root/.cache/huggingface/hub/models--tsinghua-ee--SALMONN/snapshots/e0e903b8a07f623616d1b950b8846b4535b76666/salmonn_v1.pth",
+    "llama_path": "lmsys/vicuna-13b-v1.1",
+    "whisper_path": "openai/whisper-large-v2",
+    "beats_path": "/vol/salmonn_artifacts/beats.pt",
+    "low_resource": false,
+    "n_layers": 40,
+    "n_audio_tokens": 88,
+    "category": "emotional_prosody",
+    "seed": 0,
+    "fixed_seconds": 3.0,
+    "n_mismatched": 266,
+    "n_matched": 266
+  },
+  "baseline": {
+    "audio": 0.015037593984962405,
+    "capability": 0.8646616541353384,
+    "tdr": {
+      "n": 266,
+      "tdr": 0.7819548872180451,
+      "audio_rate": 0.015037593984962405,
+      "neither": 0.20300751879699247
+    }
+  },
+  "sweep": [
+    {
+      "src": 39,
+      "dst": 0,
+      "window": 1,
+      "audio": 0.13533834586466165,
+      "capability": 0.10150375939849623,
+      "tdr": 0.14661654135338345
+    },
+    {
+      "src": 39,
+      "dst": 0,
+      "window": 3,
+      "audio": 0.15789473684210525,
+      "capability": 0.10902255639097744,
+      "tdr": 0.15037593984962405
+    },
+    {
+      "src": 39,
+      "dst": 0,
+      "window": 5,
+      "audio": 0.18045112781954886,
+      "capability": 0.10526315789473684,
+      "tdr": 0.08270676691729323
+    },
+    {
+      "src": 39,
+      "dst": 2,
+      "window": 1,
+      "audio": 0.16541353383458646,
+      "capability": 0.13157894736842105,
+      "tdr": 0.12781954887218044
+    },
+    {
+      "src": 39,
+      "dst": 2,
+      "window": 3,
+      "audio": 0.15789473684210525,
+      "capability": 0.10902255639097744,
+      "tdr": 0.14285714285714285
+    },
+    {
+      "src": 39,
+      "dst": 2,
+      "window": 5,
+      "audio": 0.12781954887218044,
+      "capability": 0.13533834586466165,
+      "tdr": 0.15413533834586465
+    },
+    {
+      "src": 39,
+      "dst": 4,
+      "window": 1,
+      "audio": 0.17669172932330826,
+      "capability": 0.12030075187969924,
+      "tdr": 0.10526315789473684
+    },
+    {
+      "src": 39,
+      "dst": 4,
+      "window": 3,
+      "audio": 0.16917293233082706,
+      "capability": 0.15037593984962405,
+      "tdr": 0.10526315789473684
+    },
+    {
+      "src": 39,
+      "dst": 4,
+      "window": 5,
+      "audio": 0.14661654135338345,
+      "capability": 0.13909774436090225,
+      "tdr": 0.14285714285714285
+    }
+  ],
+  "best": {
+    "src": 39,
+    "dst": 0,
+    "window": 5,
+    "audio": 0.18045112781954886,
+    "capability": 0.10526315789473684,
+    "tdr": 0.08270676691729323
+  },
+  "mid_layer_control": {
+    "src": 20,
+    "audio": 0.02631578947368421
+  },
+  "verdict": "REJECT: capability fell 0.865 -> 0.105; the patch damaged the model rather than the suppression."
+}

@@ -16,3 +16,10 @@ dataset_audio/
 
 # local virtualenv
 .venv/
+
+# model checkpoints - large, fetched manually (BEATs is OneDrive-only)
+*.pt
+*.pth
+
+# raw corpus clips - large, fetched with scripts/fetch_audio.py (see CLAUDE.md)
+data/raw/**/audio/
