@@ -1,0 +1,775 @@
+{
+  "run": {
+    "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "eager",
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "category": "speaker_identity",
+    "seed": 0,
+    "limit": 60,
+    "bands": [
+      "late",
+      "mid",
+      "all"
+    ],
+    "gammas": [
+      0.0,
+      0.25
+    ],
+    "n_items": 60,
+    "skipped_no_claim_span": 0
+  },
+  "positive_control": {
+    "audio": 0.7166666666666667,
+    "margin": 0.9587239718995988,
+    "margin_delta": 5.801562483577679,
+    "capability": 0.8,
+    "tdr": 0.2833333333333333,
+    "passed": true
+  },
+  "baseline": {
+    "audio": 0.06666666666666667,
+    "capability": 1.0,
+    "margin": -4.84283851167808,
+    "tdr": 0.9333333333333333
+  },
+  "sweep": [
+    {
+      "band": "late",
+      "layers": [
+        22,
+        31
+      ],
+      "gamma": 0.0,
+      "audio": 0.06666666666666667,
+      "ci95": [
+        0.02622827414319793,
+        0.15925579893767722
+      ],
+      "margin": -4.789322919134672,
+      "margin_delta": 0.0535155925434081,
+      "capability": 1.0,
+      "tdr": 0.9333333333333333
+    },
+    {
+      "band": "late",
+      "layers": [
+        22,
+        31
+      ],
+      "gamma": 0.25,
+      "audio": 0.06666666666666667,
+      "ci95": [
+        0.02622827414319793,
+        0.15925579893767722
+      ],
+      "margin": -4.799479137749101,
+      "margin_delta": 0.04335937392897904,
+      "capability": 1.0,
+      "tdr": 0.9333333333333333
+    },
+    {
+      "band": "mid",
+      "layers": [
+        10,
+        21
+      ],
+      "gamma": 0.0,
+      "audio": 0.08333333333333333,
+      "ci95": [
+        0.0361199240504859,
+        0.18069168468112481
+      ],
+      "margin": -4.873437450344984,
+      "margin_delta": -0.03059893866690455,
+      "capability": 1.0,
+      "tdr": 0.9166666666666666
+    },
+    {
+      "band": "mid",
+      "layers": [
+        10,
+        21
+      ],
+      "gamma": 0.25,
+      "audio": 0.06666666666666667,
+      "ci95": [
+        0.02622827414319793,
+        0.15925579893767722
+      ],
+      "margin": -4.883463575908293,
+      "margin_delta": -0.0406250642302135,
+      "capability": 1.0,
+      "tdr": 0.9333333333333333
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        31
+      ],
+      "gamma": 0.0,
+      "audio": 0.08333333333333333,
+      "ci95": [
+        0.0361199240504859,
+        0.18069168468112481
+      ],
+      "margin": -4.828124985843897,
+      "margin_delta": 0.014713525834182839,
+      "capability": 1.0,
+      "tdr": 0.9166666666666666
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        31
+      ],
+      "gamma": 0.25,
+      "audio": 0.06666666666666667,
+      "ci95": [
+        0.02622827414319793,
+        0.15925579893767722
+      ],
+      "margin": -4.84752604784444,
+      "margin_delta": -0.0046875361663598625,
+      "capability": 1.0,
+      "tdr": 0.9333333333333333
+    }
+  ],
+  "routing": [
+    {
+      "rows": "gen",
+      "audio": 0.08333333333333333,
+      "ci95": [
+        0.0361199240504859,
+        0.18069168468112481
+      ],
+      "margin": -4.828124985843897,
+      "margin_delta": 0.014713525834182839,
+      "capability": 1.0,
+      "tdr": 0.9166666666666666
+    },
+    {
+      "rows": "post_claim",
+      "audio": 0.7166666666666667,
+      "ci95": [
+        0.5923247495026484,
+        0.8149332139569141
+      ],
+      "margin": 0.9587239718995988,
+      "margin_delta": 5.801562483577679,
+      "capability": 0.8,
+      "tdr": 0.2833333333333333
+    },
+    {
+      "rows": "all",
+      "audio": 0.7166666666666667,
+      "ci95": [
+        0.5923247495026484,
+        0.8149332139569141
+      ],
+      "margin": 0.9587239718995988,
+      "margin_delta": 5.801562483577679,
+      "capability": 0.8,
+      "tdr": 0.2833333333333333
+    }
+  ],
+  "routing_recovered_fraction": 1.0,
+  "freeform": [
+    {
+      "condition": "baseline",
+      "band": null,
+      "gamma": 1.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 30,
+        "said_true": 0,
+        "decided": 30,
+        "mean_token_logprob": -1.4528069068988165,
+        "repetition_rate": 0.05615682695656448,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds like she is in her thirties.",
+          "The speaker is an English-speaking female who is likely to be between the ages of 18 and 6",
+          "Based on the provided transcript, the speaker is identified as male."
+        ],
+        "median_tokens": 18,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.7867618227892791,
+          0.9815233646723066
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.9333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.9756426190336546,
+        "repetition_rate": 0.03416334497493918,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who sounds disgusted.",
+          "The speaker is an English-speaking male who is likely to be around 18-25 years old.",
+          "The speaker is an English-speaking male who sounds fearful."
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.8802935053904851,
+        "repetition_rate": 0.08855555555555554,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old.",
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old.",
+          "Based on the provided transcript, the speaker is identified as male."
+        ],
+        "median_tokens": 24,
+        "informative": true
+      }
+    },
+    {
+      "condition": "late g=0",
+      "band": "late",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8712669561953783,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          0.005908437994857381,
+          0.16670751396958874
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.03333333333333333,
+        "said_claim": 26,
+        "said_true": 0,
+        "decided": 26,
+        "mean_token_logprob": -1.5382095048824946,
+        "repetition_rate": 0.05123759954019748,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds like she is in her twenties.",
+          "The speaker is an English-speaking female who is likely to be between the ages of 18 and 6",
+          "Based on the provided transcript, the speaker is identified as male."
+        ],
+        "median_tokens": 18,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.9232231020927429,
+        "repetition_rate": 0.04093643453575253,
+        "n": 30,
+        "samples": [
+          "The speaker is a male who sounds disgusted.",
+          "The speaker is an English-speaking male who is likely to be around 18-25 years old.",
+          "The speaker is a male who sounds fearful."
+        ],
+        "median_tokens": 15,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.9159727483987808,
+        "repetition_rate": 0.09043209876543207,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old.",
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old.",
+          "Based on the provided text, the speaker is identified as male."
+        ],
+        "median_tokens": 24,
+        "informative": true
+      }
+    },
+    {
+      "condition": "late g=0.25",
+      "band": "late",
+      "gamma": 0.25,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8830264055344442,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          0.005908437994857381,
+          0.16670751396958874
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.03333333333333333,
+        "said_claim": 29,
+        "said_true": 0,
+        "decided": 29,
+        "mean_token_logprob": -1.472707266608874,
+        "repetition_rate": 0.05143878581572082,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds like she is in her twenties.",
+          "The speaker is an English-speaking female who is likely to be between the ages of 18 and 6",
+          "Based on the provided transcript, the speaker is identified as male."
+        ],
+        "median_tokens": 18,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.8618166223168373,
+        "repetition_rate": 0.03850257210189009,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who sounds disgusted.",
+          "The speaker is an English-speaking male who is likely to be around 18-25 years old.",
+          "The speaker is an English-speaking male who sounds fearful."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.9159727483987808,
+        "repetition_rate": 0.09043209876543207,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old.",
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old.",
+          "Based on the provided text, the speaker is identified as male."
+        ],
+        "median_tokens": 24,
+        "informative": true
+      }
+    },
+    {
+      "condition": "mid g=0",
+      "band": "mid",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 0.43333333333333335,
+        "generative_tdr_ci95": [
+          0.27377237430615114,
+          0.6080299045459127
+        ],
+        "names_true_ci95": [
+          0.39197009545408734,
+          0.7262276256938489
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.5666666666666667,
+        "said_claim": 13,
+        "said_true": 17,
+        "decided": 30,
+        "mean_token_logprob": -0.7765603706240654,
+        "repetition_rate": 0.039184022223237906,
+        "n": 30,
+        "samples": [
+          "The speaker is identified as male, based on the provided description of the speech.",
+          "The speaker is identified as male, based on the provided speech characteristics.",
+          "Based on the provided transcript, the speaker is identified as female."
+        ],
+        "median_tokens": 15,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.5961780687173207,
+        "repetition_rate": 0.032872682872682864,
+        "n": 30,
+        "samples": [
+          "The speaker is a male who speaks English.",
+          "The speaker is an English-speaking male with a disgusted mood.",
+          "The speaker is an English-speaking male who sounds fearful."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.5829549203316371,
+        "repetition_rate": 0.07349206349206347,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who is likely to be between 16 and 25 years old an",
+          "The speaker is an English-speaking male who is likely to be between 16 and 25 years old an",
+          "Based on the provided text, the speaker is identified as male."
+        ],
+        "median_tokens": 21,
+        "informative": true
+      }
+    },
+    {
+      "condition": "mid g=0.25",
+      "band": "mid",
+      "gamma": 0.25,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 30,
+        "said_true": 0,
+        "decided": 30,
+        "mean_token_logprob": -1.304255685210228,
+        "repetition_rate": 0.04428086532519611,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds like she is in her twenties.",
+          "The speaker is an English-speaking female who is likely standing near a doorway where chil",
+          "Based on the provided transcript, the speaker is identified as male."
+        ],
+        "median_tokens": 17,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.7948944126566251,
+        "repetition_rate": 0.03432862888745241,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who sounds disgusted.",
+          "The speaker is an English-speaking male who sounds disgusted.",
+          "The speaker is an English-speaking male who sounds fearful."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.6570344537496566,
+        "repetition_rate": 0.0922222222222222,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old an",
+          "The speaker is an English-speaking male who is likely to be between 18 and 60 years old an",
+          "Based on the provided text, the speaker is identified as male."
+        ],
+        "median_tokens": 27,
+        "informative": true
+      }
+    },
+    {
+      "condition": "all g=0",
+      "band": "all",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 0.3,
+        "generative_tdr_ci95": [
+          0.16664562643958936,
+          0.47876121011660183
+        ],
+        "names_true_ci95": [
+          0.5212387898833981,
+          0.8333543735604106
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7,
+        "said_claim": 9,
+        "said_true": 21,
+        "decided": 30,
+        "mean_token_logprob": -0.6906869334479173,
+        "repetition_rate": 0.02935702783528871,
+        "n": 30,
+        "samples": [
+          "The speaker is male.",
+          "The speaker is identified as male, based on the provided transcript.",
+          "Based on the provided transcript, the speaker can be described as female."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.7867618227892791,
+          0.9815233646723066
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.9333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.5872116843859355,
+        "repetition_rate": 0.027516233766233765,
+        "n": 30,
+        "samples": [
+          "The speaker is a male who speaks English.",
+          "The speaker is a male who speaks English.",
+          "The speaker is a male who sounds surprised while speaking English."
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.7437855868473338,
+          0.9654007400402839
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.9,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.5280147393544515,
+        "repetition_rate": 0.06721444133208838,
+        "n": 30,
+        "samples": [
+          "The speaker is a male who speaks English and is likely in his neutral mood.",
+          "The speaker is a male who speaks English and is likely in his neutral mood.",
+          "Based on the provided text, the speaker is identified as male."
+        ],
+        "median_tokens": 17,
+        "informative": true
+      }
+    },
+    {
+      "condition": "all g=0.25",
+      "band": "all",
+      "gamma": 0.25,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 30,
+        "said_true": 0,
+        "decided": 30,
+        "mean_token_logprob": -1.2857581088940302,
+        "repetition_rate": 0.045179134781817974,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds like she is in her twenties.",
+          "The speaker is an English-speaking female who is likely standing near a doorway where chil",
+          "Based on the provided transcript, the speaker is identified as male."
+        ],
+        "median_tokens": 17,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.8301132852832477,
+        "repetition_rate": 0.03872349347323549,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who sounds disgusted.",
+          "The speaker is an English-speaking male who sounds disgusted.",
+          "The speaker is an English-speaking male who sounds fearful."
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.886482908609522,
+          1.0
+        ],
+        "n_items": 30,
+        "names_true_rate": 1.0,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.6114064027865728,
+        "repetition_rate": 0.07579297245963912,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking male who is likely to be between 16 and 25 years old an",
+          "The speaker is an English-speaking male who is likely to be between 16 and 25 years old an",
+          "Based on the provided text, the speaker is identified as male."
+        ],
+        "median_tokens": 26,
+        "informative": true
+      }
+    }
+  ],
+  "freeform_baseline": {
+    "generative_tdr": 1.0,
+    "generative_tdr_ci95": [
+      0.886482908609522,
+      1.0
+    ],
+    "names_true_ci95": [
+      -1.2302421700937121e-17,
+      0.11351709139047801
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.0,
+    "said_claim": 30,
+    "said_true": 0,
+    "decided": 30,
+    "mean_token_logprob": -1.4528069068988165,
+    "repetition_rate": 0.05615682695656448,
+    "n": 30,
+    "samples": [
+      "The speaker is an English-speaking female who sounds like she is in her thirties.",
+      "The speaker is an English-speaking female who is likely to be between the ages of 18 and 6",
+      "Based on the provided transcript, the speaker is identified as male."
+    ],
+    "median_tokens": 18,
+    "informative": true
+  },
+  "generative_tdr_baseline": 1.0,
+  "freeform_best": {
+    "generative_tdr": 0.3,
+    "generative_tdr_ci95": [
+      0.16664562643958936,
+      0.47876121011660183
+    ],
+    "names_true_ci95": [
+      0.5212387898833981,
+      0.8333543735604106
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.7,
+    "said_claim": 9,
+    "said_true": 21,
+    "decided": 30,
+    "mean_token_logprob": -0.6906869334479173,
+    "repetition_rate": 0.02935702783528871,
+    "n": 30,
+    "samples": [
+      "The speaker is male.",
+      "The speaker is identified as male, based on the provided transcript.",
+      "Based on the provided transcript, the speaker can be described as female."
+    ],
+    "median_tokens": 14,
+    "informative": true
+  },
+  "verdict": "FREE-FORM EFFECT: closed-set choice is unmoved (1% of the gap) but in open generation the description flips toward the audio, gen-TDR 1.000 -> 0.300, with fluency intact and matched-item accuracy holding at 0.933. Cost: with no audio, where the claim is the only evidence, accuracy goes 1.000 -> 0.900 -- the intervention is unconditional and this is the price."
+}

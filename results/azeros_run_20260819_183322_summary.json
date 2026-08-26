@@ -1,0 +1,554 @@
+{
+  "timestamp": "20260819_183322",
+  "model_path": "AudenAI/azeros",
+  "dtype": "float16",
+  "input": "/repo/data/combined_examples.json",
+  "seed": 0,
+  "limit": 8,
+  "experiments": [
+    "emotional_prosody",
+    "speaker_identity"
+  ],
+  "per_category": {
+    "emotional_prosody": {
+      "category": "emotional_prosody",
+      "result_file": "/vol/results/azeros_emotional_prosody_20260819_183322.json",
+      "claimed_key": "claimed_emotion",
+      "elapsed_seconds": 5.298389196395874,
+      "metrics": {
+        "n_total": 8,
+        "n_scored": 6,
+        "n_invalid": 0,
+        "n_error": 2,
+        "weighted_accuracy": 0.3333333333333333,
+        "uar": 0.2,
+        "macro_f1": 0.1142857142857143,
+        "micro_f1": 0.3333333333333333,
+        "accuracy_invalid_as_wrong": 0.25,
+        "per_class": {
+          "angry": {
+            "precision": 0.6666666666666666,
+            "recall": 1.0,
+            "f1": 0.8,
+            "support": 2
+          },
+          "calm": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          },
+          "disgust": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "fearful": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "happy": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "sad": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 1
+          },
+          "surprised": {
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 0
+          }
+        }
+      },
+      "by_condition": {
+        "Neutral-Text": {
+          "n_total": 1,
+          "n_scored": 0,
+          "n_invalid": 0,
+          "n_error": 1,
+          "weighted_accuracy": null,
+          "uar": null,
+          "macro_f1": null,
+          "micro_f1": null,
+          "per_class": {}
+        },
+        "Matched": {
+          "n_total": 2,
+          "n_scored": 2,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 1.0,
+          "uar": 1.0,
+          "macro_f1": 1.0,
+          "micro_f1": 1.0,
+          "accuracy_invalid_as_wrong": 1.0,
+          "per_class": {
+            "angry": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 2
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 1,
+                "n_scored": 1,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 1.0,
+                "uar": 1.0,
+                "macro_f1": 1.0,
+                "micro_f1": 1.0,
+                "accuracy_invalid_as_wrong": 1.0,
+                "per_class": {
+                  "angry": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 1
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 1,
+                "n_scored": 1,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 1.0,
+                "uar": 1.0,
+                "macro_f1": 1.0,
+                "micro_f1": 1.0,
+                "accuracy_invalid_as_wrong": 1.0,
+                "per_class": {
+                  "angry": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Mismatched": {
+          "n_total": 5,
+          "n_scored": 4,
+          "n_invalid": 0,
+          "n_error": 1,
+          "weighted_accuracy": 0.0,
+          "uar": 0.0,
+          "macro_f1": 0.0,
+          "micro_f1": 0.0,
+          "accuracy_invalid_as_wrong": 0.0,
+          "per_class": {
+            "angry": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "calm": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            },
+            "disgust": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "fearful": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "happy": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "sad": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 1
+            },
+            "surprised": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 0
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 4,
+                "n_scored": 4,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.0,
+                "uar": 0.0,
+                "macro_f1": 0.0,
+                "micro_f1": 0.0,
+                "accuracy_invalid_as_wrong": 0.0,
+                "per_class": {
+                  "angry": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "calm": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  },
+                  "disgust": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 1
+                  },
+                  "fearful": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 1
+                  },
+                  "happy": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 1
+                  },
+                  "sad": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 1
+                  },
+                  "surprised": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "tdr": {
+        "n_mismatched": 5,
+        "n_usable": 4,
+        "follow_text": 4,
+        "follow_audio": 0,
+        "follow_neither": 0,
+        "invalid": 0,
+        "claim_unresolved": 0,
+        "tdr": 1.0,
+        "by_modality": {
+          "text_only": {
+            "n": 1,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "audio_only": {
+            "n": 0,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "text_audio": {
+            "n": 4,
+            "n_usable": 4,
+            "text_claim": 4,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          }
+        },
+        "by_order": {
+          "claim_first": {
+            "n": 4,
+            "n_usable": 4,
+            "text_claim": 4,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          }
+        }
+      }
+    },
+    "speaker_identity": {
+      "category": "speaker_identity",
+      "result_file": "/vol/results/azeros_speaker_identity_20260819_183322.json",
+      "claimed_key": "claimed_gender",
+      "elapsed_seconds": 3.24314284324646,
+      "metrics": {
+        "n_total": 8,
+        "n_scored": 7,
+        "n_invalid": 0,
+        "n_error": 1,
+        "weighted_accuracy": 0.2857142857142857,
+        "uar": 0.29166666666666663,
+        "macro_f1": 0.28571428571428575,
+        "micro_f1": 0.2857142857142857,
+        "accuracy_invalid_as_wrong": 0.25,
+        "per_class": {
+          "female": {
+            "precision": 0.3333333333333333,
+            "recall": 0.25,
+            "f1": 0.28571428571428575,
+            "support": 4
+          },
+          "male": {
+            "precision": 0.25,
+            "recall": 0.3333333333333333,
+            "f1": 0.28571428571428575,
+            "support": 3
+          }
+        }
+      },
+      "by_condition": {
+        "Neutral-Text": {
+          "n_total": 1,
+          "n_scored": 1,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 1.0,
+          "uar": 1.0,
+          "macro_f1": 1.0,
+          "micro_f1": 1.0,
+          "accuracy_invalid_as_wrong": 1.0,
+          "per_class": {
+            "female": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 1
+            }
+          }
+        },
+        "Matched": {
+          "n_total": 1,
+          "n_scored": 1,
+          "n_invalid": 0,
+          "n_error": 0,
+          "weighted_accuracy": 1.0,
+          "uar": 1.0,
+          "macro_f1": 1.0,
+          "micro_f1": 1.0,
+          "accuracy_invalid_as_wrong": 1.0,
+          "per_class": {
+            "male": {
+              "precision": 1.0,
+              "recall": 1.0,
+              "f1": 1.0,
+              "support": 1
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_last": {
+                "n_total": 1,
+                "n_scored": 1,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 1.0,
+                "uar": 1.0,
+                "macro_f1": 1.0,
+                "micro_f1": 1.0,
+                "accuracy_invalid_as_wrong": 1.0,
+                "per_class": {
+                  "male": {
+                    "precision": 1.0,
+                    "recall": 1.0,
+                    "f1": 1.0,
+                    "support": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Mismatched": {
+          "n_total": 6,
+          "n_scored": 5,
+          "n_invalid": 0,
+          "n_error": 1,
+          "weighted_accuracy": 0.0,
+          "uar": 0.0,
+          "macro_f1": 0.0,
+          "micro_f1": 0.0,
+          "accuracy_invalid_as_wrong": 0.0,
+          "per_class": {
+            "female": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 3
+            },
+            "male": {
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "support": 2
+            }
+          },
+          "by_order": {
+            "text_audio": {
+              "claim_first": {
+                "n_total": 4,
+                "n_scored": 4,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.0,
+                "uar": 0.0,
+                "macro_f1": 0.0,
+                "micro_f1": 0.0,
+                "accuracy_invalid_as_wrong": 0.0,
+                "per_class": {
+                  "female": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 2
+                  },
+                  "male": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 2
+                  }
+                }
+              },
+              "claim_last": {
+                "n_total": 1,
+                "n_scored": 1,
+                "n_invalid": 0,
+                "n_error": 0,
+                "weighted_accuracy": 0.0,
+                "uar": 0.0,
+                "macro_f1": 0.0,
+                "micro_f1": 0.0,
+                "accuracy_invalid_as_wrong": 0.0,
+                "per_class": {
+                  "female": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 1
+                  },
+                  "male": {
+                    "precision": 0.0,
+                    "recall": 0.0,
+                    "f1": 0.0,
+                    "support": 0
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "tdr": {
+        "n_mismatched": 6,
+        "n_usable": 5,
+        "follow_text": 5,
+        "follow_audio": 0,
+        "follow_neither": 0,
+        "invalid": 0,
+        "claim_unresolved": 0,
+        "tdr": 1.0,
+        "by_modality": {
+          "text_only": {
+            "n": 1,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "audio_only": {
+            "n": 0,
+            "n_usable": 0,
+            "text_claim": 0,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": null
+          },
+          "text_audio": {
+            "n": 5,
+            "n_usable": 5,
+            "text_claim": 5,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          }
+        },
+        "by_order": {
+          "claim_first": {
+            "n": 4,
+            "n_usable": 4,
+            "text_claim": 4,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          },
+          "claim_last": {
+            "n": 1,
+            "n_usable": 1,
+            "text_claim": 1,
+            "audio_truth": 0,
+            "neither": 0,
+            "invalid": 0,
+            "claim_unresolved": 0,
+            "tdr": 1.0
+          }
+        }
+      }
+    }
+  }
+}

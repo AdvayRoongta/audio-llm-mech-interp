@@ -1,0 +1,456 @@
+{
+  "run": {
+    "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "eager",
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "category": "sarcasm_pacing",
+    "seed": 0,
+    "limit": 60,
+    "bands": [
+      "late",
+      "mid",
+      "all"
+    ],
+    "gammas": [
+      0.0,
+      0.25
+    ],
+    "n_items": 60,
+    "skipped_no_claim_span": 0
+  },
+  "positive_control": {
+    "audio": 0.23333333333333334,
+    "margin": 0.3871093732615312,
+    "margin_delta": 5.699218759623667,
+    "capability": 0.16666666666666666,
+    "tdr": 0.1,
+    "passed": true
+  },
+  "baseline": {
+    "audio": 0.03333333333333333,
+    "capability": 0.9166666666666666,
+    "margin": -5.312109386362136,
+    "tdr": 0.8
+  },
+  "sweep": [
+    {
+      "band": "late",
+      "layers": [
+        22,
+        31
+      ],
+      "gamma": 0.0,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.326106762800676,
+      "margin_delta": -0.013997376438540599,
+      "capability": 0.95,
+      "tdr": 0.8166666666666667
+    },
+    {
+      "band": "late",
+      "layers": [
+        22,
+        31
+      ],
+      "gamma": 0.25,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.2965494719722,
+      "margin_delta": 0.01555991438993587,
+      "capability": 0.95,
+      "tdr": 0.8166666666666667
+    },
+    {
+      "band": "mid",
+      "layers": [
+        10,
+        21
+      ],
+      "gamma": 0.0,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.3462240020511675,
+      "margin_delta": -0.03411461568903196,
+      "capability": 0.9333333333333333,
+      "tdr": 0.8166666666666667
+    },
+    {
+      "band": "mid",
+      "layers": [
+        10,
+        21
+      ],
+      "gamma": 0.25,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.352083335110607,
+      "margin_delta": -0.0399739487484716,
+      "capability": 0.9333333333333333,
+      "tdr": 0.8
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        31
+      ],
+      "gamma": 0.0,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.3107421899524825,
+      "margin_delta": 0.0013671964096531042,
+      "capability": 0.95,
+      "tdr": 0.8166666666666667
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        31
+      ],
+      "gamma": 0.25,
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.328645786495569,
+      "margin_delta": -0.016536400133433382,
+      "capability": 0.95,
+      "tdr": 0.8166666666666667
+    }
+  ],
+  "routing": [
+    {
+      "rows": "gen",
+      "audio": 0.03333333333333333,
+      "ci95": [
+        0.009189126490150246,
+        0.11363987528925378
+      ],
+      "margin": -5.3107421899524825,
+      "margin_delta": 0.0013671964096531042,
+      "capability": 0.95,
+      "tdr": 0.8166666666666667
+    },
+    {
+      "rows": "post_claim",
+      "audio": 0.23333333333333334,
+      "ci95": [
+        0.1443943161843107,
+        0.3543651134039202
+      ],
+      "margin": 0.3871093732615312,
+      "margin_delta": 5.699218759623667,
+      "capability": 0.16666666666666666,
+      "tdr": 0.1
+    },
+    {
+      "rows": "all",
+      "audio": 0.23333333333333334,
+      "ci95": [
+        0.1443943161843107,
+        0.3543651134039202
+      ],
+      "margin": 0.3871093732615312,
+      "margin_delta": 5.699218759623667,
+      "capability": 0.16666666666666666,
+      "tdr": 0.1
+    }
+  ],
+  "routing_recovered_fraction": 1.0,
+  "freeform": [
+    {
+      "condition": "baseline",
+      "band": null,
+      "gamma": 1.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.7224598312333834,
+          1.0
+        ],
+        "names_true_ci95": [
+          0.005908437994857381,
+          0.16670751396958874
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.03333333333333333,
+        "said_claim": 10,
+        "said_true": 0,
+        "decided": 10,
+        "mean_token_logprob": -1.6104123016198477,
+        "repetition_rate": 0.0060691584032545156,
+        "n": 30,
+        "samples": [
+          "The speaker is male, speaks English, and conveys a neutral mood in his speech.",
+          "The speaker sounds calm and composed, without any strong positive or negative emotions.",
+          "The speaker sounds calm and composed, without any strong positive or negative emotions."
+        ],
+        "median_tokens": 16,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.11792239210501229,
+          0.40928672330324267
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.23333333333333334,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -1.8703250030676524,
+        "repetition_rate": 0.009070048309178742,
+        "n": 30,
+        "samples": [
+          "The speaker sounds angry and commanding.",
+          "The speaker sounds irritated and possibly confrontational.",
+          "The speaker sounds irritated and possibly confrontational due to the context of teaching a"
+        ],
+        "median_tokens": 11,
+        "informative": true
+      },
+      "text_only": {}
+    },
+    {
+      "condition": "late g=0",
+      "band": "late",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.7008472464490406,
+          1.0
+        ],
+        "names_true_ci95": [
+          0.005908437994857381,
+          0.16670751396958874
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.03333333333333333,
+        "said_claim": 9,
+        "said_true": 0,
+        "decided": 9,
+        "mean_token_logprob": -1.605785564581553,
+        "repetition_rate": 0.01084054834054834,
+        "n": 30,
+        "samples": [
+          "The speaker's emotion is neutral, as indicated by the provided description.",
+          "The speaker sounds calm and composed, without any strong positive or negative emotions.",
+          "The speaker sounds calm and composed, without any strong positive or negative emotions."
+        ],
+        "median_tokens": 16,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.07336434240351682,
+          0.3356470518568018
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.16666666666666666,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -1.6932110011577606,
+        "repetition_rate": 0.012578820239003308,
+        "n": 30,
+        "samples": [
+          "The speaker sounds angry and commanding.",
+          "The speaker sounds angry and commanding.",
+          "The speaker sounds irritated and possibly confrontational due to the context of a graduate"
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "text_only": {}
+    },
+    {
+      "condition": "mid g=0",
+      "band": "mid",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 0.6666666666666666,
+        "generative_tdr_ci95": [
+          0.2999883213415286,
+          0.903230667440783
+        ],
+        "names_true_ci95": [
+          0.01847663532769335,
+          0.2132381772107209
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.06666666666666667,
+        "said_claim": 4,
+        "said_true": 2,
+        "decided": 6,
+        "mean_token_logprob": -0.5673733030756315,
+        "repetition_rate": 0.026392114187486233,
+        "n": 30,
+        "samples": [
+          "The speaker is a male who speaks Mandarin and is likely between 16-25 years old.",
+          "The speaker is a male who speaks English and has expressed amusement or laughter.",
+          "The speaker is male, speaks English, and conveys an angry mood."
+        ],
+        "median_tokens": 19,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.07336434240351682,
+          0.3356470518568018
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.16666666666666666,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.5531886070966721,
+        "repetition_rate": 0.040244518455807544,
+        "n": 30,
+        "samples": [
+          "The speaker sounds angry and commanding.",
+          "The speaker sounds angry and commanding.",
+          "The speaker is a male who is angry and speaks English."
+        ],
+        "median_tokens": 16,
+        "informative": true
+      },
+      "text_only": {}
+    },
+    {
+      "condition": "all g=0",
+      "band": "all",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 0.6666666666666666,
+        "generative_tdr_ci95": [
+          0.2999883213415286,
+          0.903230667440783
+        ],
+        "names_true_ci95": [
+          0.01847663532769335,
+          0.2132381772107209
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.06666666666666667,
+        "said_claim": 4,
+        "said_true": 2,
+        "decided": 6,
+        "mean_token_logprob": -0.4892998899022738,
+        "repetition_rate": 0.03211633974580791,
+        "n": 30,
+        "samples": [
+          "The speaker is a male who speaks Mandarin and is likely between 16-25 years old.",
+          "The speaker is a male who speaks Mandarin and appears to be in his twenties.",
+          "The speaker is male, speaks English, and conveys an angry mood."
+        ],
+        "median_tokens": 19,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.07336434240351682,
+          0.3356470518568018
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.16666666666666666,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.430007362862428,
+        "repetition_rate": 0.03813867514382388,
+        "n": 30,
+        "samples": [
+          "The speaker sounds angry and commanding.",
+          "The speaker sounds angry and commanding.",
+          "The speaker is a male who is angry and speaks English."
+        ],
+        "median_tokens": 18,
+        "informative": true
+      },
+      "text_only": {}
+    }
+  ],
+  "freeform_baseline": {
+    "generative_tdr": 1.0,
+    "generative_tdr_ci95": [
+      0.7224598312333834,
+      1.0
+    ],
+    "names_true_ci95": [
+      0.005908437994857381,
+      0.16670751396958874
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.03333333333333333,
+    "said_claim": 10,
+    "said_true": 0,
+    "decided": 10,
+    "mean_token_logprob": -1.6104123016198477,
+    "repetition_rate": 0.0060691584032545156,
+    "n": 30,
+    "samples": [
+      "The speaker is male, speaks English, and conveys a neutral mood in his speech.",
+      "The speaker sounds calm and composed, without any strong positive or negative emotions.",
+      "The speaker sounds calm and composed, without any strong positive or negative emotions."
+    ],
+    "median_tokens": 16,
+    "informative": true
+  },
+  "generative_tdr_baseline": 1.0,
+  "freeform_best": {
+    "generative_tdr": 0.6666666666666666,
+    "generative_tdr_ci95": [
+      0.2999883213415286,
+      0.903230667440783
+    ],
+    "names_true_ci95": [
+      0.01847663532769335,
+      0.2132381772107209
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.06666666666666667,
+    "said_claim": 4,
+    "said_true": 2,
+    "decided": 6,
+    "mean_token_logprob": -0.5673733030756315,
+    "repetition_rate": 0.026392114187486233,
+    "n": 30,
+    "samples": [
+      "The speaker is a male who speaks Mandarin and is likely between 16-25 years old.",
+      "The speaker is a male who speaks English and has expressed amusement or laughter.",
+      "The speaker is male, speaks English, and conveys an angry mood."
+    ],
+    "median_tokens": 19,
+    "informative": true
+  },
+  "verdict": "FREE-FORM EFFECT: closed-set choice is unmoved (0% of the gap) but in open generation the description flips toward the audio, gen-TDR 1.000 -> 0.667, with fluency intact and matched-item accuracy holding at 0.167."
+}

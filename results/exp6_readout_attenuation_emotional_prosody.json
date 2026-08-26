@@ -1,0 +1,544 @@
+{
+  "run": {
+    "model_path": "Qwen/Qwen2-Audio-7B-Instruct",
+    "dtype": "torch.float16",
+    "quantization": "fp16",
+    "attn_implementation": "eager",
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "category": "emotional_prosody",
+    "seed": 0,
+    "limit": 60,
+    "bands": [
+      "late",
+      "mid",
+      "all"
+    ],
+    "gammas": [
+      0.0,
+      0.25
+    ],
+    "n_items": 60,
+    "skipped_no_claim_span": 0
+  },
+  "positive_control": {
+    "audio": 0.5333333333333333,
+    "margin": 3.208072934144487,
+    "margin_delta": 10.537565142071495,
+    "capability": 0.36666666666666664,
+    "tdr": 0.15,
+    "passed": true
+  },
+  "baseline": {
+    "audio": 0.0,
+    "capability": 1.0,
+    "margin": -7.329492207927008,
+    "tdr": 0.9833333333333333
+  },
+  "sweep": [
+    {
+      "band": "late",
+      "layers": [
+        22,
+        31
+      ],
+      "gamma": 0.0,
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.351236943465968,
+      "margin_delta": -0.021744735538959503,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    },
+    {
+      "band": "late",
+      "layers": [
+        22,
+        31
+      ],
+      "gamma": 0.25,
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.343880177661776,
+      "margin_delta": -0.014387969734768191,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    },
+    {
+      "band": "mid",
+      "layers": [
+        10,
+        21
+      ],
+      "gamma": 0.0,
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.308203076633315,
+      "margin_delta": 0.021289131293693586,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    },
+    {
+      "band": "mid",
+      "layers": [
+        10,
+        21
+      ],
+      "gamma": 0.25,
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.320768204300354,
+      "margin_delta": 0.008724003626654486,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        31
+      ],
+      "gamma": 0.0,
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.330859422342231,
+      "margin_delta": -0.001367214415222584,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    },
+    {
+      "band": "all",
+      "layers": [
+        0,
+        31
+      ],
+      "gamma": 0.25,
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.3342447683525585,
+      "margin_delta": -0.0047525604255502785,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    }
+  ],
+  "routing": [
+    {
+      "rows": "gen",
+      "audio": 0.0,
+      "ci95": [
+        -6.521353384539763e-18,
+        0.060173930477932895
+      ],
+      "margin": -7.330859422342231,
+      "margin_delta": -0.001367214415222584,
+      "capability": 1.0,
+      "tdr": 0.9833333333333333
+    },
+    {
+      "rows": "post_claim",
+      "audio": 0.5333333333333333,
+      "ci95": [
+        0.4089320867113511,
+        0.65372298459012
+      ],
+      "margin": 3.208072934144487,
+      "margin_delta": 10.537565142071495,
+      "capability": 0.36666666666666664,
+      "tdr": 0.15
+    },
+    {
+      "rows": "all",
+      "audio": 0.5333333333333333,
+      "ci95": [
+        0.4089320867113511,
+        0.65372298459012
+      ],
+      "margin": 3.208072934144487,
+      "margin_delta": 10.537565142071495,
+      "capability": 0.36666666666666664,
+      "tdr": 0.15
+    }
+  ],
+  "routing_recovered_fraction": 1.0,
+  "freeform": [
+    {
+      "condition": "baseline",
+      "band": null,
+      "gamma": 1.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8568788745827373,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 23,
+        "said_true": 0,
+        "decided": 23,
+        "mean_token_logprob": -1.2761280864477158,
+        "repetition_rate": 0.02480261843419739,
+        "n": 30,
+        "samples": [
+          "The speaker sounds joyful and content based on the described emotion.",
+          "The speaker is an English-speaking female who sounds happy.",
+          "The speaker sounds surprised while describing dogs sitting by the door."
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.5907132766967573,
+          0.8820776078949878
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.7666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.7483905479311943,
+        "repetition_rate": 0.003333333333333336,
+        "n": 30,
+        "samples": [
+          "The speaker sounds surprised while noting kids talking by the door.",
+          "The speaker sounds startled and taken aback.",
+          "The speaker is male, speaks English, and conveys a sense of fear in his voice."
+        ],
+        "median_tokens": 12,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.39197009545408734,
+          0.7262276256938489
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.5666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -1.4458197931448618,
+        "repetition_rate": 0.044867369472632625,
+        "n": 30,
+        "samples": [
+          "The speaker is likely a person who was not expecting to find kids by the door and expresse",
+          "The speaker is experiencing fear.",
+          "The speaker is a male who speaks English and conveys a disgusted mood in his speech."
+        ],
+        "median_tokens": 19,
+        "informative": true
+      }
+    },
+    {
+      "condition": "late g=0",
+      "band": "late",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 1.0,
+        "generative_tdr_ci95": [
+          0.8568788745827373,
+          1.0000000000000002
+        ],
+        "names_true_ci95": [
+          -1.2302421700937121e-17,
+          0.11351709139047801
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.0,
+        "said_claim": 23,
+        "said_true": 0,
+        "decided": 23,
+        "mean_token_logprob": -1.1266335040330886,
+        "repetition_rate": 0.012123738834265155,
+        "n": 30,
+        "samples": [
+          "The speaker sounds joyful and content based on the described emotion.",
+          "The speaker is an English-speaking female who sounds happy.",
+          "The speaker sounds surprised while describing dogs sitting by the door."
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.7437855868473338,
+          0.9654007400402839
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.9,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.5779768099387487,
+        "repetition_rate": 0.005632183908045981,
+        "n": 30,
+        "samples": [
+          "The speaker sounds surprised while noting kids talking by the door.",
+          "The speaker sounds surprised while noting kids talking by the door.",
+          "The speaker is male, speaks English, and conveys a sense of fear in his voice."
+        ],
+        "median_tokens": 12,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.3023212722412823,
+          0.6385798671847496
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.4666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -1.3383529593547185,
+        "repetition_rate": 0.062482015992313476,
+        "n": 30,
+        "samples": [
+          "The speaker is likely a person who was not expecting to find kids by the door and was surp",
+          "The speaker is a female who is experiencing a feeling of fear while listening to children ",
+          "The speaker is a female who speaks English and conveys a disgusted mood in her speech."
+        ],
+        "median_tokens": 20,
+        "informative": true
+      }
+    },
+    {
+      "condition": "mid g=0",
+      "band": "mid",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 0.375,
+        "generative_tdr_ci95": [
+          0.21159133433631455,
+          0.5729038096209293
+        ],
+        "names_true_ci95": [
+          0.3315385122717376,
+          0.6684614877282624
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.5,
+        "said_claim": 9,
+        "said_true": 15,
+        "decided": 24,
+        "mean_token_logprob": -0.6446284761031469,
+        "repetition_rate": 0.010266290726817043,
+        "n": 30,
+        "samples": [
+          "The speaker sounds surprised while stating that kids are talking by the door.",
+          "The speaker is an English-speaking female who sounds surprised while saying 'Kids are talk",
+          "The speaker sounds disgusted."
+        ],
+        "median_tokens": 14,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.7437855868473338,
+          0.9654007400402839
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.9,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.3983344756066799,
+        "repetition_rate": 0.006401821862348178,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds surprised while saying 'Kids are talk",
+          "The speaker sounds surprised while noting kids talking by the door.",
+          "The speaker sounds fearful as he describes kids talking by the door."
+        ],
+        "median_tokens": 12,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.39197009545408734,
+          0.7262276256938489
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.5666666666666667,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -1.017543331782023,
+        "repetition_rate": 0.054005390595106596,
+        "n": 30,
+        "samples": [
+          "The speaker is likely a person who has overheard children conversing by a doorway and was ",
+          "The speaker is a female who is expressing a fearful mood.",
+          "The speaker is a male who speaks English and conveys a disgusted mood in his speech."
+        ],
+        "median_tokens": 20,
+        "informative": true
+      }
+    },
+    {
+      "condition": "all g=0",
+      "band": "all",
+      "gamma": 0.0,
+      "mismatched": {
+        "generative_tdr": 0.18181818181818182,
+        "generative_tdr_ci95": [
+          0.0730676602410512,
+          0.3851702197663787
+        ],
+        "names_true_ci95": [
+          0.42320052498273836,
+          0.754096056739166
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.6,
+        "said_claim": 4,
+        "said_true": 18,
+        "decided": 22,
+        "mean_token_logprob": -0.46107954581578575,
+        "repetition_rate": 0.010482643390084416,
+        "n": 30,
+        "samples": [
+          "The speaker sounds surprised while noting kids talking by the door.",
+          "The speaker is an English-speaking female who sounds surprised while saying 'Kids are talk",
+          "The speaker sounds disgusted."
+        ],
+        "median_tokens": 15,
+        "informative": true
+      },
+      "matched": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.4877972581383026,
+          0.807697044731538
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.6666666666666666,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.3537964557607969,
+        "repetition_rate": 0.006608220211161387,
+        "n": 30,
+        "samples": [
+          "The speaker is an English-speaking female who sounds surprised while saying 'Kids are talk",
+          "The speaker is an English-speaking female who sounds surprised while saying 'Kids are talk",
+          "The speaker is male, speaks English, and conveys an angry mood."
+        ],
+        "median_tokens": 13,
+        "informative": true
+      },
+      "text_only": {
+        "generative_tdr": null,
+        "generative_tdr_ci95": null,
+        "names_true_ci95": [
+          0.36142013281525043,
+          0.6976787277587176
+        ],
+        "n_items": 30,
+        "names_true_rate": 0.5333333333333333,
+        "said_claim": 0,
+        "said_true": 0,
+        "decided": 0,
+        "mean_token_logprob": -0.7138893455266953,
+        "repetition_rate": 0.06051980378296169,
+        "n": 30,
+        "samples": [
+          "The speaker is likely an adult who has overheard children conversing by the doorway and wa",
+          "The speaker is a female who is expressing sadness or disappointment.",
+          "The speaker is a male who speaks English and conveys a disgusted mood in his speech."
+        ],
+        "median_tokens": 25,
+        "informative": true
+      }
+    }
+  ],
+  "freeform_baseline": {
+    "generative_tdr": 1.0,
+    "generative_tdr_ci95": [
+      0.8568788745827373,
+      1.0000000000000002
+    ],
+    "names_true_ci95": [
+      -1.2302421700937121e-17,
+      0.11351709139047801
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.0,
+    "said_claim": 23,
+    "said_true": 0,
+    "decided": 23,
+    "mean_token_logprob": -1.2761280864477158,
+    "repetition_rate": 0.02480261843419739,
+    "n": 30,
+    "samples": [
+      "The speaker sounds joyful and content based on the described emotion.",
+      "The speaker is an English-speaking female who sounds happy.",
+      "The speaker sounds surprised while describing dogs sitting by the door."
+    ],
+    "median_tokens": 13,
+    "informative": true
+  },
+  "generative_tdr_baseline": 1.0,
+  "freeform_best": {
+    "generative_tdr": 0.375,
+    "generative_tdr_ci95": [
+      0.21159133433631455,
+      0.5729038096209293
+    ],
+    "names_true_ci95": [
+      0.3315385122717376,
+      0.6684614877282624
+    ],
+    "n_items": 30,
+    "names_true_rate": 0.5,
+    "said_claim": 9,
+    "said_true": 15,
+    "decided": 24,
+    "mean_token_logprob": -0.6446284761031469,
+    "repetition_rate": 0.010266290726817043,
+    "n": 30,
+    "samples": [
+      "The speaker sounds surprised while stating that kids are talking by the door.",
+      "The speaker is an English-speaking female who sounds surprised while saying 'Kids are talk",
+      "The speaker sounds disgusted."
+    ],
+    "median_tokens": 14,
+    "informative": true
+  },
+  "verdict": "FREE-FORM EFFECT: closed-set choice is unmoved (0% of the gap) but in open generation the description flips toward the audio, gen-TDR 1.000 -> 0.375, with fluency intact and matched-item accuracy holding at 0.900. Cost: with no audio, where the claim is the only evidence, accuracy goes 0.567 -> 0.567 -- the intervention is unconditional and this is the price."
+}
