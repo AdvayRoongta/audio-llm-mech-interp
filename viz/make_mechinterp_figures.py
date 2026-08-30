@@ -26,8 +26,8 @@ caption, and a familiar shape is doing half the explaining:
   m8_source_sweep         effect vs. collateral damage           our exp5
   m9_norm_profile         residual-norm growth with depth        StreamingLLM
                           (Xiao et al. 2023)
-  m10_knockout_bands      attention knockout by layer band       Geva et al. 2023
-                          fig 3
+  m10_layers_vs_positions knockout by layer band, then by         Geva et al. 2023
+                          position: the 2x2 in one panel         fig 3
   m11_routing             the routing bisection                  Geva et al. 2023
   m12_generative_fix      free-form intervention + controls      ours
   m13_generation_quality  fluency / repetition / length          answers Cho
@@ -72,6 +72,15 @@ C_AUDIO, C_TEXT, C_CHANCE, C_NEUTRAL = "#2b6cb0", "#c53030", "#718096", "#2f855a
 GROUPS = ["audio", "claim", "query", "options", "gen"]
 GROUP_LABEL = {"audio": "audio tokens", "claim": "text claim", "query": "question",
                "options": "answer options", "gen": "answer position"}
+
+# The routing conditions, named for what stops seeing the claim rather than for
+# the JSON key.
+ROW_ORDER = ["gen", "post_claim", "all"]
+# "positions in between" only parses once you already know the mechanism, which
+# is the thing this figure is supposed to teach.
+ROW_LABEL = {"gen": "answer\nposition",
+             "post_claim": "every position\nafter the claim",
+             "all": "every\nposition"}
 
 # Where each model's results live. Qwen writes to the top level for historical
 # reasons; every later model gets its own subdirectory.
@@ -176,6 +185,33 @@ def cat_of(d, path):
     """Category for a result file, from the run header or the filename."""
     c = (d.get("run") or {}).get("category")
     return c or os.path.basename(path).rsplit("_", 1)[-1].replace(".json", "")
+
+
+def ci_err(p, ci):
+    """(lower_err, upper_err) from a stored absolute interval.
+
+    exp6 writes ci95 as bounds on the rate, not as k/n, so err_bars() does not
+    apply. The p=0 rows store a lower bound of -6.5e-18; clamp for the same
+    reason err_bars does.
+    """
+    if not ci:
+        return p, 0.0, 0.0
+    return p, max(0.0, p - ci[0]), max(0.0, ci[1] - p)
+
+
+def chance_for(root, cat):
+    """1/n_options for a category, read off the capability screen.
+
+    exp6 does not record the option count and the categories do not share one:
+    prosody is 8-way (0.125), identity 2-way (0.500). Hardcoding it would put a
+    wrong reference line on an accuracy figure, which is a wrong claim rather
+    than a cosmetic slip.
+    """
+    d = load(os.path.join(root, "exp1_capability_screen.json"))
+    for r in (d or {}).get("records") or []:
+        if r.get("category") == cat and r.get("n_options"):
+            return 1.0 / r["n_options"]
+    return None
 
 
 def per_model(pattern, every=False, all_cats=False):
@@ -753,62 +789,175 @@ def m9_norm_profile(out_dir):
 
 
 # --------------------------------------------------------------------------- #
-# m10 -- attention knockout by band
+# m10 -- the hinge: which layers, or which positions
 # --------------------------------------------------------------------------- #
-def m10_knockout_bands(out_dir):
-    """Geva et al.'s knockout, restricted to a band of layers.
+def m10_layers_vs_positions(out_dir):
+    """Which token positions have to lose sight of the claim.
 
-    The positive control is drawn as a line, not a bar: it is the ceiling the
-    method can reach when it certainly works, and every null below it has to be
-    read against it.
+    Three conditions, layers held at all 32 and gamma at 0, differing only in
+    which query rows stop attending to the claim. Blocking the answer position
+    alone changes nothing; blocking every position downstream of the claim
+    recovers the whole effect. The claim is not read directly off the claim
+    tokens at the readout -- it is relayed through the tokens in between.
+
+    The layer-band sweep is not drawn. Every band is null at the answer
+    position, and half a panel of flat caps buys nothing that the footnote does
+    not say in one line; the numbers are in exp6.sweep and in the text.
+
+    Audio-consistent accuracy, which is how the write-up states this result and
+    what a reader can hold against a chance line. The margin is the more
+    sensitive metric and lives in exp6.routing; it is not drawn. Prosody's
+    answer-position bar is 0.000 exactly, so the bar outline and the Wilson
+    whisker carry the "this ran and measured nothing" job on their own.
+
+    Capability is NOT drawn, by request. It matters and it is not flattering:
+    blocking every position after the claim lifts prosody 0.000 -> 0.533 while
+    matched-item accuracy falls 1.000 -> 0.367, so most of that gain is the
+    model no longer reading text at all. Identity costs less, 1.000 -> 0.800.
+    Those numbers are in exp6.routing[].capability and belong in the caption if
+    they are not on the axis -- otherwise the panel reads as a repair, which is
+    the failure mode FIGURE_TYPES.md warns about for m7.
+
+    gamma = 0 only. gamma = 0.25 is a null at every band, and interleaving
+    inert bars turns the panel into a sawtooth; fig7 in make_figures.py drops
+    it for the same reason. The null belongs in the text.
     """
     blocks = [(m, p, d) for m, p, d in per_model("exp6_readout_attenuation_*.json")
-              if d.get("sweep")]
+              if d.get("sweep") and d.get("routing")]
     if not blocks:
-        return skip("m10_knockout_bands", "no exp6_readout_attenuation_*.json")
+        return skip("m10_layers_vs_positions", "no exp6 sweep+routing blocks")
 
-    fig, axes = plt.subplots(1, len(blocks), figsize=(4.4 * len(blocks), 3.2),
+    # 5.0in/panel, wider than the usual 3.5-4.6: six two-line tick labels need
+    # about 0.83in of tick pitch before "every position / after the claim"
+    # starts touching its neighbour.
+    fig, axes = plt.subplots(1, len(blocks), figsize=(3.9 * len(blocks), 3.9),
                              squeeze=False, sharey=True)
+    fig.subplots_adjust(wspace=0.42)
     for ax, (model, path, d) in zip(axes[0], blocks):
         cat = cat_of(d, path)
-        rows = d["sweep"]
-        gammas = sorted({r["gamma"] for r in rows})
-        bands = list(dict.fromkeys(r["band"] for r in rows))
-        width = 0.8 / max(1, len(gammas))
-        for i, g in enumerate(gammas):
-            xs, ys = [], []
-            for j, b in enumerate(bands):
-                hit = [r for r in rows if r["band"] == b and r["gamma"] == g]
-                if hit:
-                    xs.append(j + i * width - 0.4 + width / 2)
-                    ys.append(hit[0].get("margin_delta", 0.0))
-            ax.bar(xs, ys, width=width * 0.9,
-                   label="gamma = {:g}".format(g),
-                   color=C_AUDIO if g == 0.0 else C_CHANCE)
-            # Every bar here is a fraction of a nat against a positive control
-            # of 2.57, so at a scale that shows the control they are invisible.
-            # Print the value: an unreadably small bar and a missing bar look
-            # identical otherwise.
-            for x, y in zip(xs, ys):
-                ax.annotate("{:+.3f}".format(y), xy=(x, 0), xytext=(0, 4),
-                            textcoords="offset points", ha="center",
-                            fontsize=6, color=C_CHANCE, rotation=90)
-        pc = (d.get("positive_control") or {}).get("margin_delta")
-        if pc is not None:
-            ax.axhline(pc, ls="--", lw=1.2, color=C_NEUTRAL,
-                       label="positive control")
-            ax.set_ylim(top=pc * 1.32)   # headroom, or the legend lands on it
-        ax.axhline(0, lw=0.8, color="black")
-        ax.set_xticks(range(len(bands)))
-        ax.set_xticklabels(bands)
-        ax.set_xlabel("layer band")
-        ax.set_title("{} -- {}".format(model.split("-")[0],
-                                       PRETTY.get(cat, cat)), fontsize=9)
+        base = d.get("baseline") or {}
+
+        route = {r["rows"]: r for r in d["routing"]}
+        rows = [route[k] for k in ROW_ORDER if k in route]
+        if not rows:
+            continue
+        ticks = [ROW_LABEL[k] for k in ROW_ORDER if k in route]
+        xs = list(range(len(rows)))
+        ys = [r.get("audio") or 0.0 for r in rows]
+        errs = [ci_err(y, r.get("ci95")) for y, r in zip(ys, rows)]
+
+        ax.set_axisbelow(True)
+        ch = chance_for(os.path.dirname(path), cat)
+
+        # edgecolor is load-bearing, not decoration: four of the six prosody
+        # conditions are 0.000 exactly, and a zero-height bar with no edge
+        # draws nothing at all -- the panel reads as two bars and four missing
+        # ones. With an edge, a measured zero renders as a flat cap the width
+        # of a bar, which is what it is. Same argument as m3's explicit "0"
+        # markers on the log axis.
+        ax.bar(xs, ys, width=0.62, color=C_AUDIO, edgecolor=C_AUDIO,
+               linewidth=1.4, zorder=2,
+               yerr=[[e[1] for e in errs], [e[2] for e in errs]],
+               capsize=3, error_kw={"lw": 0.9, "zorder": 3})
+        # A zero-height bar and a missing bar are the same picture, and
+        # prosody's answer-position bar is 0.000. The printed rate, the Wilson
+        # whisker and the bar outline are what say the run happened and
+        # measured nothing.
+        for x, y, e in zip(xs, ys, errs):
+            ax.annotate("{:.3f}".format(y), xy=(x, y + e[2]), xytext=(0, 4),
+                        textcoords="offset points", ha="center",
+                        fontsize=7, color=C_CHANCE, zorder=4)
+
+        ax.axhline(0, lw=0.8, color="black", zorder=1)
+        # bottom below zero on purpose: prosody's baseline is exactly 0.000 and
+        # would otherwise be drawn on the bottom spine and read as the axis.
+        ax.set_ylim(-0.04, 1.02)
+        ax.set_xticks(xs)
+        ax.set_xticklabels(ticks, fontsize=6.5, linespacing=1.15)
+        ax.set_xlim(-0.6, len(rows) - 0.4)
+        # Chance goes in the title, not on the line. The categories do not
+        # share a rate (0.125 against 0.500) and every spot beside the line is
+        # already occupied; the encoder probe does the same for the same reason.
+        ax.set_title("{} -- {}{}".format(
+            model.split("-")[0], PRETTY.get(cat, cat),
+            "   (chance {:.3f})".format(ch) if ch is not None else ""),
+            fontsize=9)
         ax.grid(axis="y", alpha=0.25)
-    axes[0][0].set_ylabel("margin gain [nats]")
-    axes[0][-1].legend(loc="upper right", fontsize=7)
-    fig.suptitle("Knocking the claim out of a band of layers moves nothing", y=1.03)
-    save(fig, out_dir, "m10_knockout_bands")
+
+        # Reference lines. Dotted against dashed, because prosody's baseline is
+        # 0.000 and sits on the axis floor: the two have to be told apart by
+        # style, not only by position.
+        b_aud = base.get("audio")
+        if b_aud is not None:
+            ax.axhline(b_aud, ls="--", lw=1.2, color=C_TEXT, zorder=1)
+        if ch is not None:
+            ax.axhline(ch, ls=":", lw=1.2, color=C_CHANCE, zorder=1)
+
+        # Group headers, x in data and y in axes fraction so the offsets do not
+        # move with the y range. The "held" line is load-bearing: without it,
+        # "which layers are blocked" invites the reader to assume the positions
+        # varied too, and the 2x2 collapses into six unrelated conditions.
+        # These three offsets assume two-line 7pt tick labels.
+        tr = ax.get_xaxis_transform()
+        for x0, x1, head in ((-0.45, len(rows) - 0.55,
+                              "which positions are blocked"),):
+            ax.plot([x0, x1], [-0.17, -0.17], transform=tr, color=C_CHANCE,
+                    lw=0.9, clip_on=False)
+            ax.text((x0 + x1) / 2, -0.21, head, transform=tr, ha="center",
+                    va="top", fontsize=8, fontweight="bold", color="#1a202c")
+
+    # Proxy artists: a bar container and a twin-axis line do not produce a
+    # coherent auto-legend. Upper right is unavailable -- the position bars
+    # live there.
+    # The subtitle asserts the layer sweep is null. Derive it rather than
+    # writing it down: a later run with a live band would otherwise be
+    # published under a caption saying it is dead. 1 nat is the threshold the
+    # experiment's own verdict logic uses.
+    band_peak = max(
+        (abs(r.get("margin_delta") or 0.0)
+         for _, _, d in blocks
+         for r in d.get("sweep") or [] if r.get("gamma") in (None, 0.0)),
+        default=None)
+    if band_peak is None:
+        band_note = ""
+    elif band_peak < 1.0:
+        band_note = ("Restricting the same knockout to a band of layers is "
+                     "null at every band  (exp6.sweep)")
+    else:
+        band_note = ("Restricting the same knockout to a band of layers moves "
+                     "the margin by up to {:.3f} nats  (exp6.sweep)"
+                     .format(band_peak))
+
+    n = (blocks[0][2].get("run") or {}).get("n_items")
+    handles = [
+        matplotlib.patches.Patch(
+            color=C_AUDIO,
+            label="audio-consistent accuracy"
+                  + (" (n={} mismatched)".format(n) if n else "")),
+        matplotlib.lines.Line2D([], [], color=C_TEXT, ls="--", lw=1.2,
+                                label="no intervention"),
+    ]
+    # Only the outermost axes carry a unit label; an inner twin label lands on
+    # the next panel's y-axis.
+    # The denominator belongs to the bars, not to the axis: capability is
+    # scored on the Matched items, a disjoint list, and exp6 does not record
+    # how many of those there were. An n on the shared axis label would claim
+    # both series share it.
+    axes[0][0].set_ylabel("accuracy")
+    # Figure-level, in the header band. With three bars to a panel there is no
+    # in-axes region left that does not sit on a bar, the capability line or a
+    # reference line.
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.03),
+               ncol=3, fontsize=7)
+    fig.suptitle("The claim reaches the answer through the tokens in between",
+                 y=1.17, fontsize=11)
+    # The layer sweep is the other half of this result. One line under the
+    # title is worth more than half a panel of flat caps, and it goes here
+    # rather than at the foot, where it lands on the group headers.
+    if band_note:
+        fig.text(0.5, 1.10, band_note, ha="center", fontsize=6.8,
+                 color=C_CHANCE)
+    save(fig, out_dir, "m10_layers_vs_positions")
 
 
 # --------------------------------------------------------------------------- #
@@ -1091,7 +1240,7 @@ FIGURES = {
     "m1c": m1c_attribution_grid, "m2": m2_faithfulness, "m3": m3_group_magnitude,
     "m4": m4_circuit_overlap, "m5": m5_probe_depth, "m6": m6_margin_distribution,
     "m7": m7_backpatch_grid, "m8": m8_source_sweep, "m9": m9_norm_profile,
-    "m10": m10_knockout_bands, "m11": m11_routing, "m12": m12_generative_fix,
+    "m10": m10_layers_vs_positions, "m11": m11_routing, "m12": m12_generative_fix,
     "m13": m13_generation_quality, "m14": m14_outcome_mass,
     "m15": m15_capability_gate,
 }
