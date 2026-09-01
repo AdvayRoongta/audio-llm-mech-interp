@@ -44,17 +44,25 @@ CV, seed 0, Qwen2-Audio-7B-Instruct at fp16. Speaker-independent is the part
 that matters — with speaker-dependent folds a probe can memorise voices and
 report a ceiling that means nothing.
 
-**The control.** Each layer also carries a shuffled-label probe (Hewitt & Liang
-2019). It runs 0.245–0.513 across the layers, i.e. at chance, which is what
-makes the real trajectory readable as signal rather than as probe capacity.
+**The control, drawn.** Each layer also carries a shuffled-label probe (Hewitt &
+Liang 2019), plotted as the dotted line. It runs 0.245–0.513 across the layers,
+i.e. at chance, and the shaded band between it and the probe is *selectivity* —
+what the probe reads that it does not get from noise. Without it a ceiling could
+as easily be probe capacity as signal.
+
+**No chance rule at 0.500.** A second horizontal line competes with the shuffled
+control for the same job, and the control is the one that answers the question:
+it lands where a probe of this capacity lands on labels that mean nothing. The
+projector sits three units out behind a break rule, because it is a different
+module and not encoder layer 33.
 
 **Drawn as a line, not a strip.** Position is a finer visual channel than
 lightness, and the dips are the honest part: the write-up's "1.000 from layer 13
 onward" is not literally true. Accuracy touches 1.000 at layer 13, falls to
 0.975 at 21 and 0.988 at 22 and 27, and only holds ceiling from 28. A line shows
 that without anyone having to say it; a heatmap of the same numbers hides it in
-two shades of the same blue. The figure derives its own annotation from the data
-so it is able to contradict the sentence it illustrates.
+two shades of the same blue. The dip is visible on the line but not annotated,
+so this paragraph is the only thing that points at it.
 
 **What a reader should not conclude.** That the encoder preserves paralinguistic
 information *in general*. exp2 covers speaker gender and nothing else. There is
@@ -176,6 +184,12 @@ holding layers at all 32, gamma at 0, and items fixed:
 | every position after the claim | every position downstream of the claim |
 | every position | every position |
 
+**Nothing on the panel names the panel.** The titles and the group headers are
+off, so the figure does not say which category is which, nor what the dotted rule
+is. Left is emotional prosody against a chance rate of 0.125, right is speaker
+identity against 0.500, the dotted rule is that rate and the dashed red rule is
+the un-intervened baseline. All four facts live in the caption and nowhere else.
+
 **The metric is audio-consistent accuracy on the 60 Mismatched items**, with
 Wilson intervals, against `1/n_options` read off the capability screen — 0.125
 for prosody's 8 options, 0.500 for identity's 2. This is how the write-up states
@@ -193,10 +207,11 @@ before the answer position reads it, so cutting the direct edge changes nothing.
 **The layer sweep is not drawn.** `exp6.sweep` varies the layer band — late
 22–31, middle 10–21, all 0–31 — with positions held at the answer position, and
 every band is null: the largest `|margin_delta|` across both categories is 0.054
-nats. Half a panel of flat caps buys nothing that one line under the title does
-not say, and the figure derives that line from the data rather than asserting
-it, so a later run with a live band cannot be published under a caption saying
-it is dead.
+nats. Half a panel of flat caps buys nothing. An earlier version carried a
+subtitle derived from `exp6.sweep` at render time, which meant a later run with
+a live band would have contradicted its own figure; that subtitle was removed,
+so this paragraph is now the only thing asserting the null and it has to be
+re-checked by hand after any re-run.
 
 **`sweep["all", gamma=0]` and `routing["gen"]` are the same run**, identical to
 the last float bit. The 2×2 has five measurements, not six.
