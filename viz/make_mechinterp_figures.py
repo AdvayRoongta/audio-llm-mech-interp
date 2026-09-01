@@ -209,20 +209,22 @@ def grid_from_attr(attr, n_layers):
 # fig1 -- the signal is in the encoder
 # --------------------------------------------------------------------------- #
 def fig1_probe_accuracy_by_encoder_layer(out_dir):
-    """Probe accuracy by encoder layer.
+    """Probe accuracy by encoder layer, with the selectivity band.
 
-    One line, one chance rate, and the layer where the line first reaches
-    ceiling. Drawn as a line rather than a strip because position is a finer channel than
-    lightness, and because the dips are the honest part. The write-up says
-    accuracy is "1.000 from layer 13 onward"; it is not. It touches 1.000 at 13,
-    falls to 0.975 at 21 and 0.988 at 22 and 27, and only holds ceiling from 28.
-    A line plot shows that without anyone having to say it; a heatmap of the same
-    numbers hides it in two shades of the same blue.
+    Pasad et al. read a speech encoder as a depth trajectory; the shuffled-label
+    line is the selectivity control (Hewitt & Liang), and the shaded band between
+    the two is what the probe reads that it does not get from noise. Without it a
+    ceiling could be probe capacity rather than signal.
 
-    Scope: exp2 covers speaker_identity only, so this rules out encoder loss for
-    speaker gender and for nothing else. There is no Qwen encoder probe for
-    emotional prosody -- the open gap in the argument chain -- and the panel says
-    so rather than leaving a reader to assume the result generalises.
+    No chance rule. A second horizontal line at 0.500 competes with the shuffled
+    control for the same job, and the control is the one that answers the
+    question -- it lands where a probe of this capacity lands on labels that mean
+    nothing, which is the comparison a reader needs.
+
+    The projector sits three units out with a break rule before it. It is a
+    different module, not encoder layer 33, and the gap is what stops it reading
+    as one; the dotted connector says the two are the same trajectory without
+    asserting a layer between them.
     """
     blocks = []
     for model, root in roots():
@@ -232,76 +234,49 @@ def fig1_probe_accuracy_by_encoder_layer(out_dir):
                 if r.get("category") in MECH_CATEGORIES:
                     blocks.append((model, r))
     if not blocks:
-        return skip("fig1_probe_accuracy_by_encoder_layer", "no exp2_encoder_probe*.json")
+        return skip("fig1_probe_accuracy_by_encoder_layer",
+                    "no exp2_encoder_probe*.json")
 
-    fig, axes = plt.subplots(1, len(blocks), figsize=(5.4 * len(blocks), 3.6),
+    fig, axes = plt.subplots(1, len(blocks), figsize=(6.5 * len(blocks), 3.4),
                              squeeze=False, sharey=True)
     for ax, (model, r) in zip(axes[0], blocks):
         layers = r["layers"]
-        # the last entry is the projector, a different module on a different
-        # x-scale; it gets its own tick rather than being tacked onto the line.
-        enc = [x for x in layers if str(x.get("name", "")).startswith("encoder")]
-        proj = next((x for x in layers
-                     if not str(x.get("name", "")).startswith("encoder")), None)
+        enc, proj = layers[:-1], layers[-1]
         xs = [x["layer"] for x in enc]
         acc = [x["accuracy"] for x in enc]
-        ch = r.get("chance")
+        shuf = [x["shuffled"] for x in enc]
+        x_proj = xs[-1] + 3
+        x_break = xs[-1] + 1.5
 
-        ax.set_axisbelow(True)
-        ax.plot(xs, acc, marker="o", ms=3.2, lw=1.8, color=C_AUDIO, zorder=3)
-        if ch is not None:
-            ax.axhline(ch, ls=":", lw=1.3, color=C_CHANCE, zorder=1)
+        # selectivity: the probe's real reading over what it gets from noise
+        ax.fill_between(xs, shuf, acc, color=C_AUDIO, alpha=0.13, lw=0,
+                        label="selectivity")
+        ax.plot(xs, acc, marker="o", ms=2.5, lw=1.5, color=C_AUDIO,
+                label="linear probe")
+        ax.plot(xs, shuf, ls=":", lw=1.2, color=C_CHANCE,
+                label="shuffled labels")
 
-        # First layer at ceiling, and the last dip after it. Both are read off
-        # the data: "from layer 13 onward" is the claim the figure has to be
-        # able to contradict.
-        top = max(acc)
-        first = next((x for x, a in zip(xs, acc) if a >= top - 1e-9), None)
-        dips = [(x, a) for x, a in zip(xs, acc) if x > first and a < top - 1e-9]
-        if first is not None:
-            ax.axvline(first, ls="--", lw=1.2, color=C_TEXT, zorder=2)
-            ax.annotate("first reaches {:.3f}\nat layer {}".format(top, first),
-                        xy=(first, top), xytext=(6, -14),
-                        textcoords="offset points", ha="left", va="top",
-                        fontsize=7, color=C_TEXT, annotation_clip=False)
-        if dips:
-            lx, la = dips[-1]
-            ax.annotate("dips to {:.3f} at {}".format(
-                            min(a for _, a in dips),
-                            min(dips, key=lambda t: t[1])[0]),
-                        xy=(lx, la), xytext=(0, -12),
-                        textcoords="offset points", ha="center", va="top",
-                        fontsize=6.5, color=C_CHANCE)
+        ax.axvline(x_break, lw=0.8, ls=(0, (1, 3)), color="0.65", zorder=1)
+        ax.plot([xs[-1], x_proj], [acc[-1], proj["accuracy"]], ls=(0, (1, 2)),
+                lw=1.0, color=C_AUDIO, alpha=0.6, zorder=2)
+        ax.scatter([x_proj], [proj["accuracy"]], marker="D", s=34,
+                   color=C_NEUTRAL, zorder=5, label="post-projector")
 
-        if proj is not None:
-            px = xs[-1] + 2
-            ax.scatter([px], [proj["accuracy"]], marker="D", s=40,
-                       color=C_NEUTRAL, zorder=5)
-            ax.annotate("post-\nprojector", xy=(px, proj["accuracy"]),
-                        xytext=(0, -12), textcoords="offset points",
-                        ha="center", va="top", fontsize=6.5, color=C_NEUTRAL)
-            ax.set_xticks(list(range(0, xs[-1] + 1, 4)) + [px])
-            ax.set_xticklabels([str(v) for v in range(0, xs[-1] + 1, 4)]
-                               + ["proj"], fontsize=7.5)
-
+        ticks = list(range(0, xs[-1] + 1, 4))
+        ax.set_xticks(ticks + [x_proj])
+        ax.set_xticklabels([str(t) for t in ticks] + ["proj"])
+        ax.set_xlim(-1, x_proj + 1.5)
+        ax.set_ylim(0, 1.05)
         ax.set_xlabel("audio encoder layer")
-        ax.set_ylim(0, 1.06)
-        ax.grid(axis="y", alpha=0.25)
-        ax.set_title("{} -- {}{}".format(
-            model.split("-")[0], PRETTY.get(r["category"], r["category"]),
-            "   (chance {:.3f})".format(ch) if ch is not None else ""),
-            fontsize=9)
+        ax.grid(alpha=0.25)
+        # The only line naming the model, the category and the sample. Not a
+        # headline -- without it the depth axis has no model to be a depth of.
+        ax.set_title("{} -- {}, {} clips, {}".format(
+            model, PRETTY.get(r["category"], r["category"]),
+            r["n_clips"], r.get("cv_scheme", "")))
+        ax.legend(loc="lower right")
 
-    axes[0][0].set_ylabel("linear-probe accuracy")
-    cat = blocks[0][1]
-    # No suptitle, by request. The scope note stays -- it is a limit on what the
-    # figure licenses, not a headline, and it moves up into the vacated band.
-    fig.text(0.5, 1.02,
-             "{} clips, {}, {} actors.  exp2 covers speaker_identity only: this "
-             "rules out encoder loss for speaker gender, not for prosody."
-             .format(cat.get("n_clips"), cat.get("cv_scheme", ""),
-                     cat.get("n_actors")),
-             ha="center", fontsize=6.8, color=C_CHANCE)
+    axes[0][0].set_ylabel("probe accuracy")
     save(fig, out_dir, "fig1_probe_accuracy_by_encoder_layer")
 
 
@@ -482,13 +457,10 @@ def fig3_knockout_by_position(out_dir):
         ax.set_xticks(xs)
         ax.set_xticklabels(ticks, fontsize=6.5, linespacing=1.15)
         ax.set_xlim(-0.6, len(rows) - 0.4)
-        # Chance goes in the title, not on the line. The categories do not
-        # share a rate (0.125 against 0.500) and every spot beside the line is
-        # already occupied.
-        ax.set_title("{} -- {}{}".format(
-            model.split("-")[0], PRETTY.get(cat, cat),
-            "   (chance {:.3f})".format(ch) if ch is not None else ""),
-            fontsize=9)
+        # No panel titles, by request. Nothing on the panel now names the
+        # category or the chance rate, so the caption has to carry both: left is
+        # emotional prosody against 0.125, right is speaker identity against
+        # 0.500, and the dotted rule is that rate.
         ax.grid(axis="y", alpha=0.25)
 
         # Reference lines. Dotted against dashed, because prosody's baseline is
@@ -500,41 +472,9 @@ def fig3_knockout_by_position(out_dir):
         if ch is not None:
             ax.axhline(ch, ls=":", lw=1.2, color=C_CHANCE, zorder=1)
 
-        # Group headers, x in data and y in axes fraction so the offsets do not
-        # move with the y range. The "held" line is load-bearing: without it,
-        # "which layers are blocked" invites the reader to assume the positions
-        # varied too, and the 2x2 collapses into six unrelated conditions.
-        # These three offsets assume two-line 7pt tick labels.
-        tr = ax.get_xaxis_transform()
-        for x0, x1, head in ((-0.45, len(rows) - 0.55,
-                              "which positions are blocked"),):
-            ax.plot([x0, x1], [-0.17, -0.17], transform=tr, color=C_CHANCE,
-                    lw=0.9, clip_on=False)
-            ax.text((x0 + x1) / 2, -0.21, head, transform=tr, ha="center",
-                    va="top", fontsize=8, fontweight="bold", color="#1a202c")
-
-    # Proxy artists: a bar container and a twin-axis line do not produce a
+    # Proxy artists: a bar container and a bare axhline do not produce a
     # coherent auto-legend. Upper right is unavailable -- the position bars
     # live there.
-    # The subtitle asserts the layer sweep is null. Derive it rather than
-    # writing it down: a later run with a live band would otherwise be
-    # published under a caption saying it is dead. 1 nat is the threshold the
-    # experiment's own verdict logic uses.
-    band_peak = max(
-        (abs(r.get("margin_delta") or 0.0)
-         for _, _, d in blocks
-         for r in d.get("sweep") or [] if r.get("gamma") in (None, 0.0)),
-        default=None)
-    if band_peak is None:
-        band_note = ""
-    elif band_peak < 1.0:
-        band_note = ("Restricting the same knockout to a band of layers is "
-                     "null at every band  (exp6.sweep)")
-    else:
-        band_note = ("Restricting the same knockout to a band of layers moves "
-                     "the margin by up to {:.3f} nats  (exp6.sweep)"
-                     .format(band_peak))
-
     n = (blocks[0][2].get("run") or {}).get("n_items")
     handles = [
         matplotlib.patches.Patch(
@@ -556,13 +496,9 @@ def fig3_knockout_by_position(out_dir):
     # reference line.
     fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.03),
                ncol=3, fontsize=7)
-    # No suptitle, by request. The layer sweep is the other half of this result
-    # and it is a finding rather than a headline, so it stays: one line is worth
-    # more than half a panel of flat caps, and it goes above the legend rather
-    # than at the foot, where it would land on the group headers.
-    if band_note:
-        fig.text(0.5, 1.09, band_note, ha="center", fontsize=6.8,
-                 color=C_CHANCE)
+    # Nothing above the legend, by request. The layer-band sweep is the other
+    # half of this result and it is now carried only by the prose: every band is
+    # null, max |margin shift| 0.054 nats, in exp6.sweep.
     save(fig, out_dir, "fig3_knockout_by_position")
 
 # --------------------------------------------------------------------------- #
