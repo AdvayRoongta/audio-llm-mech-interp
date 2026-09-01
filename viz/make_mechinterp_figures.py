@@ -98,7 +98,10 @@ MECH_CATEGORIES = ["emotional_prosody", "speaker_identity"]
 HEATMAP_CIRCUITS = ("text",)
 
 plt.rcParams.update({
+    # pad_inches trims the outer rim bbox="tight" leaves behind. The default
+    # 0.1in is a border on every side of a figure that is only ~1.7in tall.
     "figure.dpi": 150, "savefig.dpi": 300, "savefig.bbox": "tight",
+    "savefig.pad_inches": 0.015,
     "font.size": 9, "axes.titlesize": 10, "axes.labelsize": 9,
     "axes.spines.top": False, "axes.spines.right": False,
     "legend.frameon": False, "legend.fontsize": 8,
@@ -237,7 +240,11 @@ def fig1_probe_accuracy_by_encoder_layer(out_dir):
         return skip("fig1_probe_accuracy_by_encoder_layer",
                     "no exp2_encoder_probe*.json")
 
-    fig, axes = plt.subplots(1, len(blocks), figsize=(6.5 * len(blocks), 3.4),
+    # 3.3x1.65 per panel, a quarter of the area of the 6.5x3.4 plate this
+    # started as. Everything drawn below carries an explicit size because the
+    # module rcParams are set for the plate scale; at this size those defaults
+    # render as a fat line under oversized type.
+    fig, axes = plt.subplots(1, len(blocks), figsize=(3.3 * len(blocks), 1.65),
                              squeeze=False, sharey=True)
     for ax, (model, r) in zip(axes[0], blocks):
         layers = r["layers"]
@@ -251,15 +258,15 @@ def fig1_probe_accuracy_by_encoder_layer(out_dir):
         # selectivity: the probe's real reading over what it gets from noise
         ax.fill_between(xs, shuf, acc, color=C_AUDIO, alpha=0.13, lw=0,
                         label="selectivity")
-        ax.plot(xs, acc, marker="o", ms=2.5, lw=1.5, color=C_AUDIO,
+        ax.plot(xs, acc, marker="o", ms=1.4, lw=0.9, color=C_AUDIO,
                 label="linear probe")
-        ax.plot(xs, shuf, ls=":", lw=1.2, color=C_CHANCE,
+        ax.plot(xs, shuf, ls=":", lw=0.75, color=C_CHANCE,
                 label="shuffled labels")
 
-        ax.axvline(x_break, lw=0.8, ls=(0, (1, 3)), color="0.65", zorder=1)
+        ax.axvline(x_break, lw=0.5, ls=(0, (1, 3)), color="0.65", zorder=1)
         ax.plot([xs[-1], x_proj], [acc[-1], proj["accuracy"]], ls=(0, (1, 2)),
-                lw=1.0, color=C_AUDIO, alpha=0.6, zorder=2)
-        ax.scatter([x_proj], [proj["accuracy"]], marker="D", s=34,
+                lw=0.7, color=C_AUDIO, alpha=0.6, zorder=2)
+        ax.scatter([x_proj], [proj["accuracy"]], marker="D", s=11,
                    color=C_NEUTRAL, zorder=5, label="post-projector")
 
         ticks = list(range(0, xs[-1] + 1, 4))
@@ -267,16 +274,18 @@ def fig1_probe_accuracy_by_encoder_layer(out_dir):
         ax.set_xticklabels([str(t) for t in ticks] + ["proj"])
         ax.set_xlim(-1, x_proj + 1.5)
         ax.set_ylim(0, 1.05)
-        ax.set_xlabel("audio encoder layer")
-        ax.grid(alpha=0.25)
+        ax.set_xlabel("audio encoder layer", fontsize=6, labelpad=2)
+        ax.tick_params(labelsize=5.5, length=2, pad=1.2)
+        ax.grid(alpha=0.25, lw=0.4)
         # The only line naming the model, the category and the sample. Not a
         # headline -- without it the depth axis has no model to be a depth of.
         ax.set_title("{} -- {}, {} clips, {}".format(
             model, PRETTY.get(r["category"], r["category"]),
-            r["n_clips"], r.get("cv_scheme", "")))
-        ax.legend(loc="lower right")
+            r["n_clips"], r.get("cv_scheme", "")), fontsize=6, pad=3)
+        ax.legend(loc="lower right", fontsize=5, handlelength=1.2,
+                  handletextpad=0.4, labelspacing=0.28, borderpad=0.15)
 
-    axes[0][0].set_ylabel("probe accuracy")
+    axes[0][0].set_ylabel("probe accuracy", fontsize=6, labelpad=2)
     save(fig, out_dir, "fig1_probe_accuracy_by_encoder_layer")
 
 
@@ -322,7 +331,11 @@ def fig2_attribution_by_layer_and_position(out_dir):
 
     # One row: attention and MLP summed per (layer, group). The question is
     # where the mass sits, not which mechanism carries it.
-    fig, axes = plt.subplots(1, len(cols), figsize=(2.55 * len(cols), 2.5),
+    # 2.05x2.0 per panel, down from 2.55x2.5, to sit at the same weight as
+    # fig1 and fig3. Every size below is explicit for the same reason it is in
+    # fig1: the module rcParams are set for the larger plate, and left alone
+    # they render as oversized type on a shrunken map.
+    fig, axes = plt.subplots(1, len(cols), figsize=(1.72 * len(cols), 1.68),
                              squeeze=False, sharey=True)
     for c, (model, cat, label, grids, cmap) in enumerate(cols):
         ax = axes[0][c]
@@ -331,17 +344,17 @@ def fig2_attribution_by_layer_and_position(out_dir):
                        interpolation="nearest")
         ax.set_yticks(range(len(GROUPS)))
         if c == 0:
-            ax.set_yticklabels([GROUP_LABEL[g] for g in GROUPS], fontsize=6.5)
+            ax.set_yticklabels([GROUP_LABEL[g] for g in GROUPS], fontsize=5)
         # circuit subtitle only when there is more than one to tell apart
         if len(HEATMAP_CIRCUITS) > 1:
             ax.set_title(label, fontsize=8.5)
-        ax.set_xlabel("layer", fontsize=8)
-        ax.tick_params(labelsize=7)
+        ax.set_xlabel("layer", fontsize=5.5, labelpad=1.5)
+        ax.tick_params(labelsize=5, length=2, pad=1.2)
         if label == HEATMAP_CIRCUITS[0]:
             span = 1.02 if len(HEATMAP_CIRCUITS) > 1 else 0.5
             ax.text(span, 1.04 if len(HEATMAP_CIRCUITS) == 1 else 1.16,
                     PRETTY.get(cat, cat), transform=ax.transAxes,
-                    ha="center", va="bottom", fontsize=9.5, fontweight="bold")
+                    ha="center", va="bottom", fontsize=7, fontweight="bold")
     fig.subplots_adjust(top=0.78, bottom=0.20, wspace=0.16)
     # Two colourbars, not one. The panels use two colormaps, so a single bar
     # necessarily shows one of them and silently mislabels the other half of
@@ -365,8 +378,8 @@ def fig2_attribution_by_layer_and_position(out_dir):
         if len(bars) > 1:
             cax.set_title(label, fontsize=7, pad=5)
         if ticks:
-            cb.ax.tick_params(labelsize=6.5, length=2)
-            cb.set_label("|attribution|, shared limits", fontsize=7)
+            cb.ax.tick_params(labelsize=5, length=1.5, pad=1.2)
+            cb.set_label("|attribution|, shared limits", fontsize=5.5)
         else:
             cb.set_ticks([])
     save(fig, out_dir, "fig2_attribution_by_layer_and_position")
@@ -410,11 +423,11 @@ def fig3_knockout_by_position(out_dir):
     if not blocks:
         return skip("fig3_knockout_by_position", "no exp6 sweep+routing blocks")
 
-    # 3.0in/panel is the floor: below it the two-line tick labels lose the
-    # ~0.83in of pitch they need and "every position / after the claim" starts
-    # touching its neighbour. top leaves just enough room for the legend to sit
-    # against the axes rather than float above them.
-    fig, axes = plt.subplots(1, len(blocks), figsize=(3.0 * len(blocks), 2.8),
+    # 2.5in/panel with 5.5pt ticks. The floor is set by the two-line tick
+    # labels -- "every position / after the claim" needs roughly 0.72in of pitch
+    # at this type size, and three bars across 2.5in gives 0.83in. top leaves
+    # just enough room for the legend to sit against the axes.
+    fig, axes = plt.subplots(1, len(blocks), figsize=(2.5 * len(blocks), 2.25),
                              squeeze=False, sharey=True)
     fig.subplots_adjust(wspace=0.42, top=0.88)
     for ax, (model, path, d) in zip(axes[0], blocks):
@@ -447,22 +460,25 @@ def fig3_knockout_by_position(out_dir):
         # whisker and the bar outline are what say the run happened and
         # measured nothing.
         for x, y, e in zip(xs, ys, errs):
-            ax.annotate("{:.3f}".format(y), xy=(x, y + e[2]), xytext=(0, 4),
+            ax.annotate("{:.3f}".format(y), xy=(x, y + e[2]), xytext=(0, 3),
                         textcoords="offset points", ha="center",
-                        fontsize=7, color=C_CHANCE, zorder=4)
+                        fontsize=6, color=C_CHANCE, zorder=4)
 
         ax.axhline(0, lw=0.8, color="black", zorder=1)
         # bottom below zero on purpose: prosody's baseline is exactly 0.000 and
         # would otherwise be drawn on the bottom spine and read as the axis.
         ax.set_ylim(-0.04, 1.02)
         ax.set_xticks(xs)
-        ax.set_xticklabels(ticks, fontsize=6.5, linespacing=1.15)
+        ax.set_xticklabels(ticks, fontsize=5.5, linespacing=1.1)
+        # The y ticks were the one thing still at the rcParams plate size of 9;
+        # everything else on this panel is explicit. 6.75 is that, minus 25%.
+        ax.tick_params(axis="y", labelsize=6.75)
         ax.set_xlim(-0.6, len(rows) - 0.4)
         # No panel titles, by request. Nothing on the panel now names the
         # category or the chance rate, so the caption has to carry both: left is
         # emotional prosody against 0.125, right is speaker identity against
         # 0.500, and the dotted rule is that rate.
-        ax.grid(axis="y", alpha=0.25)
+        ax.grid(axis="y", alpha=0.25, lw=0.5)
 
         # Reference lines. Dotted against dashed, because prosody's baseline is
         # 0.000 and sits on the axis floor: the two have to be told apart by
@@ -491,12 +507,12 @@ def fig3_knockout_by_position(out_dir):
     # scored on the Matched items, a disjoint list, and exp6 does not record
     # how many of those there were. An n on the shared axis label would claim
     # both series share it.
-    axes[0][0].set_ylabel("accuracy")
+    axes[0][0].set_ylabel("accuracy", fontsize=6.5, labelpad=5)
     # Figure-level, in the header band. With three bars to a panel there is no
     # in-axes region left that does not sit on a bar, the capability line or a
     # reference line.
     fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.0),
-               ncol=3, fontsize=7)
+               ncol=3, fontsize=6)
     # Nothing above the legend, by request. The layer-band sweep is the other
     # half of this result and it is now carried only by the prose: every band is
     # null, max |margin shift| 0.054 nats, in exp6.sweep.
