@@ -516,6 +516,15 @@ def fig3_knockout_by_position(out_dir):
     # Nothing above the legend, by request. The layer-band sweep is the other
     # half of this result and it is now carried only by the prose: every band is
     # null, max |margin shift| 0.054 nats, in exp6.sweep.
+    # A wider right margin. bbox="tight" crops to the artists, so the only way
+    # to hold margin without moving anything is to give it an artist to crop to:
+    # a zero-alpha patch past the right of the drawn content. Nothing on the
+    # panel shifts, the canvas simply ends about 0.26in later. The x is
+    # calibrated against the crop, not meaningful on its own -- the content
+    # currently ends near 0.93 of figure width.
+    fig.add_artist(matplotlib.patches.Rectangle(
+        (0.94, 0.0), 0.012, 0.01, transform=fig.transFigure, alpha=0.0))
+
     save(fig, out_dir, "fig3_knockout_by_position")
 
 # --------------------------------------------------------------------------- #
