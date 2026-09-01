@@ -410,12 +410,13 @@ def fig3_knockout_by_position(out_dir):
     if not blocks:
         return skip("fig3_knockout_by_position", "no exp6 sweep+routing blocks")
 
-    # Wide panels on purpose: the two-line tick labels need about 0.83in of
-    # tick pitch before "every position / after the claim" touches its
-    # neighbour.
-    fig, axes = plt.subplots(1, len(blocks), figsize=(3.9 * len(blocks), 3.9),
+    # 3.0in/panel is the floor: below it the two-line tick labels lose the
+    # ~0.83in of pitch they need and "every position / after the claim" starts
+    # touching its neighbour. top leaves just enough room for the legend to sit
+    # against the axes rather than float above them.
+    fig, axes = plt.subplots(1, len(blocks), figsize=(3.0 * len(blocks), 2.8),
                              squeeze=False, sharey=True)
-    fig.subplots_adjust(wspace=0.42)
+    fig.subplots_adjust(wspace=0.42, top=0.88)
     for ax, (model, path, d) in zip(axes[0], blocks):
         cat = cat_of(d, path)
         base = d.get("baseline") or {}
@@ -494,7 +495,7 @@ def fig3_knockout_by_position(out_dir):
     # Figure-level, in the header band. With three bars to a panel there is no
     # in-axes region left that does not sit on a bar, the capability line or a
     # reference line.
-    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.03),
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.0),
                ncol=3, fontsize=7)
     # Nothing above the legend, by request. The layer-band sweep is the other
     # half of this result and it is now carried only by the prose: every band is
