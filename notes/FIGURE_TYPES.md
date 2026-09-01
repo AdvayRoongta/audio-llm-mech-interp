@@ -9,40 +9,66 @@ covers the behavioural story and four of the headline plots.
 
 **Scope: Qwen2-Audio, `emotional_prosody` and `speaker_identity`.** SALMONN-13B
 is excluded because it does not clear the capability screen; `sarcasm_pacing` is
-excluded as underpowered. Neither is drawn. Two figures deliberately ignore both
-filters — `m15`, which *is* part of the evidence for the exclusions, and `m14`,
-which is behavioural rather than mechanistic. `--models` and `--categories`
-override.
+excluded as underpowered. Neither is drawn. `--models` and `--categories`
+override. The capability screen itself is not one of these figures any more —
+it is behavioural, it lives in the results table, and it is still what licenses
+both exclusions.
 
-All 17 figures render as of the 2026-08-27 pull, which brought in the Qwen
-`exp5` and `exp6` results that six of them had been waiting on.
+**Three figures, numbered in the order the argument runs.** The number, the
+function name and the output filename are one string, so there is nothing to
+look up:
 
-Section 1 is the methodology behind the three figures that carry the argument.
-Section 2 is the shape catalogue. Sections 3–5 are the full figure list, the
-gaps, and sources.
+| # | file | shape | says |
+|---|---|---|---|
+| 1 | `fig1_probe_accuracy_by_encoder_layer` | layer-wise probe trajectory | the signal survives the encoder, so this is not a perception failure |
+| 2 | `fig2_attribution_by_layer_and_position` | position-grouped causal map | but the decision is made from the text claim, at the answer position, late |
+| 3 | `fig3_knockout_by_position` | attention-knockout bars | and the claim reaches the answer through the tokens in between |
+
+Section 1 is the methodology behind each. Section 2 is the shape catalogue this
+project draws from. Sections 3 and 4 are the gaps and the sources.
 
 ---
 
-## 1. Methodology for the main figures
+## 1. Methodology
 
-Three figures carry the paper's argument: **m1** (with its aggregation **m3**),
-**m11**, and **m15**, which gates both. Everything else either validates these
-or rules out an alternative.
+### 1.1 fig1 — probe accuracy by encoder layer
 
-### 1.1 m1 / m3 — attribution by layer and prompt position
+**What each point is.** A linear probe fitted on mean-pooled activations from
+one audio-encoder layer, scored by accuracy. 33 encoder layers plus the
+post-projector representation, which gets its own tick because it is a different
+module and not encoder layer 33.
+
+**The data.** `exp2_encoder_probe.json`, `speaker_identity` only: 80 clips, 24
+actors, classes `female` / `male`, chance 0.500, 5-fold **speaker-independent**
+CV, seed 0, Qwen2-Audio-7B-Instruct at fp16. Speaker-independent is the part
+that matters — with speaker-dependent folds a probe can memorise voices and
+report a ceiling that means nothing.
+
+**The control.** Each layer also carries a shuffled-label probe (Hewitt & Liang
+2019). It runs 0.245–0.513 across the layers, i.e. at chance, which is what
+makes the real trajectory readable as signal rather than as probe capacity.
+
+**Drawn as a line, not a strip.** Position is a finer visual channel than
+lightness, and the dips are the honest part: the write-up's "1.000 from layer 13
+onward" is not literally true. Accuracy touches 1.000 at layer 13, falls to
+0.975 at 21 and 0.988 at 22 and 27, and only holds ceiling from 28. A line shows
+that without anyone having to say it; a heatmap of the same numbers hides it in
+two shades of the same blue. The figure derives its own annotation from the data
+so it is able to contradict the sentence it illustrates.
+
+**What a reader should not conclude.** That the encoder preserves paralinguistic
+information *in general*. exp2 covers speaker gender and nothing else. There is
+no Qwen encoder probe for emotional prosody, so for prosody the separation
+between encoder loss and decoder suppression currently rests on no measurement —
+see the gaps. The panel says so on the figure rather than leaving a reader to
+assume it generalises.
+
+### 1.2 fig2 — attribution by layer and prompt position
 
 **What each cell is.** One `(layer, submodule, position-group)` attribution,
-plotted as `|attr|`. Submodules are `attn` and `mlp`; position groups are
-`audio`, `claim`, `query`, `options`, `gen`. That is 32 × 2 × 5 = 320 cells for
-Qwen2-Audio (40 × 2 × 5 = 400 for a 40-layer model, if a second one is added).
-
-**m3 plots a peak, not a sum.** Each bar is the single largest
-`(layer, submodule)` component within that position group — that is what exp3
-stores in `group_magnitudes`. So the headline 18:1 at the answer position for
-Qwen prosody is a ratio of peaks (3.29 against 0.18), not of total mass. The
-summed mass tells the same story and is worth quoting alongside it: 21.1 against
-1.3 nats at the answer position, 16:1. They are different quantities and the
-axis now says which.
+plotted as `|attr|`, with `attn` and `mlp` summed into one row per group.
+Position groups are `audio`, `claim`, `query`, `options`, `gen`. That is
+32 × 2 × 5 = 320 components for Qwen2-Audio.
 
 **The quantity.** Attribution patching. For a component with activation `a`,
 
@@ -50,15 +76,14 @@ axis now says which.
 attr = (a_clean - a_corrupt) · ∂M/∂a
 ```
 
-with the gradient taken on the **corrupt** run and `a_clean` cached from a
-clean forward. One forward and one backward score every component at once;
-exact activation patching would need one run per component. Contributions are
-summed over the token positions belonging to each group
-(`contrib[lo:hi+1].sum()`).
+with the gradient taken on the **corrupt** run and `a_clean` cached from a clean
+forward. One forward and one backward score every component at once; exact
+activation patching would need one run per component. Contributions are summed
+over the token positions belonging to each group (`contrib[lo:hi+1].sum()`).
 
 **The metric `M`.** `log P(audio-correct option) − log P(claimed option)` at the
-final sequence position, over option-letter token ids. This is the same decision
-margin used in exp5 and exp6, so the figures are commensurable.
+final sequence position, over option-letter token ids. The same decision margin
+used in exp5 and exp6, so the figures are commensurable.
 
 **Two counterfactuals, one per circuit.** A circuit is defined by what changes
 the answer, so each modality needs its own clean/corrupt pair:
@@ -84,26 +109,27 @@ than an error, which is the worst failure mode available here.
 
 **n = 8 pairs per circuit**, averaged component-wise.
 
-**Why the two panels share a colour scale.** Scaled independently, the audio
-circuit looks as busy as the text circuit while carrying a fraction of the mass.
-The shared scale is the finding, not a rendering preference.
+**Only the text circuit is drawn.** On a scale shared with the text panels the
+audio panels are near-blank, which is the finding but costs half the figure
+width to show, and a blank panel reads as a rendering failure as easily as a
+result. The comparison is carried numerically instead: peak ratio 18:1
+text:audio at the answer position for prosody, 13:1 for identity (3.29 against
+0.18), and 21.1 against 1.3 nats of summed mass, 16:1. `HEATMAP_CIRCUITS =
+("text", "audio")` restores both panels on one shared scale, which is the
+comparison drawn rather than quoted.
 
-**Validation, plotted separately.**
+**No suptitle**, by request. The bold category labels sit above their panels and
+the colourbar names the quantity. What the title carried and nothing else on the
+figure does is the model and the circuit, so the caption has to say
+"Qwen2-Audio-7B, text circuit" — without a known depth the layer axis means
+nothing.
 
-- **m2, faithfulness.** Real activation patching restricted to the top-k
-  components, checking the linear approximation held. 0.999–1.003 at top-20%
-  on both categories.
-- **m4, circuit overlap.** IoU between the two top-k sets, percentile bootstrap
-  over pairs, 1,000 resamples. Chance is computed per model rather than
-  hardcoded: for two independent top-k sets from n components,
-  `IoU = k / (2n − k)` with `k = floor(0.2n)` — 0.103 for Qwen's 64 components.
-  It is computed rather than hardcoded so a model with a different layer count
-  gets its own chance level.
-- **Signal floor, 1e-8.** A group with no signal returns an empty top-set rather
-  than a stably-sorted all-zero ranking. Without it, two groups that both
-  contribute nothing "agree" perfectly and IoU reads 1.000.
+**Exact zeros are real, not small.** For the text circuit every audio-position
+attribution is exactly 0.0: causal masking means the audio span cannot see a
+claim that comes after it, so those activations are bit-identical between the
+clean and corrupt runs.
 
-**What a reviewer should hold against these figures.**
+**What a reviewer should hold against this figure.**
 
 1. **Plain AtP, not AP-IG.** Cho et al. run integrated gradients with K=5 on top
    of attribution patching. That is not implemented here: interpolating every
@@ -119,71 +145,85 @@ The shared scale is the finding, not a rendering preference.
    generation position — and **still scored faithfulness 1.00**, because
    patching the final position alone does recover the effect. The current hooks
    observe only; they call `retain_grad()` and never modify an output.
-3. **n = 8.** The IoU intervals are wide and several contain chance. The
-   attribution means are correspondingly soft.
+   Faithfulness was 0.999–1.003 at top-20% on both categories when it was
+   plotted; it is no longer drawn, and that number belongs in the text.
+3. **n = 8.** The attribution means are correspondingly soft.
 4. **These ran on the 518-item dataset**, before it was scaled to 3,594. The
    methods are current; the numbers describe a smaller sample and should be
    regenerated before publication.
-5. **Exact zeros are real, not small.** For the text circuit, every
-   audio-position attribution is exactly 0.0 — causal masking means the audio
-   span cannot see a claim that comes after it, so those activations are
-   bit-identical between the clean and corrupt runs. `m3` marks them `0` rather
-   than letting a log-axis floor read as a small contribution.
 
-### 1.2 m11 — the routing bisection
+### 1.3 fig3 — attention knockout by token position
 
 **The intervention.** Attention knockout after Geva et al., in graded form.
 `log(gamma)` is added to the claim's key positions in the additive attention
 mask before softmax, which scales those weights by gamma and lets the rest
 renormalise; `gamma = 0` recovers their hard knockout.
 
-Two implementation details are load-bearing. The hard block writes
-`finfo.min`, not `-inf`, because a true `-inf` propagates to NaN through fp16
-softmax. And the attenuator modifies the mask the model already passes rather
-than substituting a precomputed one, so the mask stays valid as `generate()`
-extends the sequence. The run **requires eager attention** and raises if it does
-not get a 4D float mask — sdpa passes `None` and applies causality inside the
-kernel, leaving nothing to modify.
+Two implementation details are load-bearing. The hard block writes `finfo.min`,
+not `-inf`, because a true `-inf` propagates to NaN through fp16 softmax. And
+the attenuator modifies the mask the model already passes rather than
+substituting a precomputed one, so the mask stays valid as `generate()` extends
+the sequence. The run **requires eager attention** and raises if it does not get
+a 4D float mask — sdpa passes `None` and applies causality inside the kernel,
+leaving nothing to modify.
 
-**The three conditions differ only in which query rows lose sight of the
-claim**, holding layers, gamma and items fixed:
+**The three bars differ only in which query rows lose sight of the claim**,
+holding layers at all 32, gamma at 0, and items fixed:
 
-| condition | rows blocked |
+| bar | rows blocked |
 |---|---|
-| `gen` | the answer position onward |
-| `post_claim` | every position downstream of the claim |
-| `all` | every position |
+| answer position | the answer position onward |
+| every position after the claim | every position downstream of the claim |
+| every position | every position |
 
-**Metric.** The same margin as above, reported as `margin_delta` against the
-un-intervened baseline.
+**The metric is audio-consistent accuracy on the 60 Mismatched items**, with
+Wilson intervals, against `1/n_options` read off the capability screen — 0.125
+for prosody's 8 options, 0.500 for identity's 2. This is how the write-up states
+the result and what a reader can hold against a chance line. The margin is the
+more sensitive metric and lives in `exp6.routing[].margin_delta`; it is not
+drawn.
+
+**Result.** Blocking the answer position alone is null: prosody 0.000 → 0.000
+(margin −0.001 nats), identity 0.067 → 0.083 (+0.015). Blocking every position
+after the claim recovers the whole effect: prosody 0.000 → 0.533 (+10.538
+nats), identity 0.067 → 0.717 (+5.802). `all` is identical to `post_claim` in
+both categories. The claim is absorbed into the question and option tokens
+before the answer position reads it, so cutting the direct edge changes nothing.
+
+**The layer sweep is not drawn.** `exp6.sweep` varies the layer band — late
+22–31, middle 10–21, all 0–31 — with positions held at the answer position, and
+every band is null: the largest `|margin_delta|` across both categories is 0.054
+nats. Half a panel of flat caps buys nothing that one line under the title does
+not say, and the figure derives that line from the data rather than asserting
+it, so a later run with a live band cannot be published under a caption saying
+it is dead.
+
+**`sweep["all", gamma=0]` and `routing["gen"]` are the same run**, identical to
+the last float bit. The 2×2 has five measurements, not six.
 
 **The positive control is what makes the nulls readable.** Blocking the claim at
 every position and every layer must move the decision. If it does not, the
-intervention is not reaching the model, and every null below is a null of the
-method rather than a fact about the model. The verdict returns INCONCLUSIVE when
-the margin moves less than 1 nat. It is not a candidate fix — a model that
-cannot see the claim is not a model that resists it.
+intervention is not reaching the model, and every null is a null of the method
+rather than a fact about the model. The verdict returns INCONCLUSIVE when the
+margin moves less than 1 nat.
 
-**Result.** `gen` is null (−0.057 nats); `post_claim` and `all` both recover the
-full positive-control effect (+2.571), recovered fraction 1.00. The claim is
-absorbed into the question and option tokens before the answer position reads
-it, so cutting the direct edge changes nothing.
+**Capability is not drawn, by request, and it is not flattering.** The
+`post_claim` condition is byte-identical to that positive control, which
+`METHODS_PROVENANCE.md` describes as *not a candidate fix — a model that cannot
+see the claim is not a model that resists it*. Prosody's matched-item accuracy
+falls 1.000 → 0.367 under it, so most of the accuracy gain is the model no
+longer reading text at all; identity costs less, 1.000 → 0.800. Those numbers
+are in `exp6.routing[].capability` and **belong in the caption**, because
+otherwise the panel reads as a repair, and a gain bought by damaging the model
+is not a gain.
 
-### 1.3 m15 — the capability screen
+**gamma = 0 only.** gamma = 0.25 is a null at every band, and interleaving inert
+bars turns the panel into a sawtooth. The null belongs in the text.
 
-Paralinguistic / `audio_only` items only. Accuracy against a chance rate of
-`1/n_options`, with a binomial test; **passing requires both** a point estimate
-above chance and p < 0.05, since a point estimate above chance on a small sample
-is not a pass. Wilson intervals throughout, because several rates sit at exactly
-0.0 or 1.0 where the normal approximation misbehaves.
-
-Scoring is by option log-probability rather than generate-and-parse, so
-abstention cannot masquerade as a parse failure — the failure mode that made an
-earlier sarcasm run uninterpretable at 47% discards.
-
-This figure is the gate. A model or category that does not clear its own chance
-line cannot be shown to be suppressing anything, and is excluded from everything
-downstream. It is the argument behind both exclusions in the write-up.
+**One number to settle before publication.** The draft quotes 0.633 / 0.783 for
+`post_claim` and 0.183 for identity's answer position. The committed JSON and
+`mech_interp_section.txt` both say 0.533 / 0.717 and 0.083. Either the draft
+quotes an uncommitted run or it needs correcting.
 
 ---
 
@@ -201,7 +241,7 @@ SAEs, and neuron-level description.
 
 | shape | what it plots | canonical source |
 |---|---|---|
-| **Layer-wise probe trajectory** | probe accuracy vs. layer index, with chance and a shuffled-label control | Pasad et al. 2021 (speech); Hewitt & Liang 2019 for selectivity |
+| **Layer-wise probe trajectory** | probe accuracy vs. layer index, with chance and a shuffled-label control | Pasad et al. 2021 (speech); Hewitt & Liang 2019 for selectivity — **fig1** |
 | **Logit lens / tuned lens** | layer x position, cell = the token the model would emit there | nostalgebraist; Belrose et al. 2023 |
 | **Attention pattern heatmap** | source x destination positions, per head | ubiquitous — and per Jain & Wallace 2019 a hypothesis, never evidence |
 | **Representation-similarity curve** | cross-modal cosine similarity vs. depth | Cho et al. 2026's convergence result |
@@ -211,10 +251,10 @@ SAEs, and neuron-level description.
 | shape | what it plots | canonical source |
 |---|---|---|
 | **Causal-tracing heatmap** | (layer, token position) grid, colour = effect of restoring/patching that cell | ROME (Meng et al. 2022) fig 2 — *the* iconic mech-interp figure |
-| **Position-group tracing** | the same, with the sequence bucketed into prompt roles rather than words | Chen et al. 2026 for audio LALMs; needed the moment a span has no word to label |
+| **Position-group tracing** | the same, with the sequence bucketed into prompt roles rather than words | Chen et al. 2026 for audio LALMs; needed the moment a span has no word to label — **fig2** |
 | **Layer sweep** | one metric vs. the layer intervened on, per attribute, per model | Chen et al. 2026 fig 2; Meng et al. 2022 |
 | **Faithfulness vs. sparsity** | fraction of components kept vs. fraction of behaviour reproduced | ACDC (Conmy et al. 2023), AtP* (Kramár et al. 2024), EAP |
-| **Attention-knockout curve** | effect of severing an edge, restricted to a band of layers | Geva et al. 2023 fig 3 |
+| **Attention-knockout curve** | effect of severing an edge, restricted to a band of layers or a set of positions | Geva et al. 2023 fig 3 — **fig3** |
 | **Circuit-overlap (IoU)** | set overlap between two discovered circuits, against a chance level | Cho et al. 2026 |
 | **Intervention sweep grid** | source x destination (or window x destination), colour = post-intervention metric | Meng et al. 2022 |
 | **Logit-difference distribution** | per-item spread of the decision metric, not just its mean | Zhang & Nanda 2024, on patching metrics |
@@ -228,77 +268,50 @@ example table** showing real outputs before and after. Chen et al. 2026 open
 with the first; Cho et al. close with the second. We have material for both and
 have built neither — see the gaps below.
 
----
-
-## 2. What we built, and what feeds it
-
-Seventeen files, from `python3 viz/make_mechinterp_figures.py`.
-
-| figure | type | source data | says |
-|---|---|---|---|
-| `m1_attribution_map` (x3) | causal-tracing heatmap, position-grouped | `exp3.attr_text` / `attr_audio` | text mass concentrates at the answer position in late layers; the audio panel is nearly empty on the same colour scale |
-| `m2_faithfulness` | faithfulness vs. sparsity | `exp3.faithfulness` | the top 20% of components reproduce the full model (≥0.99) |
-| `m3_group_magnitude` | position-group modality bars | `exp3.group_magnitudes` | peak ratio 18x text:audio at the answer position for prosody, 13x for identity |
-| `m4_circuit_overlap` | IoU with bootstrap CI vs. chance | `exp3.overlap_iou` + `_ci95` | overlap is above chance but several intervals are wide |
-| `m5_probe_depth` | layer-wise probe + selectivity | `exp2.results[].layers` | the signal survives the encoder and the projector — **for gender only**; there is no Qwen prosody probe |
-| `m6_margin_distribution` | per-item logit difference | `exp1.records[].scores` | 82–100% of items sit below zero; it is a distribution shift, not a few outliers |
-| `m7_backpatch_grid` | intervention sweep grid, 2 rows | `exp4.sweep` | every cell at the floor, capability intact: nothing moved |
-| `m8_source_sweep` | effect vs. collateral damage | `exp5.test_b_source_sweep` | margin gain arrives exactly where capability collapses |
-| `m9_norm_profile` | residual-norm growth | `exp5.test_a_norms` | late/early = 7.5x, so a late→early patch is an amplitude shock first |
-| `m10_knockout_bands` | attention knockout by band | `exp6.sweep` | every band is a null against a positive control of +2.57 nats |
-| `m11_routing` | routing bisection | `exp6.routing` | answer position alone: nothing. Positions in between: the whole effect |
-| `m12_generative_fix` | intervention + controls | `exp6.freeform` | with the decided-description count printed under each point |
-| `m13_generation_quality` | fluency / repetition / length | `exp6.freeform` | whether the intervention wrecks the text |
-| `m14_outcome_mass` | three-way follow-rate, 7 models | `*_summary.json` `tdr` | the "neither" residual, which a binary TDR hides |
-| `m15_capability_gate` | screen vs. chance, Wilson CIs | `exp1` Paralinguistic items | the gate behind the SALMONN and sarcasm exclusions (draws every model) |
-
 ### Three choices in there that are not cosmetic
 
-- **`m1` shares one colour scale across the text and audio panels.** Scaled
-  independently, the audio circuit looks as busy as the text circuit while
-  carrying a fifth of the mass. The shared scale *is* the finding.
-- **`m7` pins its colour scale to [0, 1] and carries a capability row.** A null
-  autoscaled to its own noise acquires a gradient. The capability row is kept
-  even though Qwen's is flat at 1.00, because a gain bought by damaging the
-  model is not a gain, and the figure has to be able to show that. It did for
-  SALMONN before the exclusion: audio rose 0.015 → 0.18 while capability fell
-  0.865 → 0.10 over the same cells.
-- **`m12` prints the gen-TDR denominator under every point.** The metric drops
-  descriptions naming several labels or none, so the denominator moves between
-  conditions. The verdict logic already refuses to call an effect below 15; a
-  reader needs to be able to see the same thing. (Currently unrendered — see
-  section 4.)
+- **`fig2` shares one colour scale across its panels.** Scaled independently,
+  each category looks as busy as the other regardless of how much mass it
+  carries. The shared scale *is* the finding. The same argument applied to the
+  text/audio split when both circuits were drawn.
+- **`fig3` draws its bars with an edge.** Prosody's answer-position bar is
+  0.000 exactly, and a zero-height bar with no edge draws nothing at all — the
+  panel would read as two bars and one missing one. With an edge, a measured
+  zero renders as a flat cap the width of a bar, which is what it is. The
+  printed rate and the Wilson whisker do the same job.
+- **`fig1` is a line and not a strip.** A null or a dip autoscaled into
+  lightness disappears; on a position axis it does not. This is the same reason
+  a null must never be autoscaled to its own noise — it acquires a gradient and
+  reads as structure.
 
 ---
 
 ## 3. Gaps
 
-**Everything now renders.** The 2026-08-27 pull added
-`results/exp5_patch_diagnosis_emotional_prosody.json` and
-`results/exp6_readout_attenuation_{emotional_prosody,speaker_identity,sarcasm_pacing}.json`,
-all Qwen2-Audio/fp16. Every figure's numbers were checked against
-`mech_interp_section.txt` and agree: baseline margin −7.323, TDR 0.983 / 0.933,
-routing recovered fraction 1.00 in both categories, gen-TDR 1.000 → 0.375 and
-1.000 → 0.433, matched 0.767 → 0.900 and 0.933 → 1.000, text-only flat at 0.567
-and 1.000, best source layer 16 at +0.511 nats, late sources to −0.381,
-amplitude saturating at +0.097 before capability collapses to 0.100 at α = 5.
+**All three figures render** against the 2026-08-27 pull, which brought in the
+Qwen `exp5` and `exp6` results. Their numbers were checked against
+`mech_interp_section.txt` and agree, with the one exception noted in §1.3:
+baseline margin −7.329 prosody / −4.843 identity, routing recovered fraction
+1.00 in both categories.
 
-Two coverage notes:
-
-- **exp5 covers `emotional_prosody` only**, so `m8` and `m9` are single-panel.
 - **exp2 covers `speaker_identity` only**, so there is still no encoder probe
   for emotional prosody. Per §11 of `METHODOLOGY_FULL.md`, exp2 is what
   separates encoder loss from decoder suppression — for prosody that separation
   currently rests on no measurement. This is the one remaining gap in the
-  argument chain, and it is a cheap run.
-
-**One inconsistency to resolve before this is shown outside the project:** `m15`
-marks SALMONN's prosody bar green, "passes screen", because the stored verdict
-is a pass (0.188 vs 0.125 chance on 133 items). The write-up says it "does not
-clear it in substance", citing 0.133 — chance — on the 60-item subset the
-intervention ran on. Both are true of different samples, but a figure captioned
-*passes* beside prose saying *excluded* invites the question. Either tighten the
-screen criterion to the subset the mechanism runs on, or show both numbers.
+  argument chain, it is now load-bearing because fig1 opens the argument, and it
+  is a cheap run.
+- **The capability screen is no longer plotted here.** It still gates
+  everything, and it carries an unresolved inconsistency worth settling before
+  the exclusions are defended in print: the stored verdict passes SALMONN's
+  prosody (0.188 against 0.125 chance on 133 items) while the write-up says it
+  "does not clear it in substance", citing 0.133 — chance — on the 60-item
+  subset the intervention ran on. Both are true of different samples. Either
+  tighten the screen criterion to the subset the mechanism runs on, or show
+  both numbers.
+- **exp6 records no Matched denominator.** `n_items` is the mismatched list
+  only, so the capability rates quoted in §1.3 cannot be turned back into k/n:
+  prosody's 0.367 fits 11/30 and 22/60 equally. Adding `n_matched` to the run
+  header is a one-line fix in `eval/exp6_readout_attenuation.py`.
 
 **Not built, and worth building:**
 
@@ -309,11 +322,8 @@ screen criterion to the subset the mechanism runs on, or show both numbers.
   generations per condition — "The speaker's emotion is happy" (the false claim)
   against what the intervened model says instead. This is the figure that makes
   the result legible to someone who reads no other panel.
-- **Recency / claim-order.** `make_figures.py` fig3 covers it, but only for
-  summaries carrying `tdr.by_order` — which the Qwen, DeSTA and SALMONN
-  behavioural summaries predate. Those three are silently absent from that plot.
 - **Cross-modal similarity vs. depth.** Cho et al.'s convergence result is the
-  natural companion to `m1`, and we have never computed it.
+  natural companion to fig2, and we have never computed it.
 - **A logit-lens panel.** AudioLens does this for audio models. Nothing in our
   pipeline currently emits per-layer vocabulary projections.
 
@@ -327,8 +337,11 @@ screen criterion to the subset the mechanism runs on, or show both numbers.
   Language Models* (arXiv:2603.13768) — the closest prior art to this project;
   layer-wise recovery-rate curves faceted by attribute, and token-wise tracing
   bucketed into prompt roles. Also reports Qwen fusing abruptly in the final
-  third of the network, which is the same depth range our `m1` lights up.
+  third of the network, which is the same depth range fig2 lights up.
 - Geva et al. 2023 (arXiv:2304.14767) — attention knockout, restricted by band.
+- Pasad et al. 2021 (arXiv:2107.04734) — layer-wise probing of a speech encoder.
+- Hewitt & Liang 2019 (arXiv:1909.03368) — control tasks, and why a probe needs
+  a shuffled-label baseline.
 - Conmy et al. 2023 (ACDC) and Kramár et al. 2024 (AtP*) — faithfulness curves,
   and why an approximation needs one.
 - Zhang & Nanda 2024 (arXiv:2309.16042), *Towards Best Practices of Activation

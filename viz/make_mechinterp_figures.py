@@ -1,52 +1,39 @@
 #!/usr/bin/env python3
-"""The mechanistic figures, in the shapes this literature actually uses.
+"""The three figures for the mechanistic-interpretability section.
 
-`make_figures.py` covers the behavioural story and the four headline plots.
-This file adds the figure *types* that mech-interp papers are expected to
-carry, and reads the result files that script never opens -- exp5, exp6, and
-everything under `results/salmonn/`.
+Numbered in the order the argument runs, and named for what they draw. The
+number, the function name and the output filename are the same string, so
+`--only 2` builds `fig2_attribution_by_layer_and_position.{pdf,png}` and there
+is nothing to look up:
 
-Each figure below names the convention it follows and the prior work that
-established it, because a reviewer reads a figure type before reading its
-caption, and a familiar shape is doing half the explaining:
+  fig1  probe accuracy by encoder layer      the audio signal survives the
+        line -- exp2_encoder_probe           encoder, so this is not a
+                                             perception failure
+        Pasad et al. 2021; Hewitt & Liang 2019 for the shuffled-label control
 
-  m1c_attribution_grid    layer x position-group causal map      ROME (Meng
-                          et al. 2022) fig 2; Chen et al. 2026 fig 3, the
-                          audio-LALM version of the same grid
-  m2_faithfulness         faithfulness vs. circuit sparsity      ACDC (Conmy
-                          et al. 2023), AtP* (Kramar et al. 2024)
-  m3_group_magnitude      per-position-group modality bars       Cho et al.
-                          2026; Geva et al. 2023
-  m4_circuit_overlap      IoU with bootstrap CI vs. chance       Cho et al. 2026
-  m5_probe_depth          layer-wise probe + selectivity         Pasad et al.
-                          2021; Hewitt & Liang 2019 for the control
-  m6_margin_distribution  per-item logit-difference spread       Zhang & Nanda
-                          2024, "report the distribution, not the mean"
-  m7_backpatch_grid       intervention sweep grid                Meng et al. 2022
-  m8_source_sweep         effect vs. collateral damage           our exp5
-  m9_norm_profile         residual-norm growth with depth        StreamingLLM
-                          (Xiao et al. 2023)
-  m10_layers_vs_positions knockout by layer band, then by         Geva et al. 2023
-                          position: the 2x2 in one panel         fig 3
-  m11_routing             the routing bisection                  Geva et al. 2023
-  m12_generative_fix      free-form intervention + controls      ours
-  m13_generation_quality  fluency / repetition / length          answers Cho
-                          et al.'s degeneration finding
-  m14_outcome_mass        three-way follow-rate across models    LISTEN
-  m15_capability_gate     the audio-only screen that gates all   LISTEN
+  fig2  attribution by layer and position    but the decision is driven by the
+        heatmap -- exp3_circuits             text claim at the answer position
+        ROME (Meng et al. 2022) fig 2; Chen et al. 2026 fig 3, the audio-LALM
+        version of the same grid
+
+  fig3  knockout by token position           and the claim reaches the answer
+        bars -- exp6_readout_attenuation     through the tokens in between
+        Geva et al. 2023 fig 3
+
+Each figure names the convention it follows, because a reviewer reads a figure
+type before reading its caption and a familiar shape does half the explaining.
 
 Usage, from the repo root:
 
     python3 viz/make_mechinterp_figures.py
-    python3 viz/make_mechinterp_figures.py --out figures --only m1 m6
+    python3 viz/make_mechinterp_figures.py --out figures --only 1 3
 
-Every figure is skipped with a printed reason if its inputs are absent, so
-this is safe to run against a partial results tree.
+Every figure is skipped with a printed reason if its inputs are absent, so this
+is safe to run against a partial results tree.
 """
 import argparse
 import glob
 import json
-import math
 import os
 
 try:
@@ -67,17 +54,16 @@ PRETTY = {"emotional_prosody": "Emotional prosody",
           "sarcasm_pacing": "Sarcasm / pacing"}
 C_AUDIO, C_TEXT, C_CHANCE, C_NEUTRAL = "#2b6cb0", "#c53030", "#718096", "#2f855a"
 
-# Position groups in sequence order, so the y-axis of the causal map reads as a
-# spatial map of the prompt the way Chen et al. lay theirs out.
+# Position groups in sequence order, so fig2's y-axis reads as a spatial map of
+# the prompt the way Chen et al. lay theirs out.
 GROUPS = ["audio", "claim", "query", "options", "gen"]
 GROUP_LABEL = {"audio": "audio tokens", "claim": "text claim", "query": "question",
                "options": "answer options", "gen": "answer position"}
 
-# The routing conditions, named for what stops seeing the claim rather than for
-# the JSON key.
+# fig3's conditions, named for what stops seeing the claim rather than for the
+# JSON key. "positions in between" only parses once you already know the
+# mechanism, which is the thing the figure is supposed to teach.
 ROW_ORDER = ["gen", "post_claim", "all"]
-# "positions in between" only parses once you already know the mechanism, which
-# is the thing this figure is supposed to teach.
 ROW_LABEL = {"gen": "answer\nposition",
              "post_claim": "every position\nafter the claim",
              "all": "every\nposition"}
@@ -89,40 +75,27 @@ MODEL_ROOTS = [("Qwen2-Audio-7B", "results"),
 
 # SALMONN is excluded from the mechanistic analysis: it does not clear the
 # capability screen, and a model that cannot do the task from audio cannot be
-# shown to be suppressing audio. So the mechanism figures are Qwen-only by
-# default. Override with --models to draw a panel per model again.
-#
-# Two figures deliberately ignore this filter, because for them SALMONN is not
-# a mechanistic claim:
-#   m15  the capability screen -- it IS the evidence for the exclusion, so
-#        dropping the excluded model would remove the argument
-#   m14  behavioural follow-rates, a different section of the paper, where
-#        SALMONN appears in the results table alongside every other model
+# shown to be suppressing audio. So these figures are Qwen-only by default.
+# Override with --models to draw a panel per model again. The evidence for the
+# exclusion is the capability screen, which is a different section of the paper
+# and not one of these three figures.
 MECH_MODELS = ["Qwen2-Audio-7B"]
 
 # sarcasm_pacing is run but not reported: its audio does not settle a single
 # correct label (removing the claim lifts audio accuracy only to 0.233 against
 # 0.100 chance), and its free-form descriptions name one identifiable label
 # only ~10 times in 30, so the intervention's intervals overlap the baseline.
-# Underpowered rather than negative -- excluded from the mechanism figures for
-# the same reason it is excluded from the write-up. --categories overrides.
-# m14 and m15 ignore this filter: m15 is part of why sarcasm is set aside, and
-# m14 is behavioural.
+# Underpowered rather than negative -- excluded here for the same reason it is
+# excluded from the write-up. --categories overrides.
 MECH_CATEGORIES = ["emotional_prosody", "speaker_identity"]
 
-# Circuits drawn in the heatmaps. The audio panels are near-blank on a scale
-# shared with the text panels, which is the finding but costs half the figure
-# width to show it -- and a blank panel reads as a rendering failure as easily
-# as a result. m3 carries the text-vs-audio comparison numerically, so the
-# heatmaps show the text circuit alone. Set to ("text", "audio") to restore.
+# Circuits drawn in fig2. The audio panels are near-blank on a scale shared
+# with the text panels, which is the finding but costs half the figure width to
+# show it -- and a blank panel reads as a rendering failure as easily as a
+# result. The text-vs-audio comparison is carried numerically in the write-up
+# (text 3.29 against audio 0.18), so the heatmap shows the text circuit alone.
+# Set to ("text", "audio") to restore.
 HEATMAP_CIRCUITS = ("text",)
-
-
-def roots(every=False):
-    """Model roots for a figure. `every=True` opts out of the mech filter."""
-    if every:
-        return MODEL_ROOTS
-    return [(m, r) for m, r in MODEL_ROOTS if m in MECH_MODELS]
 
 plt.rcParams.update({
     "figure.dpi": 150, "savefig.dpi": 300, "savefig.bbox": "tight",
@@ -135,26 +108,11 @@ plt.rcParams.update({
 # --------------------------------------------------------------------------- #
 # helpers
 # --------------------------------------------------------------------------- #
-def wilson(k, n, z=1.96):
-    """Wilson interval; the normal approximation fails at the 0.0 and 1.0 rates
-    this project hits constantly."""
-    if not n:
-        return 0.0, 0.0
-    p = k / n
-    d = 1 + z * z / n
-    centre = p + z * z / (2 * n)
-    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
-    return (centre - half) / d, (centre + half) / d
-
-
-def err_bars(k, n):
-    """(point, lower_err, upper_err), clamped non-negative -- matplotlib
-    rejects a negative yerr and Wilson can land 1e-16 the wrong side at p=0."""
-    if not n:
-        return 0.0, 0.0, 0.0
-    p = k / n
-    lo, hi = wilson(k, n)
-    return p, max(0.0, p - lo), max(0.0, hi - p)
+def roots(every=False):
+    """Model roots for a figure. `every=True` opts out of the model filter."""
+    if every:
+        return MODEL_ROOTS
+    return [(m, r) for m, r in MODEL_ROOTS if m in MECH_MODELS]
 
 
 def load(path):
@@ -188,11 +146,10 @@ def cat_of(d, path):
 
 
 def ci_err(p, ci):
-    """(lower_err, upper_err) from a stored absolute interval.
+    """(point, lower_err, upper_err) from a stored absolute interval.
 
-    exp6 writes ci95 as bounds on the rate, not as k/n, so err_bars() does not
-    apply. The p=0 rows store a lower bound of -6.5e-18; clamp for the same
-    reason err_bars does.
+    exp6 writes ci95 as bounds on the rate, not as k/n, so a Wilson helper does
+    not apply. The p=0 rows store a lower bound of -6.5e-18, so clamp.
     """
     if not ci:
         return p, 0.0, 0.0
@@ -248,38 +205,130 @@ def grid_from_attr(attr, n_layers):
     return out
 
 
-def chance_iou(n_components, top_frac):
-    """Expected IoU of two independent top-k sets drawn from n components.
+# --------------------------------------------------------------------------- #
+# fig1 -- the signal is in the encoder
+# --------------------------------------------------------------------------- #
+def fig1_probe_accuracy_by_encoder_layer(out_dir):
+    """Probe accuracy by encoder layer.
 
-    E|A n B| = k^2/n and |A u B| = 2k - k^2/n, so IoU = k / (2n - k). With
-    n=64 and k=floor(0.2*64)=12 this gives 0.103, the value the methods note
-    quotes for Qwen -- worth reproducing rather than hardcoding, since SALMONN
-    has 40 layers and therefore a different chance level.
+    One line, one chance rate, and the layer where the line first reaches
+    ceiling. Drawn as a line rather than a strip because position is a finer channel than
+    lightness, and because the dips are the honest part. The write-up says
+    accuracy is "1.000 from layer 13 onward"; it is not. It touches 1.000 at 13,
+    falls to 0.975 at 21 and 0.988 at 22 and 27, and only holds ceiling from 28.
+    A line plot shows that without anyone having to say it; a heatmap of the same
+    numbers hides it in two shades of the same blue.
+
+    Scope: exp2 covers speaker_identity only, so this rules out encoder loss for
+    speaker gender and for nothing else. There is no Qwen encoder probe for
+    emotional prosody -- the open gap in the argument chain -- and the panel says
+    so rather than leaving a reader to assume the result generalises.
     """
-    k = int(top_frac * n_components)
-    return k / (2 * n_components - k) if n_components and k else None
+    blocks = []
+    for model, root in roots():
+        for path in found(root, "exp2_encoder_probe*.json"):
+            d = load(path) or {}
+            for r in d.get("results", []):
+                if r.get("category") in MECH_CATEGORIES:
+                    blocks.append((model, r))
+    if not blocks:
+        return skip("fig1_probe_accuracy_by_encoder_layer", "no exp2_encoder_probe*.json")
+
+    fig, axes = plt.subplots(1, len(blocks), figsize=(5.4 * len(blocks), 3.6),
+                             squeeze=False, sharey=True)
+    for ax, (model, r) in zip(axes[0], blocks):
+        layers = r["layers"]
+        # the last entry is the projector, a different module on a different
+        # x-scale; it gets its own tick rather than being tacked onto the line.
+        enc = [x for x in layers if str(x.get("name", "")).startswith("encoder")]
+        proj = next((x for x in layers
+                     if not str(x.get("name", "")).startswith("encoder")), None)
+        xs = [x["layer"] for x in enc]
+        acc = [x["accuracy"] for x in enc]
+        ch = r.get("chance")
+
+        ax.set_axisbelow(True)
+        ax.plot(xs, acc, marker="o", ms=3.2, lw=1.8, color=C_AUDIO, zorder=3)
+        if ch is not None:
+            ax.axhline(ch, ls=":", lw=1.3, color=C_CHANCE, zorder=1)
+
+        # First layer at ceiling, and the last dip after it. Both are read off
+        # the data: "from layer 13 onward" is the claim the figure has to be
+        # able to contradict.
+        top = max(acc)
+        first = next((x for x, a in zip(xs, acc) if a >= top - 1e-9), None)
+        dips = [(x, a) for x, a in zip(xs, acc) if x > first and a < top - 1e-9]
+        if first is not None:
+            ax.axvline(first, ls="--", lw=1.2, color=C_TEXT, zorder=2)
+            ax.annotate("first reaches {:.3f}\nat layer {}".format(top, first),
+                        xy=(first, top), xytext=(6, -14),
+                        textcoords="offset points", ha="left", va="top",
+                        fontsize=7, color=C_TEXT, annotation_clip=False)
+        if dips:
+            lx, la = dips[-1]
+            ax.annotate("dips to {:.3f} at {}".format(
+                            min(a for _, a in dips),
+                            min(dips, key=lambda t: t[1])[0]),
+                        xy=(lx, la), xytext=(0, -12),
+                        textcoords="offset points", ha="center", va="top",
+                        fontsize=6.5, color=C_CHANCE)
+
+        if proj is not None:
+            px = xs[-1] + 2
+            ax.scatter([px], [proj["accuracy"]], marker="D", s=40,
+                       color=C_NEUTRAL, zorder=5)
+            ax.annotate("post-\nprojector", xy=(px, proj["accuracy"]),
+                        xytext=(0, -12), textcoords="offset points",
+                        ha="center", va="top", fontsize=6.5, color=C_NEUTRAL)
+            ax.set_xticks(list(range(0, xs[-1] + 1, 4)) + [px])
+            ax.set_xticklabels([str(v) for v in range(0, xs[-1] + 1, 4)]
+                               + ["proj"], fontsize=7.5)
+
+        ax.set_xlabel("audio encoder layer")
+        ax.set_ylim(0, 1.06)
+        ax.grid(axis="y", alpha=0.25)
+        ax.set_title("{} -- {}{}".format(
+            model.split("-")[0], PRETTY.get(r["category"], r["category"]),
+            "   (chance {:.3f})".format(ch) if ch is not None else ""),
+            fontsize=9)
+
+    axes[0][0].set_ylabel("linear-probe accuracy")
+    cat = blocks[0][1]
+    fig.suptitle("The encoder does not discard the signal", y=1.10, fontsize=11)
+    fig.text(0.5, 1.03,
+             "{} clips, {}, {} actors.  exp2 covers speaker_identity only: this "
+             "rules out encoder loss for speaker gender, not for prosody."
+             .format(cat.get("n_clips"), cat.get("cv_scheme", ""),
+                     cat.get("n_actors")),
+             ha="center", fontsize=6.8, color=C_CHANCE)
+    save(fig, out_dir, "fig1_probe_accuracy_by_encoder_layer")
 
 
 # --------------------------------------------------------------------------- #
-# m1c -- all eight panels in one grid
+# fig2 -- but the decision is made from the text
 # --------------------------------------------------------------------------- #
-def m1c_attribution_grid(out_dir):
-    """Every category and circuit in one figure, on one colour scale.
+def fig2_attribution_by_layer_and_position(out_dir):
+    """Attribution by decoder layer and prompt position, one panel per category.
 
-    The only heatmap. One panel per category, attention and MLP summed, one
-    shared vmax so the categories are comparable by eye. Chen et al. facet all
-    four of their attributes into a single grid for the same reason.
+    Attention and MLP summed, one shared vmax so the categories are comparable
+    by eye. Chen et al. facet all their attributes into one grid for the same
+    reason.
 
-    An earlier version also wrote per-category files with attn and mlp split
-    into separate rows. Dropped -- but the split carried a real result worth
-    keeping in the text: text mass at the answer position is 72% attention
-    (15.1 vs 6.0) while audio mass at the audio tokens is 71% MLP (1.44 vs
-    0.58). The claim is routed to the readout; the acoustics are processed in
-    place and largely not moved.
+    No suptitle, by request. The bold category labels sit above their panels
+    and the colourbar names the quantity. What the title carried and nothing
+    else on the figure does is the model and the circuit, so the caption has
+    to say "Qwen2-Audio-7B, text circuit" -- without a known depth the layer
+    axis means nothing.
+
+    An earlier version split attn and MLP into separate rows. Dropped -- but
+    the split carried a result worth keeping in the text: text mass at the
+    answer position is 72% attention (15.1 vs 6.0) while audio mass at the
+    audio tokens is 71% MLP (1.44 vs 0.58). The claim is routed to the
+    readout; the acoustics are processed in place and largely not moved.
     """
     blocks = per_model("exp3_circuits_*.json")
     if not blocks:
-        return skip("m1c_attribution_grid", "no exp3_circuits_*.json")
+        return skip("fig2_attribution_by_layer_and_position", "no exp3_circuits_*.json")
 
     cols = []                       # (model, cat, circuit_label, grids, cmap)
     vmax = 0.0
@@ -295,9 +344,8 @@ def m1c_attribution_grid(out_dir):
             cols.append((model, cat, label, g, cmap))
     vmax = vmax or 1.0
 
-    # One row: attention and MLP summed per (layer, group). The split lives in
-    # m1's per-category files; here the question is where the mass sits, not
-    # which mechanism carries it.
+    # One row: attention and MLP summed per (layer, group). The question is
+    # where the mass sits, not which mechanism carries it.
     fig, axes = plt.subplots(1, len(cols), figsize=(2.55 * len(cols), 2.5),
                              squeeze=False, sharey=True)
     for c, (model, cat, label, grids, cmap) in enumerate(cols):
@@ -345,453 +393,13 @@ def m1c_attribution_grid(out_dir):
             cb.set_label("|attribution|, shared limits", fontsize=7)
         else:
             cb.set_ticks([])
-    # Names the model and the circuit: with the audio panels gone nothing else
-    # on the figure says which circuit this is, and the model matters because
-    # the layer axis is only meaningful against a known depth.
-    models = " / ".join(dict.fromkeys(m for m, _, _, _, _ in cols))
-    circuits = " + ".join(HEATMAP_CIRCUITS)
-    fig.suptitle("{} \u2014 {}-circuit attribution by layer and prompt position"
-                 .format(models, circuits), y=1.0, fontsize=10.5)
-    save(fig, out_dir, "m1c_attribution_grid")
+    save(fig, out_dir, "fig2_attribution_by_layer_and_position")
 
 
 # --------------------------------------------------------------------------- #
-# m2 -- faithfulness vs sparsity
+# fig3 -- and it gets there through the tokens in between
 # --------------------------------------------------------------------------- #
-def m2_faithfulness(out_dir):
-    """Does the small set of components we kept reproduce the whole model?
-
-    Standard circuit-validation curve (ACDC, AtP*, EAP). Cho et al. threshold
-    at 0.8, which is drawn. Without this a localisation claim is unfalsifiable,
-    and our own methods note records a case where faithfulness read 1.00 on a
-    version of the code that was broken -- so it is necessary, not sufficient.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp3_circuits_*.json")
-              if d.get("faithfulness")]
-    if not blocks:
-        return skip("m2_faithfulness", "no faithfulness block in exp3 files")
-
-    fig, ax = plt.subplots(figsize=(5.0, 3.3))
-    markers = {"Qwen2-Audio-7B": "o", "SALMONN-13B": "s"}
-    palette = [C_AUDIO, C_NEUTRAL, "#805ad5", "#d69e2e"]
-    for i, (model, path, d) in enumerate(blocks):
-        cat = cat_of(d, path)
-        fr = sorted((float(k), v) for k, v in d["faithfulness"].items())
-        ax.plot([x for x, _ in fr], [y for _, y in fr],
-                marker=markers.get(model, "o"), ms=4, lw=1.5,
-                color=palette[i % len(palette)],
-                label="{} -- {}".format(model.split("-")[0],
-                                        PRETTY.get(cat, cat)))
-    ax.axhline(1.0, ls="--", lw=1, color=C_CHANCE, label="full model")
-    ax.axhline(0.8, ls=":", lw=1, color=C_TEXT, label="Cho et al. threshold")
-    ax.set_xlabel("fraction of components kept")
-    ax.set_ylabel("faithfulness")
-    ax.set_xscale("log")
-    ax.set_xticks([0.05, 0.10, 0.20, 0.40])
-    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    # A log axis keeps its minor labels, which print 6x10^-2 straight through
-    # the 0.05 major label.
-    ax.get_xaxis().set_minor_formatter(matplotlib.ticker.NullFormatter())
-    ax.set_ylim(0.78, 1.03)
-    ax.grid(alpha=0.25)
-    ax.legend(loc="lower right", fontsize=7)
-    ax.set_title("A fifth of the components reproduce the behaviour")
-    save(fig, out_dir, "m2_faithfulness")
-
-
-# --------------------------------------------------------------------------- #
-# m3 -- where each modality's mass sits
-# --------------------------------------------------------------------------- #
-def m3_group_magnitude(out_dir):
-    """The lopsidedness, as one panel per category.
-
-    Log axis, because the headline is a ratio (roughly 18:1 at the answer
-    position for Qwen prosody) and a linear axis renders the audio bar as an
-    invisible sliver next to the text bar.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp3_circuits_*.json")
-              if d.get("group_magnitudes")]
-    if not blocks:
-        return skip("m3_group_magnitude", "no group_magnitudes in exp3 files")
-
-    fig, axes = plt.subplots(1, len(blocks), figsize=(3.5 * len(blocks), 3.2),
-                             squeeze=False, sharey=True)
-    for ax, (model, path, d) in zip(axes[0], blocks):
-        cat = cat_of(d, path)
-        gm = d["group_magnitudes"]
-        rows = [g for g in GROUPS if g in gm]
-        y = np.arange(len(rows))
-        floor = 1e-4                    # a zero cannot be drawn on a log axis
-        t = [max(gm[g].get("text") or 0.0, floor) for g in rows]
-        a = [max(gm[g].get("audio") or 0.0, floor) for g in rows]
-        ax.barh(y + 0.19, t, height=0.36, color=C_TEXT, label="text")
-        ax.barh(y - 0.19, a, height=0.36, color=C_AUDIO, label="audio")
-        # A bar sitting on the floor is a substituted zero, not a small value.
-        # The text attribution over the audio span is exactly 0.0 by
-        # construction -- causal masking makes those activations identical
-        # between the clean and corrupt runs -- so it has to be marked as such
-        # rather than read as "text contributes a little here".
-        for g, val, off in [(g, gm[g].get("text"), 0.19) for g in rows] + \
-                           [(g, gm[g].get("audio"), -0.19) for g in rows]:
-            if not val:
-                ax.annotate("0", xy=(floor, rows.index(g) + off), xytext=(3, 0),
-                            textcoords="offset points", va="center",
-                            fontsize=6, color=C_CHANCE)
-        ax.set_yticks(y)
-        ax.set_yticklabels([GROUP_LABEL[g] for g in rows], fontsize=7)
-        ax.set_xscale("log")
-        # Each bar is the largest single (layer, submodule) component in that
-        # group, not the summed mass -- exp3 stores group_magnitudes as a max.
-        # Labelling it "|attribution|" reads as a total, which it is not.
-        ax.set_xlabel("peak |attribution| in group")
-        ax.set_title("{}\n{}".format(model.split("-")[0], PRETTY.get(cat, cat)),
-                     fontsize=9)
-        ax.grid(axis="x", alpha=0.25)
-        # Annotate the ratio at the answer position, which is the sentence the
-        # paper actually makes from this figure.
-        if "gen" in gm and (gm["gen"].get("audio") or 0) > 0:
-            ratio = (gm["gen"].get("text") or 0) / gm["gen"]["audio"]
-            ax.annotate("{:.0f}x".format(ratio),
-                        xy=(max(t[rows.index("gen")], floor),
-                            rows.index("gen") + 0.19),
-                        xytext=(4, 0), textcoords="offset points",
-                        va="center", fontsize=8, color=C_TEXT,
-                        fontweight="bold")
-    axes[0][-1].legend(loc="lower right")
-    fig.suptitle("At the answer position the text swamps the audio", y=1.03)
-    save(fig, out_dir, "m3_group_magnitude")
-
-
-# --------------------------------------------------------------------------- #
-# m4 -- circuit overlap
-# --------------------------------------------------------------------------- #
-def m4_circuit_overlap(out_dir):
-    """Are the two circuits the same machinery, or different machinery?
-
-    IoU with a bootstrap interval and the chance level for a top-k set of this
-    size. Several of our intervals contain chance, which is the honest reading
-    and is exactly why the chance line has to be drawn rather than described.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp3_circuits_*.json")
-              if d.get("overlap_iou")]
-    if not blocks:
-        return skip("m4_circuit_overlap", "no overlap_iou in exp3 files")
-
-    fig, axes = plt.subplots(1, len(blocks), figsize=(3.4 * len(blocks), 3.2),
-                             squeeze=False, sharey=True)
-    for ax, (model, path, d) in zip(axes[0], blocks):
-        cat = cat_of(d, path)
-        iou, ci = d["overlap_iou"], d.get("overlap_iou_ci95") or {}
-        rows = [g for g in GROUPS + ["ALL"] if iou.get(g) is not None]
-        xs = np.arange(len(rows))
-        pts = [iou[g] for g in rows]
-        lo = [max(0.0, iou[g] - (ci.get(g) or [iou[g], iou[g]])[0]) for g in rows]
-        hi = [max(0.0, (ci.get(g) or [iou[g], iou[g]])[1] - iou[g]) for g in rows]
-        ax.errorbar(xs, pts, yerr=[lo, hi], fmt="o", ms=5, capsize=3,
-                    lw=1.4, color=C_NEUTRAL)
-        n_layers = (d.get("run") or {}).get("n_layers") or \
-            1 + max(int(k.split("|")[0]) for k in d["attr_text"])
-        ch = chance_iou(n_layers * 2, (d.get("run") or {}).get("top_frac", 0.2))
-        if ch:
-            ax.axhline(ch, ls="--", lw=1, color=C_CHANCE,
-                       label="chance ({:.3f})".format(ch))
-        # Groups whose attribution is identically zero cannot have an overlap;
-        # say so on the axis rather than leaving an unexplained gap.
-        missing = [g for g in GROUPS if iou.get(g) is None]
-        if missing:
-            ax.set_xlabel("undefined: {}".format(", ".join(missing)), fontsize=7)
-        ax.set_xticks(xs)
-        ax.set_xticklabels([GROUP_LABEL.get(g, g) for g in rows], rotation=30,
-                           ha="right", fontsize=7)
-        ax.set_ylim(0, 1.02)
-        ax.set_title("{}\n{}".format(model.split("-")[0], PRETTY.get(cat, cat)),
-                     fontsize=9)
-        ax.grid(axis="y", alpha=0.25)
-        ax.legend(loc="upper left", fontsize=7)
-    axes[0][0].set_ylabel("circuit overlap (IoU)")
-    fig.suptitle("Do the text and audio circuits share components?", y=1.03)
-    save(fig, out_dir, "m4_circuit_overlap")
-
-
-# --------------------------------------------------------------------------- #
-# m5 -- probe depth
-# --------------------------------------------------------------------------- #
-def m5_probe_depth(out_dir):
-    """Layer-wise probe accuracy, both models, with both controls drawn.
-
-    Pasad et al. read a speech encoder as a depth trajectory; the shuffled-label
-    line is the selectivity control. The projector point is plotted apart from
-    the encoder line because it is a different module, and it is the one that
-    decides whether the signal reaches the language model at all.
-    """
-    blocks = []
-    for model, root in roots():
-        for path in found(root, "exp2_encoder_probe*.json"):
-            d = load(path) or {}
-            for r in d.get("results", []):
-                if r.get("category") in MECH_CATEGORIES:
-                    blocks.append((model, r))
-    if not blocks:
-        return skip("m5_probe_depth", "no exp2_encoder_probe*.json")
-
-    fig, axes = plt.subplots(1, len(blocks), figsize=(3.5 * len(blocks), 3.2),
-                             squeeze=False, sharey=True)
-    for ax, (model, r) in zip(axes[0], blocks):
-        layers = r["layers"]
-        enc, proj = layers[:-1], layers[-1]
-        xs = [x["layer"] for x in enc]
-        acc = [x["accuracy"] for x in enc]
-        shuf = [x["shuffled"] for x in enc]
-        ax.fill_between(xs, shuf, acc, color=C_AUDIO, alpha=0.13,
-                        label="selectivity")
-        ax.plot(xs, acc, marker="o", ms=2.5, lw=1.5, color=C_AUDIO,
-                label="linear probe")
-        ax.plot(xs, shuf, ls=":", lw=1.2, color=C_CHANCE, label="shuffled labels")
-        ax.axhline(r["chance"], ls="--", lw=1, color=C_TEXT, label="chance")
-        ax.scatter([xs[-1] + 1], [proj["accuracy"]], marker="D", s=34,
-                   color=C_NEUTRAL, zorder=5, label="post-projector")
-        ax.set_xlabel("audio encoder layer")
-        ax.set_ylim(0, 1.05)
-        ax.grid(alpha=0.25)
-        ax.set_title("{}\n{} -- {} clips, {}".format(
-            model.split("-")[0], PRETTY.get(r["category"], r["category"]),
-            r["n_clips"], r.get("cv_scheme", "")), fontsize=8)
-    axes[0][0].set_ylabel("probe accuracy")
-    axes[0][-1].legend(loc="lower right", fontsize=7)
-    fig.suptitle("The signal survives the encoder and the projector", y=1.04)
-    save(fig, out_dir, "m5_probe_depth")
-
-
-# --------------------------------------------------------------------------- #
-# m6 -- per-item margins
-# --------------------------------------------------------------------------- #
-def m6_margin_distribution(out_dir):
-    """The distribution behind the mean margin.
-
-    A mean margin of -7.73 nats is compatible with two very different worlds:
-    every item slightly wrong, or a bimodal split. Reporting the spread is the
-    standard ask for a logit-difference metric, and it is the only figure here
-    that shows individual items. Computed from exp1's stored per-option
-    log-probs, so it costs no GPU time.
-    """
-    rows = []
-    for model, root in roots():
-        d = load(os.path.join(root, "exp1_capability_screen.json"))
-        for rec in (d or {}).get("records", []):
-            if (rec["condition"] == "Mismatched" and rec["modality"] == "text_audio"
-                    and rec["category"] in MECH_CATEGORIES
-                    and rec.get("claimed") and rec.get("scores")):
-                s = rec["scores"]
-                if rec["correct_letter"] in s and rec["claimed"] in s:
-                    rows.append((model, rec["category"],
-                                 s[rec["correct_letter"]] - s[rec["claimed"]]))
-    if not rows:
-        return skip("m6_margin_distribution", "no exp1 records with scores")
-
-    pairs = sorted({(m, c) for m, c, _ in rows})
-    fig, ax = plt.subplots(figsize=(7.4, 0.62 * len(pairs) + 1.9))
-    rng = np.random.default_rng(0)      # jitter only; seeded so the figure is stable
-    # x in axes fraction, y in data coordinates -- puts the per-row annotation
-    # at a fixed distance from the right spine without pinning every row to the
-    # same height, which is what a plain annotate() in axes coords would do.
-    right = matplotlib.transforms.blended_transform_factory(ax.transAxes,
-                                                            ax.transData)
-    fractions = []
-    for i, (model, cat) in enumerate(pairs):
-        vals = np.array([v for m, c, v in rows if m == model and c == cat])
-        ax.scatter(vals, np.full_like(vals, i) + rng.uniform(-0.16, 0.16, vals.size),
-                   s=9, alpha=0.45, color=C_TEXT, edgecolors="none")
-        ax.boxplot(vals, positions=[i], vert=False, widths=0.5, showfliers=False,
-                   medianprops={"color": "black", "lw": 1.4},
-                   boxprops={"color": "#4a5568"},
-                   whiskerprops={"color": "#4a5568"},
-                   capprops={"color": "#4a5568"})
-        below = float((vals < 0).mean())
-        fractions.append(below)
-        ax.text(1.01, i, "{:.0%} favour text\nn = {}".format(below, vals.size),
-                transform=right, va="center", ha="left", fontsize=7,
-                color=C_CHANCE)
-    ax.axvline(0, ls="--", lw=1.2, color="black")
-    ax.set_yticks(range(len(pairs)))
-    ax.set_yticklabels(["{}\n{}".format(m.split("-")[0], PRETTY.get(c, c))
-                        for m, c in pairs], fontsize=7)
-    ax.set_ylim(-0.6, len(pairs) - 0.4)
-    ax.set_xlabel("decision margin, log P(audio-correct) - log P(claimed)   [nats]")
-    ax.grid(axis="x", alpha=0.25)
-    # State the range rather than rounding it up to "every item": the fraction
-    # below zero runs from 0.82 to 1.00, so a claim of unanimity is false in
-    # five of the six rows the figure draws.
-    ax.set_title("Text preference shifts the whole distribution "
-                 "({:.0%}-{:.0%} of items below zero)".format(
-                     min(fractions), max(fractions)))
-    save(fig, out_dir, "m6_margin_distribution")
-
-
-# --------------------------------------------------------------------------- #
-# m7 -- back-patching grid
-# --------------------------------------------------------------------------- #
-def m7_backpatch_grid(out_dir):
-    """A null result, drawn so that it reads as a null.
-
-    Two rows, and the second is not optional. On SALMONN the audio row rises
-    from a 0.015 baseline to 0.18, which on its own reads as the intervention
-    working; the capability row underneath shows the model losing 0.86 -> 0.10
-    over the same cells. An audio-only panel would publish a broken model as a
-    repaired one.
-
-    The colour scale is pinned to [0, 1] rather than autoscaled, because
-    autoscaling a flat field to its own noise range is how a null acquires a
-    gradient.
-    """
-    blocks = per_model("exp4_backpatching_*.json")
-    if not blocks:
-        return skip("m7_backpatch_grid", "no exp4_backpatching_*.json")
-
-    fig, axes = plt.subplots(2, len(blocks), figsize=(3.5 * len(blocks), 5.2),
-                             squeeze=False)
-    for col, (model, path, d) in enumerate(blocks):
-        cat = cat_of(d, path)
-        rows = d.get("sweep") or []
-        dsts = sorted({r["dst"] for r in rows})
-        wins = sorted({r["window"] for r in rows})
-        for row, (key, label, cmap) in enumerate(
-                (("audio", "audio accuracy", "Blues"),
-                 ("capability", "capability (matched)", "Greens"))):
-            ax = axes[row][col]
-            grid = np.full((len(wins), len(dsts)), np.nan)
-            for r in rows:
-                if r.get(key) is not None:
-                    grid[wins.index(r["window"]), dsts.index(r["dst"])] = r[key]
-            im = ax.imshow(grid, aspect="auto", origin="lower", cmap=cmap,
-                           vmin=0.0, vmax=1.0, interpolation="nearest")
-            for i in range(len(wins)):
-                for j in range(len(dsts)):
-                    if not np.isnan(grid[i, j]):
-                        # Flip to white once the cell is dark enough to swallow
-                        # dark text -- the capability row saturates at 1.00.
-                        ax.text(j, i, "{:.2f}".format(grid[i, j]), ha="center",
-                                va="center", fontsize=7,
-                                color="white" if grid[i, j] > 0.6 else "#1a202c")
-            ax.set_xticks(range(len(dsts)))
-            ax.set_xticklabels(dsts)
-            ax.set_yticks(range(len(wins)))
-            ax.set_yticklabels(wins)
-            ax.set_ylabel("window" if col == 0 else "")
-            base = (d.get("baseline") or {}).get(key)
-            if row == 0:
-                ctrl = (d.get("mid_layer_control") or {}).get("audio")
-                bits = []
-                if base is not None:
-                    bits.append("baseline {:.3f}".format(base))
-                if ctrl is not None:
-                    bits.append("mid-layer src {:.3f}".format(ctrl))
-                ax.set_title("{} -- {}\n{}".format(model.split("-")[0],
-                                                   PRETTY.get(cat, cat),
-                                                   ";  ".join(bits)), fontsize=8)
-            else:
-                ax.set_xlabel("destination layer")
-                ax.set_title("{}{}".format(
-                    label, "" if base is None else
-                    "   (baseline {:.3f})".format(base)), fontsize=8)
-            fig.colorbar(im, ax=ax, fraction=0.04, pad=0.03)
-    fig.suptitle("Back-patching, and what it costs", y=1.0)
-    fig.tight_layout()
-    save(fig, out_dir, "m7_backpatch_grid")
-
-
-# --------------------------------------------------------------------------- #
-# m8 -- source sweep: gain against damage
-# --------------------------------------------------------------------------- #
-def m8_source_sweep(out_dir):
-    """Why the null is a null: the only sources that move the margin are the
-    ones that break the model.
-
-    Two y-axes on purpose. The claim is about the *relationship* between the
-    two curves -- gain arrives exactly where capability leaves -- and separate
-    panels would make a reader do that join by eye.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp5_patch_diagnosis_*.json")
-              if (d.get("test_b_source_sweep") or {}).get("sweep")]
-    if not blocks:
-        return skip("m8_source_sweep", "no exp5_patch_diagnosis_*.json")
-
-    fig, axes = plt.subplots(1, len(blocks), figsize=(4.6 * len(blocks), 3.4),
-                             squeeze=False)
-    for ax, (model, path, d) in zip(axes[0], blocks):
-        cat = cat_of(d, path)
-        tb = d["test_b_source_sweep"]
-        rows = sorted(tb["sweep"], key=lambda r: r["src"])
-        xs = [r["src"] for r in rows]
-        ax.plot(xs, [r.get("margin_delta") for r in rows], marker="o", ms=4,
-                lw=1.6, color=C_AUDIO, label="margin gain (nats)")
-        ax.axhline(0, ls="--", lw=1, color=C_CHANCE)
-        ax.set_xlabel("source layer")
-        ax.set_ylabel("margin gain vs. baseline [nats]", color=C_AUDIO)
-        ax.tick_params(axis="y", labelcolor=C_AUDIO)
-        ax.grid(alpha=0.25)
-
-        ax2 = ax.twinx()
-        ax2.spines["right"].set_visible(True)
-        ax2.plot(xs, [r.get("capability") for r in rows], marker="s", ms=4,
-                 lw=1.6, ls="--", color=C_TEXT, label="capability")
-        base_cap = (tb.get("baseline") or {}).get("capability")
-        if base_cap is not None:
-            ax2.axhline(base_cap, ls=":", lw=1.2, color=C_TEXT)
-        ax2.set_ylabel("capability (matched items)", color=C_TEXT)
-        ax2.tick_params(axis="y", labelcolor=C_TEXT)
-        ax2.set_ylim(0, 1.05)
-
-        h1, l1 = ax.get_legend_handles_labels()
-        h2, l2 = ax2.get_legend_handles_labels()
-        ax.legend(h1 + h2, l1 + l2, loc="upper left", fontsize=7)
-        ax.set_title("{} -- {}".format(model.split("-")[0],
-                                       PRETTY.get(cat, cat)), fontsize=9)
-    fig.suptitle("Any gain from the audio side is bought by breaking the model",
-                 y=1.02)
-    save(fig, out_dir, "m8_source_sweep")
-
-
-# --------------------------------------------------------------------------- #
-# m9 -- residual norm profile
-# --------------------------------------------------------------------------- #
-def m9_norm_profile(out_dir):
-    """Residual-stream norm against depth, log scale.
-
-    This is the mechanical reason a late-layer source cannot simply be written
-    into an early layer: the two live at different scales, so the patch is an
-    amplitude shock before it is an information transfer.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp5_patch_diagnosis_*.json")
-              if (d.get("test_a_norms") or {}).get("profile")]
-    if not blocks:
-        return skip("m9_norm_profile", "no test_a_norms in exp5 files")
-
-    fig, ax = plt.subplots(figsize=(4.8, 3.2))
-    for model, path, d in blocks:
-        prof = d["test_a_norms"]["profile"]
-        xs = sorted(int(k) for k in prof)
-        ax.plot(xs, [prof[str(x)] for x in xs], marker="o", ms=2.5, lw=1.5,
-                label="{} -- {}".format(model.split("-")[0],
-                                        PRETTY.get(cat_of(d, path), "")))
-        ratio = d["test_a_norms"].get("late_over_early")
-        if ratio:
-            ax.annotate("late/early = {:.1f}x".format(ratio),
-                        xy=(xs[0], prof[str(xs[-1])]), xytext=(6, 0),
-                        textcoords="offset points", ha="left", fontsize=8,
-                        color=C_CHANCE)
-    ax.set_yscale("log")
-    ax.set_xlabel("language model layer")
-    ax.set_ylabel("residual-stream norm")
-    ax.grid(alpha=0.25, which="both")
-    ax.legend(loc="upper left", fontsize=7)
-    ax.set_title("Late and early layers are not on the same scale")
-    save(fig, out_dir, "m9_norm_profile")
-
-
-# --------------------------------------------------------------------------- #
-# m10 -- the hinge: which layers, or which positions
-# --------------------------------------------------------------------------- #
-def m10_layers_vs_positions(out_dir):
+def fig3_knockout_by_position(out_dir):
     """Which token positions have to lose sight of the claim.
 
     Three conditions, layers held at all 32 and gamma at 0, differing only in
@@ -815,21 +423,20 @@ def m10_layers_vs_positions(out_dir):
     matched-item accuracy falls 1.000 -> 0.367, so most of that gain is the
     model no longer reading text at all. Identity costs less, 1.000 -> 0.800.
     Those numbers are in exp6.routing[].capability and belong in the caption if
-    they are not on the axis -- otherwise the panel reads as a repair, which is
-    the failure mode FIGURE_TYPES.md warns about for m7.
+    they are not on the axis -- otherwise the panel reads as a repair, and a
+    gain bought by damaging the model is not a gain.
 
     gamma = 0 only. gamma = 0.25 is a null at every band, and interleaving
-    inert bars turns the panel into a sawtooth; fig7 in make_figures.py drops
-    it for the same reason. The null belongs in the text.
+    inert bars turns the panel into a sawtooth. The null belongs in the text.
     """
     blocks = [(m, p, d) for m, p, d in per_model("exp6_readout_attenuation_*.json")
               if d.get("sweep") and d.get("routing")]
     if not blocks:
-        return skip("m10_layers_vs_positions", "no exp6 sweep+routing blocks")
+        return skip("fig3_knockout_by_position", "no exp6 sweep+routing blocks")
 
-    # 5.0in/panel, wider than the usual 3.5-4.6: six two-line tick labels need
-    # about 0.83in of tick pitch before "every position / after the claim"
-    # starts touching its neighbour.
+    # Wide panels on purpose: the two-line tick labels need about 0.83in of
+    # tick pitch before "every position / after the claim" touches its
+    # neighbour.
     fig, axes = plt.subplots(1, len(blocks), figsize=(3.9 * len(blocks), 3.9),
                              squeeze=False, sharey=True)
     fig.subplots_adjust(wspace=0.42)
@@ -849,12 +456,11 @@ def m10_layers_vs_positions(out_dir):
         ax.set_axisbelow(True)
         ch = chance_for(os.path.dirname(path), cat)
 
-        # edgecolor is load-bearing, not decoration: four of the six prosody
-        # conditions are 0.000 exactly, and a zero-height bar with no edge
-        # draws nothing at all -- the panel reads as two bars and four missing
-        # ones. With an edge, a measured zero renders as a flat cap the width
-        # of a bar, which is what it is. Same argument as m3's explicit "0"
-        # markers on the log axis.
+        # edgecolor is load-bearing, not decoration: prosody's answer-position
+        # condition is 0.000 exactly, and a zero-height bar with no edge draws
+        # nothing at all -- the panel reads as two bars and one missing one.
+        # With an edge, a measured zero renders as a flat cap the width of a
+        # bar, which is what it is.
         ax.bar(xs, ys, width=0.62, color=C_AUDIO, edgecolor=C_AUDIO,
                linewidth=1.4, zorder=2,
                yerr=[[e[1] for e in errs], [e[2] for e in errs]],
@@ -877,7 +483,7 @@ def m10_layers_vs_positions(out_dir):
         ax.set_xlim(-0.6, len(rows) - 0.4)
         # Chance goes in the title, not on the line. The categories do not
         # share a rate (0.125 against 0.500) and every spot beside the line is
-        # already occupied; the encoder probe does the same for the same reason.
+        # already occupied.
         ax.set_title("{} -- {}{}".format(
             model.split("-")[0], PRETTY.get(cat, cat),
             "   (chance {:.3f})".format(ch) if ch is not None else ""),
@@ -957,293 +563,40 @@ def m10_layers_vs_positions(out_dir):
     if band_note:
         fig.text(0.5, 1.10, band_note, ha="center", fontsize=6.8,
                  color=C_CHANCE)
-    save(fig, out_dir, "m10_layers_vs_positions")
-
-
-# --------------------------------------------------------------------------- #
-# m11 -- the routing bisection
-# --------------------------------------------------------------------------- #
-def m11_routing(out_dir):
-    """The central mechanistic result, as three bars.
-
-    Blocking the answer position's own view of the claim changes nothing;
-    blocking the positions in between recovers the entire effect. The claim
-    reaches the readout by a detour, which is why the obvious intervention is
-    null.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp6_readout_attenuation_*.json")
-              if d.get("routing")]
-    if not blocks:
-        return skip("m11_routing", "no routing block in exp6 files")
-
-    labels = {"gen": "answer position\nonly", "post_claim": "positions\nin between",
-              "all": "every\nposition"}
-    fig, axes = plt.subplots(1, len(blocks), figsize=(3.8 * len(blocks), 3.2),
-                             squeeze=False, sharey=True)
-    for ax, (model, path, d) in zip(axes[0], blocks):
-        cat = cat_of(d, path)
-        route = d["routing"]
-        xs = np.arange(len(route))
-        ax.bar(xs, [r.get("margin_delta", 0.0) for r in route],
-               color=C_AUDIO, width=0.6)
-        ax.axhline(0, lw=0.9, color="black")
-        pc = (d.get("positive_control") or {}).get("margin_delta")
-        if pc is not None:
-            ax.axhline(pc, ls="--", lw=1.2, color=C_NEUTRAL,
-                       label="positive control")
-        ax.set_xticks(xs)
-        ax.set_xticklabels([labels.get(r["rows"], r["rows"]) for r in route],
-                           fontsize=8)
-        rec = d.get("routing_recovered_fraction")
-        ax.set_title("{} -- {}{}".format(
-            model.split("-")[0], PRETTY.get(cat, cat),
-            "\nrecovered fraction {:.2f}".format(rec) if rec is not None else ""),
-            fontsize=9)
-        ax.grid(axis="y", alpha=0.25)
-        ax.legend(loc="center left", fontsize=7)
-    axes[0][0].set_ylabel("margin gain [nats]")
-    fig.suptitle("The claim reaches the answer position by a detour", y=1.03)
-    save(fig, out_dir, "m11_routing")
-
+    save(fig, out_dir, "fig3_knockout_by_position")
 
 # --------------------------------------------------------------------------- #
-# m12 -- the generative intervention and its controls
+# the set, in argument order
 # --------------------------------------------------------------------------- #
-def m12_generative_fix(out_dir):
-    """The free-form result with the two controls that decide whether it counts.
-
-    gen-TDR excludes descriptions naming several labels or none, so its
-    denominator moves between conditions. That denominator is printed under
-    each point: the verdict logic refuses to call an effect below 15, and a
-    reader has to be able to see the same thing.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp6_readout_attenuation_*.json")
-              if d.get("freeform")]
-    if not blocks:
-        return skip("m12_generative_fix", "no freeform block in exp6 files")
-
-    fig, axes = plt.subplots(1, len(blocks), figsize=(4.8 * len(blocks), 3.6),
-                             squeeze=False, sharey=True)
-    for ax, (model, path, d) in zip(axes[0], blocks):
-        cat = cat_of(d, path)
-        # gamma=0.25 is inert at every band; interleaving it turns the panel
-        # into a sawtooth that hides the comparison. It belongs in the text.
-        ff = [r for r in d["freeform"]
-              if r.get("band") is None or r.get("gamma") in (None, 0.0)]
-        if not ff:
-            ax.set_visible(False)
-            continue
-        xs = np.arange(len(ff))
-        names = [r["condition"].replace(" g=0", "") for r in ff]
-
-        gt = [(r.get("mismatched") or {}).get("generative_tdr") for r in ff]
-        ci = [(r.get("mismatched") or {}).get("generative_tdr_ci95") for r in ff]
-        lo = [(g - c[0]) if (g is not None and c) else 0 for g, c in zip(gt, ci)]
-        hi = [(c[1] - g) if (g is not None and c) else 0 for g, c in zip(gt, ci)]
-        ax.errorbar(xs, [g if g is not None else np.nan for g in gt],
-                    yerr=[lo, hi], marker="o", ms=5, lw=1.6, capsize=3,
-                    color=C_TEXT, label="follows the false claim (gen-TDR)")
-        ax.plot(xs, [(r.get("matched") or {}).get("names_true_rate") for r in ff],
-                marker="s", ms=4, lw=1.4, color=C_NEUTRAL,
-                label="capability (claim true)")
-        txt = [(r.get("text_only") or {}).get("names_true_rate") for r in ff]
-        if any(v is not None for v in txt):
-            ax.plot(xs, [v if v is not None else np.nan for v in txt],
-                    marker="^", ms=4, lw=1.4, ls=":", color=C_CHANCE,
-                    label="cost (no audio)")
-        # The denominator, which is what makes an apparent effect readable.
-        # Sits above the plot rather than below it: under the axis it collides
-        # with the rotated condition labels.
-        for x, r in zip(xs, ff):
-            n_dec = (r.get("mismatched") or {}).get("decided")
-            if n_dec is not None:
-                ax.annotate("n={}".format(n_dec), xy=(x, 1.015),
-                            xycoords=("data", "axes fraction"), ha="center",
-                            fontsize=6.5, fontweight="bold" if n_dec < 15 else "normal",
-                            color=C_TEXT if n_dec < 15 else C_CHANCE)
-        ax.set_xticks(xs)
-        ax.set_xticklabels(names, rotation=30, ha="right", fontsize=8)
-        ax.set_ylim(-0.05, 1.05)
-        # pad clears the n= row printed just above the axes
-        ax.set_title("{} -- {}".format(model.split("-")[0],
-                                       PRETTY.get(cat, cat)), fontsize=9, pad=16)
-        ax.grid(axis="y", alpha=0.25)
-    axes[0][0].set_ylabel("rate")
-    axes[0][-1].legend(loc="center left", fontsize=7)
-    fig.suptitle("Attenuating the claim in open generation "
-                 "(n = descriptions naming exactly one label)", y=1.03)
-    save(fig, out_dir, "m12_generative_fix")
+# A list, not a dict: the order is part of the numbering, and the --only key is
+# the position. Each function's name is also its output filename.
+FIGURES = [
+    fig1_probe_accuracy_by_encoder_layer,
+    fig2_attribution_by_layer_and_position,
+    fig3_knockout_by_position,
+]
 
 
-# --------------------------------------------------------------------------- #
-# m13 -- generation quality
-# --------------------------------------------------------------------------- #
-def m13_generation_quality(out_dir):
-    """Does the intervention wreck the text? Cho et al. found circuit ablation
-    did, and a multiple-choice capability control cannot see that.
-
-    Log-probability is scored in a claim-free context, which is the load-bearing
-    detail: scored against the claim-bearing prompt, text that correctly
-    contradicts the claim is penalised as improbable and a working intervention
-    reports as degeneration.
-    """
-    blocks = [(m, p, d) for m, p, d in per_model("exp6_readout_attenuation_*.json")
-              if d.get("freeform")]
-    if not blocks:
-        return skip("m13_generation_quality", "no freeform block in exp6 files")
-
-    metrics = [("mean_token_logprob", "mean per-token log-prob"),
-               ("repetition_rate", "repetition rate"),
-               ("median_tokens", "median length [tokens]")]
-    fig, axes = plt.subplots(len(blocks), 3, figsize=(9.6, 2.9 * len(blocks)),
-                             squeeze=False)
-    for row, (model, path, d) in enumerate(blocks):
-        cat = cat_of(d, path)
-        ff = [r for r in d["freeform"]
-              if r.get("band") is None or r.get("gamma") in (None, 0.0)]
-        names = [r["condition"].replace(" g=0", "") for r in ff]
-        xs = np.arange(len(ff))
-        for col, (key, label) in enumerate(metrics):
-            ax = axes[row][col]
-            for sub, colour, marker in (("mismatched", C_TEXT, "o"),
-                                        ("matched", C_NEUTRAL, "s")):
-                ys = [(r.get(sub) or {}).get(key) for r in ff]
-                if any(v is not None for v in ys):
-                    ax.plot(xs, [v if v is not None else np.nan for v in ys],
-                            marker=marker, ms=4, lw=1.4, color=colour, label=sub)
-            ax.set_xticks(xs)
-            ax.set_xticklabels(names, rotation=30, ha="right", fontsize=7)
-            ax.set_ylabel(label, fontsize=8)
-            ax.grid(axis="y", alpha=0.25)
-            if col == 0:
-                ax.text(-0.34, 0.5, "{}\n{}".format(model.split("-")[0],
-                                                    PRETTY.get(cat, cat)),
-                        transform=ax.transAxes, rotation=90, va="center",
-                        ha="center", fontsize=8, fontweight="bold")
-        axes[row][-1].legend(fontsize=7, loc="best")
-    fig.suptitle("Generation quality under the intervention "
-                 "(scored by the unmodified model, claim removed)", y=1.0)
-    fig.tight_layout()
-    save(fig, out_dir, "m13_generation_quality")
-
-
-# --------------------------------------------------------------------------- #
-# m14 -- three-way outcome mass
-# --------------------------------------------------------------------------- #
-def m14_outcome_mass(out_dir):
-    """Where the answers actually go, across every model we ran.
-
-    LISTEN's point: a binary text-vs-audio ratio hides the items matching
-    neither cue, and on some models that residual is most of the mass. Stacked
-    bars keep all three visible.
-    """
-    sums = {}
-    for path in found("results", "*_summary.json"):
-        d = load(path)
-        if d and "per_category" in d:
-            sums[os.path.basename(path).replace("_summary.json", "")] = d
-    if not sums:
-        return skip("m14_outcome_mass", "no *_summary.json files")
-
-    models = sorted(sums)
-    cats = [c for c in CATEGORIES
-            if any(c in s["per_category"] for s in sums.values())]
-    fig, axes = plt.subplots(1, len(cats), figsize=(3.1 * len(cats), 3.4),
-                             squeeze=False, sharey=True)
-    for ax, cat in zip(axes[0], cats):
-        ys = np.arange(len(models))
-        text, audio, neither = [], [], []
-        for m in models:
-            t = (sums[m]["per_category"].get(cat) or {}).get("tdr") or {}
-            n = t.get("n_usable") or 0
-            text.append((t.get("follow_text") or 0) / n if n else 0)
-            audio.append((t.get("follow_audio") or 0) / n if n else 0)
-            neither.append((t.get("follow_neither") or 0) / n if n else 0)
-        ax.barh(ys, text, color=C_TEXT, label="follows text")
-        ax.barh(ys, audio, left=text, color=C_AUDIO, label="follows audio")
-        ax.barh(ys, neither, left=np.add(text, audio), color=C_CHANCE,
-                label="neither")
-        ax.set_yticks(ys)
-        ax.set_yticklabels(models, fontsize=7)
-        ax.set_xlim(0, 1)
-        ax.set_xlabel("share of conflict items")
-        ax.set_title(PRETTY.get(cat, cat), fontsize=9)
-        ax.grid(axis="x", alpha=0.25)
-    axes[0][-1].legend(loc="lower right", fontsize=7)
-    fig.suptitle("Under conflict, where does the answer come from?", y=1.02)
-    save(fig, out_dir, "m14_outcome_mass")
-
-
-# --------------------------------------------------------------------------- #
-# m15 -- the capability gate
-# --------------------------------------------------------------------------- #
-def m15_capability_gate(out_dir):
-    """The screen that decides which results may be read as suppression.
-
-    This is the figure behind two exclusions in the write-up -- SALMONN and the
-    sarcasm category -- so it earns a place in the paper rather than the
-    appendix. A bar that fails to clear its own chance line is the whole
-    argument for setting that model or category aside.
-    """
-    rows = []
-    for model, root in roots(every=True):      # exempt: see MECH_MODELS
-        d = load(os.path.join(root, "exp1_capability_screen.json"))
-        if not d:
-            continue
-        for cat in CATEGORIES:
-            sub = [r for r in (d.get("records") or [])
-                   if r["category"] == cat and r["condition"] == "Paralinguistic"
-                   and r["modality"] == "audio_only"]
-            if sub:
-                k = sum(bool(r["correct"]) for r in sub)
-                rows.append((model, cat, k, len(sub), 1.0 / sub[0]["n_options"],
-                             (d.get("screen_verdicts") or {}).get(cat)))
-    if not rows:
-        return skip("m15_capability_gate", "no exp1_capability_screen.json")
-
-    models = list(dict.fromkeys(r[0] for r in rows))
-    fig, axes = plt.subplots(1, len(models), figsize=(3.4 * len(models), 3.2),
-                             squeeze=False, sharey=True)
-    for ax, model in zip(axes[0], models):
-        mine = [r for r in rows if r[0] == model]
-        xs = np.arange(len(mine))
-        for x, (_, cat, k, n, ch, passed) in zip(xs, mine):
-            p, lo, hi = err_bars(k, n)
-            ax.bar([x], [p], width=0.55,
-                   color=C_NEUTRAL if passed else C_CHANCE,
-                   yerr=[[lo], [hi]], capsize=3, error_kw={"lw": 0.9})
-            ax.plot([x - 0.32, x + 0.32], [ch, ch], color=C_TEXT, lw=1.6)
-            ax.annotate("{}/{}".format(k, n), xy=(x, p + hi),
-                        xytext=(0, 3), textcoords="offset points",
-                        ha="center", fontsize=7, color=C_CHANCE)
-        ax.set_xticks(xs)
-        ax.set_xticklabels([PRETTY.get(r[1], r[1]) for r in mine],
-                           rotation=25, ha="right", fontsize=7.5)
-        ax.set_ylim(0, 1.08)
-        ax.set_title(model, fontsize=9)
-        ax.grid(axis="y", alpha=0.25)
-    axes[0][0].set_ylabel("audio-only accuracy")
-    # Proxy artists: an empty bar() produces a container with no patch, so the
-    # legend falls back to the colour cycle and both swatches come out blue.
-    handles = [matplotlib.lines.Line2D([], [], color=C_TEXT, lw=1.6,
-                                       label="chance"),
-               matplotlib.patches.Patch(color=C_NEUTRAL, label="passes screen"),
-               matplotlib.patches.Patch(color=C_CHANCE, label="fails -- excluded")]
-    axes[0][-1].legend(handles=handles, loc="upper right", fontsize=7)
-    fig.suptitle("Can the model do the task from audio alone? "
-                 "(the gate on every result below)", y=1.03)
-    save(fig, out_dir, "m15_capability_gate")
-
-
-# --------------------------------------------------------------------------- #
-FIGURES = {
-    "m1c": m1c_attribution_grid, "m2": m2_faithfulness, "m3": m3_group_magnitude,
-    "m4": m4_circuit_overlap, "m5": m5_probe_depth, "m6": m6_margin_distribution,
-    "m7": m7_backpatch_grid, "m8": m8_source_sweep, "m9": m9_norm_profile,
-    "m10": m10_layers_vs_positions, "m11": m11_routing, "m12": m12_generative_fix,
-    "m13": m13_generation_quality, "m14": m14_outcome_mass,
-    "m15": m15_capability_gate,
-}
+def resolve(keys):
+    """--only values -> functions. Accepts '1', 'fig1', or 'probe'."""
+    chosen, unknown = [], []
+    for k in keys:
+        want = str(k).lower().lstrip("f").lstrip("ig")
+        hit = None
+        for i, fn in enumerate(FIGURES, 1):
+            if str(k) in (str(i), "fig{}".format(i)) or want == str(i):
+                hit = fn
+            elif str(k).lower() in fn.__name__:
+                hit = fn
+            if hit:
+                break
+        (chosen if hit else unknown).append(hit or k)
+    if unknown:
+        raise SystemExit("unknown figure(s): {}\nknown: {}".format(
+            ", ".join(map(str, unknown)),
+            ", ".join("{} = {}".format(i, fn.__name__)
+                      for i, fn in enumerate(FIGURES, 1))))
+    return chosen
 
 
 def main(argv=None):
@@ -1251,14 +604,12 @@ def main(argv=None):
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default="figures")
     ap.add_argument("--only", nargs="*", default=None,
-                    help="figure keys to build, e.g. --only m1 m6")
+                    help="figures to build by number, e.g. --only 1 3")
     ap.add_argument("--categories", nargs="*", default=None,
-                    help="categories for the mechanism figures (default: {}). "
-                         "m14 and m15 always draw every category."
+                    help="categories to draw (default: {})"
                          .format(", ".join(MECH_CATEGORIES)))
     ap.add_argument("--models", nargs="*", default=None,
-                    help="models for the mechanism figures (default: {}). "
-                         "m14 and m15 always draw every model."
+                    help="models to draw (default: {})"
                          .format(", ".join(MECH_MODELS)))
     args = ap.parse_args(argv)
 
@@ -1277,20 +628,14 @@ def main(argv=None):
                 ", ".join(bad), ", ".join(CATEGORIES)))
         globals()["MECH_CATEGORIES"] = list(args.categories)
 
-    keys = args.only or list(FIGURES)
-    unknown = [k for k in keys if k not in FIGURES]
-    if unknown:
-        raise SystemExit("unknown figure(s): {}\nknown: {}".format(
-            ", ".join(unknown), ", ".join(FIGURES)))
-
-    print("writing {}/  (mechanism figures: {} | {})".format(
+    print("writing {}/  ({} | {})".format(
         args.out, ", ".join(MECH_MODELS), ", ".join(MECH_CATEGORIES)))
-    for k in keys:
+    for fn in resolve(args.only) if args.only else FIGURES:
         try:
-            FIGURES[k](args.out)
+            fn(args.out)
         except Exception as exc:                  # one bad figure must not
-            print("  ERROR in {}: {}: {}".format(  # block the rest
-                k, type(exc).__name__, exc))
+            print("  ERROR in {}: {}: {}".format(  # block the other two
+                fn.__name__, type(exc).__name__, exc))
     print("done")
     return 0
 
