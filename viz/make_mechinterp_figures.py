@@ -294,8 +294,9 @@ def fig1_probe_accuracy_by_encoder_layer(out_dir):
 
     axes[0][0].set_ylabel("linear-probe accuracy")
     cat = blocks[0][1]
-    fig.suptitle("The encoder does not discard the signal", y=1.10, fontsize=11)
-    fig.text(0.5, 1.03,
+    # No suptitle, by request. The scope note stays -- it is a limit on what the
+    # figure licenses, not a headline, and it moves up into the vacated band.
+    fig.text(0.5, 1.02,
              "{} clips, {}, {} actors.  exp2 covers speaker_identity only: this "
              "rules out encoder loss for speaker gender, not for prosody."
              .format(cat.get("n_clips"), cat.get("cv_scheme", ""),
@@ -555,13 +556,12 @@ def fig3_knockout_by_position(out_dir):
     # reference line.
     fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, 1.03),
                ncol=3, fontsize=7)
-    fig.suptitle("The claim reaches the answer through the tokens in between",
-                 y=1.17, fontsize=11)
-    # The layer sweep is the other half of this result. One line under the
-    # title is worth more than half a panel of flat caps, and it goes here
-    # rather than at the foot, where it lands on the group headers.
+    # No suptitle, by request. The layer sweep is the other half of this result
+    # and it is a finding rather than a headline, so it stays: one line is worth
+    # more than half a panel of flat caps, and it goes above the legend rather
+    # than at the foot, where it would land on the group headers.
     if band_note:
-        fig.text(0.5, 1.10, band_note, ha="center", fontsize=6.8,
+        fig.text(0.5, 1.09, band_note, ha="center", fontsize=6.8,
                  color=C_CHANCE)
     save(fig, out_dir, "fig3_knockout_by_position")
 
