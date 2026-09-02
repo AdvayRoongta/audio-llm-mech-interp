@@ -234,9 +234,49 @@ def fig_tdr_by_model(results_dir, out_dir):
 # --------------------------------------------------------------------------- #
 # fig 3 -- recency
 # --------------------------------------------------------------------------- #
+# Dropped from this figure only. AZeroS has no text_only inference path at all
+# (eval/run_azeros_eval.py: generate() requires an audio tensor), so a whole
+# condition of every category errors out rather than scoring -- 399 of 1197 for
+# prosody, 300 of 1200 for identity. Its claim-order numbers come from the
+# Mismatched text_audio items, which it can run, so this is an editorial call
+# about which models the paper shows rather than a data-validity one. Move it
+# into behavioural_summaries() to drop the model everywhere.
+RECENCY_EXCLUDE = {"azeros"}
+
+
+def _one_summary_per_model(sums):
+    """Collapse `<model>_run_<ts>_summary.json` onto `<model>`.
+
+    Every run writes its own summary file, so a model with two runs draws two
+    lines under two timestamped legend entries. Prefer the canonical
+    `<model>_summary.json`; fall back to the most recent run when that file
+    predates `tdr.by_order`, which desta25's and qwen2audio's do.
+    """
+    def has_order(d):
+        return any((b.get("tdr") or {}).get("by_order")
+                   for b in (d.get("per_category") or {}).values())
+
+    groups = {}
+    for name, d in sums.items():
+        groups.setdefault(name.split("_run_")[0], []).append((name, d))
+
+    out = {}
+    for base, items in groups.items():
+        canon = [d for n, d in items if n == base and has_order(d)]
+        if canon:
+            out[base] = canon[0]
+            continue
+        runs = sorted((n, d) for n, d in items if has_order(d))
+        if runs:
+            out[base] = runs[-1][1]          # latest timestamp
+    return out
+
+
 def fig_recency(results_dir, out_dir):
     recs = exp1_records(results_dir)
-    sums = behavioural_summaries(results_dir)
+    sums = _one_summary_per_model(
+        {m: d for m, d in behavioural_summaries(results_dir).items()
+         if m.split("_run_")[0] not in RECENCY_EXCLUDE})
     series = {}
 
     if recs:
