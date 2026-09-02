@@ -43,6 +43,15 @@ except ImportError:                                   # noqa: E402
         "Nothing else here needs a third-party package.")
 
 CATEGORIES = ["emotional_prosody", "speaker_identity", "sarcasm_pacing"]
+
+# Models kept out of the behavioural comparison figures. AZeroS has no text-only
+# inference path at all -- eval/run_azeros_eval.py:63-75, generate() requires an
+# audio tensor -- so a whole condition of every category is recorded as an error
+# rather than scored: 399 of 1197 items for prosody, 300 of 1200 for identity.
+# It is also absent from the paper's model list. Its Mismatched text_audio items
+# do run, so this is a choice about what the paper shows rather than a
+# data-validity rule; applies to fig2 and fig3 only.
+EXCLUDE_MODELS = {"azeros"}
 PRETTY = {"emotional_prosody": "Emotional prosody",
           "speaker_identity": "Speaker identity",
           "sarcasm_pacing": "Sarcasm / pacing"}
@@ -109,6 +118,52 @@ def skip(name, why):
 def exp1_records(results_dir):
     d = load(os.path.join(results_dir, "exp1_capability_screen.json"))
     return d.get("records") if d else None
+
+
+# Models whose behavioural summary predates tdr.by_modality but which do have a
+# per-item capability screen in their own results subdirectory. TDR is recomputed
+# from those records, restricted to Mismatched + text_audio, so the bar lands on
+# the same denominator as the summary-sourced ones. Same subdirectory convention
+# as MODEL_ROOTS in make_mechinterp_figures.py.
+#
+# salmonn_summary.json does carry a pooled `tdr`, but it is a different and much
+# smaller run -- 60 Mismatched items per category against 266/300/140 here -- and
+# it does not separate modalities. Using it would put one bar on a different
+# metric and a 60-item denominator beside bars built from 266-300.
+RECORD_SOURCED = {"salmonn": "salmonn"}
+
+
+def tdr_from_records(recs, cat):
+    """(text_claim, n_usable) on Mismatched + text_audio, or (None, None).
+
+    Mirrors what a summary's tdr.by_modality.text_audio block stores: usable
+    means the claimed option resolved, and text_claim counts prediction ==
+    claimed. Every SALMONN record in these categories carries `claimed`, so the
+    two counts coincide there, but the filter is kept for whatever comes next.
+    """
+    if not recs:
+        return None, None
+    usable = [r for r in recs
+              if r.get("category") == cat
+              and r.get("condition") == "Mismatched"
+              and r.get("modality") == "text_audio"
+              and r.get("claimed")]
+    if not usable:
+        return None, None
+    return sum(1 for r in usable if r.get("prediction") == r.get("claimed")), len(usable)
+
+
+def record_sourced_models(results_dir):
+    """{model: records} for the models in RECORD_SOURCED that have a screen."""
+    out = {}
+    for model, subdir in RECORD_SOURCED.items():
+        if model in EXCLUDE_MODELS:
+            continue
+        d = load(os.path.join(results_dir, subdir, "exp1_capability_screen.json"))
+        recs = (d or {}).get("records")
+        if recs:
+            out[model] = recs
+    return out
 
 
 def behavioural_summaries(results_dir):
@@ -179,21 +234,28 @@ def fig_condition_ladder(results_dir, out_dir):
 # fig 2 -- TDR across models
 # --------------------------------------------------------------------------- #
 def fig_tdr_by_model(results_dir, out_dir):
-    sums = behavioural_summaries(results_dir)
-    if not sums:
+    # One bar per model, not one per run: every eval writes its own summary, so
+    # the raw glob draws desta25, phi4mm and qwen2audio two or three times each.
+    sums = _one_summary_per_model(
+        {m: d for m, d in behavioural_summaries(results_dir).items()
+         if m.split("_run_")[0] not in EXCLUDE_MODELS})
+    # SALMONN's summary predates tdr.by_modality; its bar is recomputed from the
+    # per-item screen instead. Summary-sourced models win, so nothing draws twice.
+    recs_by_model = {m: r for m, r in record_sourced_models(results_dir).items()
+                     if m not in sums}
+    if not sums and not recs_by_model:
         return skip("fig2_tdr_by_model", "no *_summary.json files")
 
-    models = sorted(sums)
-    cats = [c for c in CATEGORIES if any(c in s["per_category"] for s in sums.values())]
+    models = sorted(set(sums) | set(recs_by_model))
+    cats = [c for c in CATEGORIES
+            if any(c in d["per_category"] for d in sums.values())
+            or any(tdr_from_records(r, c)[1] for r in recs_by_model.values())]
     if not cats:
         return skip("fig2_tdr_by_model", "summaries carry no categories")
 
-    fig, ax = plt.subplots(figsize=(1.9 * len(cats) + 2.4, 3.2))
-    width = 0.8 / max(1, len(models))
-    plotted, stale = 0, []
-    for i, model in enumerate(models):
-        ys, los, his, xs = [], [], [], []
-        for j, cat in enumerate(cats):
+    def rate_for(model, cat):
+        """(text_claim, n_usable) from whichever source holds this model."""
+        if model in sums:
             blk = sums[model]["per_category"].get(cat, {})
             # text_audio only, and no fallback to the pooled 'tdr' field: that
             # one mixes in text_only items whose correct answer IS the claim by
@@ -202,7 +264,16 @@ def fig_tdr_by_model(results_dir, out_dir):
             # reported as stale rather than quietly plotted wrong.
             ta = (((blk.get("tdr") or {}).get("by_modality") or {})
                   .get("text_audio") or {})
-            n, t = ta.get("n_usable"), ta.get("text_claim")
+            return ta.get("text_claim"), ta.get("n_usable")
+        return tdr_from_records(recs_by_model[model], cat)
+
+    fig, ax = plt.subplots(figsize=(1.9 * len(cats) + 2.4, 3.2))
+    width = 0.8 / max(1, len(models))
+    plotted, stale = 0, []
+    for i, model in enumerate(models):
+        ys, los, his, xs = [], [], [], []
+        for j, cat in enumerate(cats):
+            t, n = rate_for(model, cat)
             if not n:
                 stale.append("{}/{}".format(model, cat))
                 continue
@@ -226,7 +297,10 @@ def fig_tdr_by_model(results_dir, out_dir):
     ax.set_ylabel("text-dominance rate")
     ax.set_ylim(0, 1.05)
     ax.set_title("How often the model believes the text over the audio")
-    ax.legend(ncol=min(3, len(models)), loc="lower right")
+    # Below the axes, not inside them. With six models and SALMONN's bars filling
+    # the lower right of the identity group, an in-axes legend lands on the data.
+    ax.legend(ncol=min(6, len(models)), loc="upper center",
+              bbox_to_anchor=(0.5, -0.11), fontsize=8)
     ax.grid(axis="y", alpha=0.25)
     save(fig, out_dir, "fig2_tdr_by_model")
 
@@ -234,16 +308,6 @@ def fig_tdr_by_model(results_dir, out_dir):
 # --------------------------------------------------------------------------- #
 # fig 3 -- recency
 # --------------------------------------------------------------------------- #
-# Dropped from this figure only. AZeroS has no text_only inference path at all
-# (eval/run_azeros_eval.py: generate() requires an audio tensor), so a whole
-# condition of every category errors out rather than scoring -- 399 of 1197 for
-# prosody, 300 of 1200 for identity. Its claim-order numbers come from the
-# Mismatched text_audio items, which it can run, so this is an editorial call
-# about which models the paper shows rather than a data-validity one. Move it
-# into behavioural_summaries() to drop the model everywhere.
-RECENCY_EXCLUDE = {"azeros"}
-
-
 def _one_summary_per_model(sums):
     """Collapse `<model>_run_<ts>_summary.json` onto `<model>`.
 
@@ -276,7 +340,7 @@ def fig_recency(results_dir, out_dir):
     recs = exp1_records(results_dir)
     sums = _one_summary_per_model(
         {m: d for m, d in behavioural_summaries(results_dir).items()
-         if m.split("_run_")[0] not in RECENCY_EXCLUDE})
+         if m.split("_run_")[0] not in EXCLUDE_MODELS})
     series = {}
 
     if recs:
