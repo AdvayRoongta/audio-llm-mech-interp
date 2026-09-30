@@ -2,7 +2,7 @@
 
 Official code and data for the paper.
 
-**[Dataset](data/)** · **[Experiments](eval/)** · **[Results](results/)** · **[Running on an A100](modal/MODAL.md)**
+**[Dataset](data/)** · **[Experiments](eval/)** · **[Results](results/)**
 
 ---
 
@@ -123,9 +123,8 @@ python3 -m modal run modal/modal_app.py::experiment --name exp6_readout_attenuat
         --args "--category emotional_prosody"
 ```
 
-Run them in order: `exp1` is a precondition for the rest. They share `eval/_common.py`,
-which imports the dataset, prompt and option conventions from the behavioural runner so
-the two cannot drift apart. Two backends are selected with `MECH_BACKEND` (`qwen`,
+They share `eval/_common.py`, which imports the dataset, prompt and option conventions
+from the behavioural runner so the two cannot drift apart. Two backends are selected with `MECH_BACKEND` (`qwen`,
 `salmonn`). Every script records dtype, quantisation, attention implementation and seed
 in its output.
 
@@ -134,22 +133,6 @@ in its output.
 ```bash
 python3 viz/make_figures.py              # fig1-fig7, the paper figures
 python3 viz/make_mechinterp_figures.py   # m1-m16, the mechanistic appendix
-```
-
-Both read whatever is in `results/` and skip any figure whose inputs are missing, so they
-are safe to run mid-sweep. Vector PDF for the paper, PNG for slides.
-
----
-
-## Citation
-
-```bibtex
-@inproceedings{paralinguistic-text-dominance-2026,
-  title     = {Text Dominance in Paralinguistic Conflict: Tracing Suppression
-               Through Audio {LLM} Circuits},
-  booktitle = {NeurIPS 2026 Workshop on Interpretability as a Science},
-  year      = {2026},
-}
 ```
 
 ---
